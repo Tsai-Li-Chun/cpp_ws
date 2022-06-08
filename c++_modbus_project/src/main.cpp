@@ -7,13 +7,13 @@
 
 /* System Includes ------------------------------------------*/
 /* System Includes Begin */
+#include <unistd.h>
 #include <iostream>
-#include <memory>
-#include "modbus/modbus.h"
 /* System Includes End */
 /* User Includes --------------------------------------------*/
 /* User Includes Begin */
 #include "main.hpp"
+#include "Modbus_Handshake.hpp"
 /* User Includes End */
 
 /* namespace ------------------------------------------------*/
@@ -53,68 +53,47 @@
 /* Program Begin */
 
 /** * @brief  Program entry point.
- 	* @param argc(int) : Number of input parameters
- 	* @param argv(int) : input parameters
+ 	* @param argc(int) Number of input parameters
+ 	* @param argv(int) input parameters
  	* @return (int) Program Error.
 **	**/
 int main(int argc, char **argv)
 {
+	uint8_t i;
+	int delay_time=0;
+	char c[255];
+
 	/* 隨便顯示些東西證明程式運作 */
 	std::cout << "modbus" << std::endl;
+	/* 建立modbus通訊物件 */
+	Modbus_Handshake MH("192.168.0.161");
 
-	/* 建立modbus通訊結構體 */
-	modbus_t *mb;
-	/* 建立資料暫存陣列 */
-	uint8_t tab_reg[nb];
-	uint8_t coils[nb];
-	/* 宣告存放libmodbus-API的return值 */
-	int rc;
-	uint32_t to_sec;
-	uint32_t to_usec;
-
-	/* 初始化modbus通訊設定 */
-	mb = modbus_new_tcp("192.168.0.183",502);
-	rc = modbus_set_slave(mb,1);
-	std::cout << rc << " : " << modbus_strerror(errno) << std::endl;
-	/* 建立連結 */
-	rc = modbus_connect(mb);
-	std::cout << rc << " : " << modbus_strerror(errno) << std::endl;
-
-
-	modbus_get_byte_timeout( mb ,&to_sec ,&to_usec );
-	// std::cout << unsigned(to_sec) << " -- " << unsigned(to_usec) << std::endl;
-	modbus_get_response_timeout( mb ,&to_sec ,&to_usec );
-	// std::cout << unsigned(to_sec) << " -- " << unsigned(to_usec) << std::endl;
-
-	/* FC02,讀取DI暫存器,從start_address開始往後讀nb個 */
-	rc = modbus_read_input_bits(mb, start_address, nb, tab_reg);
-	std::cout << rc << std::endl;
-	for( int i=(rc-1); i>=0; i-- )
-		std::cout << unsigned(tab_reg[i]);
-	std::cout << std::endl;
-
-	// /* FC05,寫單1個DO暫存器 */
-	// rc = modbus_write_bit(mb, 16, FALSE);
-	// std::cout << rc << " : " << modbus_strerror(errno) << std::endl;
-	// rc = modbus_write_bit(mb, 17, FALSE);
-	// std::cout << rc << " : " << modbus_strerror(errno) << std::endl;
-	// rc = modbus_write_bit(mb, 18, FALSE);
-	// std::cout << rc << " : " << modbus_strerror(errno) << std::endl;
-	// rc = modbus_write_bit(mb, 19, FALSE);
-	// std::cout << rc << " : " << modbus_strerror(errno) << std::endl;
-
-	/* FC05,寫DO暫存器,從start_address開始往後讀nb個 */
-	coils[0] = FALSE;
-	coils[1] = FALSE;
-	coils[2] = FALSE;
-	coils[3] = FALSE;	
-	rc = modbus_write_bits(mb, 16, nb, coils);
-	std::cout << rc << " : " << modbus_strerror(errno) << std::endl;	
-
-	/* 關閉連結 */
-	modbus_close(mb);
-	/* 釋放modbus通訊結構體的位址 */
-	modbus_free(mb);
+    while (1)
+	{
+		if( delay_time == 500 )
+		{
+			printf("program runiong...\n");
+			delay_time = 0;
+		}
+		else
+		{
+			delay_time++;
+			usleep(1000);
+		}
+		fflush(stdout);
+		i=0;
+		while( MH._kbhit() )
+		{
+			c[i] = getchar();
+			i++;
+		}
+		if(i != 0)
+		{
+			printf("%d:\n",i);
+			for( int j=0;j<i; j++ )
+			printf("%d\n",c[j]);
+		}
+    }
 
 	/* main quit */
 	return 0;

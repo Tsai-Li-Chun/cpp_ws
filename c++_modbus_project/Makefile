@@ -24,7 +24,7 @@ OPT = -O0
 src_path = src/
 # headle file paths
 inc_path = -Iinc/ \
-		   $(shell pkg-config --cflags libmodbus)
+		   -I/usr/local/include/modbus
 # object file paths
 obj_path = build/
 
@@ -32,18 +32,20 @@ obj_path = build/
 # link script & libraries
 #######################################
 # libraries
-libs = $(shell pkg-config --libs libmodbus)
+libs = -L/usr/local/lib -lmodbus
 
 ############################################################################
 #	compile gcc flags
 #######################################
 # Generate dependency information
-CFLAGS = -MMD -MP $(inc_path)
+CFLAGS = -std=c++11 -O0 -MMD -MP $(inc_path)
 
 ############################################################################
 #	source code
 ######################################
-c_sources = $(shell ls $(src_path)*.cpp)
+c_sources = \
+	src/main.cpp \
+	src/Modbus_Handshake.cpp \
 
 ############################################################################
 #	object file
@@ -62,13 +64,13 @@ dep     = $(patsubst %.o, %.d, $(obj))
 all: $(target)
 	@echo "target $< complete"
 $(target): $(obj)
-	g++ -o $@ $^ $(libs)
+	g++ $^ -o $@ $(libs)
 
 ############################################################################
 # build the application
 #######################################
 -include $(dep)
-$(obj): $(c_sources) Makefile
+${obj_path}%.o: ${src_path}%.cpp Makefile
 	g++ $(CFLAGS) -c $< -o $@
 
 
