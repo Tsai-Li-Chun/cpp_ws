@@ -13,6 +13,9 @@
 /* System Includes Begin */
 #include <termios.h>
 #include <sys/ioctl.h>
+#include <linux/input.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include "modbus/modbus.h"
 /* System Includes End */
 /* User Includes --------------------------------------------*/
@@ -27,6 +30,13 @@
 
 /* Extern Typedef -------------------------------------------*/
 /* Extern Typedef Begin */
+
+union modbus_32Format
+{
+    float f;
+    uint16_t ch[ (sizeof(f))/sizeof(uint16_t) ];
+};
+
 /* Extern Typedef End */
 
 
@@ -40,15 +50,20 @@ class Modbus_Handshake
 private:
 	/* 建立modbus通訊結構體 */
 	modbus_t* mb;
-	/* kbhit用設定文件旗標 */
-	const int STDIN = 0;
-	/* kbhit用判斷鍵盤緩衝區有無資料旗標 */
-	int bytesWaiting;
+	/* 宣告檔案描述符 */
+	int keys_fd;
+	/* 宣告input事件結構體 */
+	input_event kb;
+	/* 宣告按鍵指標 */
+	int up=0,down=0,left=0,right=0;
+	/* 宣告中心速度&角速度 */
+	modbus_32Format vel,yaw;
+	modbus_32Format vel_d,yaw_d;
 
 	/* 設定連結函數 */
 	int Modbus_slave_connect(int slave);
-	/* 鍵盤緩衝區初始化函數 */
-	int kbhit_init(void);
+	/* 鍵盤文件初始化函數 */
+	int kb_event_init(void);
 
 /* 公有成員 */
 public:
@@ -58,8 +73,13 @@ public:
 	Modbus_Handshake(const char* device, int BR, char parity='N', int data_bit=8, int stop_bit=1, int slave=1);
 	/* 解建構函數 */
 	~Modbus_Handshake();
-	/* 判斷鍵盤緩衝區有無資料函數 */
-	int _kbhit(void);
+	/* 獲取鍵盤方向鍵轉車子方向函數 */
+	void keyborad_to_cardir(void);
+	/* 發送車子速度指令 */
+	void send_speed(void);
+
+	float getvel(void);
+	float getyaw(void);
 
 };
 

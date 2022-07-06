@@ -65,7 +65,10 @@ Modbus_Handshake::Modbus_Handshake(const char* IP, int port, int slave)
 		printf("Modbus TCP Mode Setup Failure!\n");
 
 	/* 鍵盤緩衝區初始化函數 */
-	kbhit_init();
+	kb_event_init();
+
+	vel.f = 0; yaw.f = 0;
+	modbus_write_bit(mb,9,TRUE);
 }
 
 /** * @brief Constructor - RTU Mode
@@ -84,8 +87,8 @@ Modbus_Handshake::Modbus_Handshake(const char* device, int BR, char parity, int 
 	if( Modbus_slave_connect(slave) != 0 )
 		printf("Modbus RTU Mode Setup Failure!\n");
 	
-	/* 鍵盤緩衝區初始化函數 */
-	kbhit_init();
+	/* 鍵盤文件初始化函數 */
+	kb_event_init();
 }
 
 /** * @brief Setup SlaveID & Connect
@@ -136,26 +139,19 @@ int Modbus_Handshake::Modbus_slave_connect(int slave)
 	return 0;
 }
 
-/** * @brief 鍵盤緩衝區初始化函數
+/** * @brief 鍵盤文件初始化函數
  	* @param None
  	* @return None 
 **	**/
-int Modbus_Handshake::kbhit_init(void)
-{	/* Use termios to turn off line buffering */
-	int rc = 0;
-	termios term;
-	tcgetattr(STDIN, &term);
-	term.c_lflag &= ~ICANON;
-	rc = tcsetattr(STDIN, TCSANOW, &term);
-	setbuf(stdin, NULL);
-	if( rc != 0 )
-	{	/* 若設定失敗,打印訊息,退出建構函數 */
-		printf("KeyBoard Buffer SetUp Failure!\n");
-		return rc;
+int Modbus_Handshake::kb_event_init(void)
+{
+	/* 已只讀模式開啟鍵盤文件,並設置為非阻塞 */
+	keys_fd = open("/dev/input/event6",O_RDONLY|O_NONBLOCK);
+	if(keys_fd == (-1))
+	{	/* 若開啟失敗,打印消息並跳出 */
+		printf("Open /dev/input/event6 Error");
+		return -1;
 	}
-
-	/* 若連結成功,打印訊息 */
-	printf("KeyBoard Buffer SetUp Success\n");
 	/* 關閉終端機本身緩衝區返饋 */
 	system("stty -echo");
 	return 0;
@@ -173,18 +169,65 @@ Modbus_Handshake::~Modbus_Handshake()
 	modbus_free(mb);
 	/* 打印關閉訊息 */
 	printf("modbus connect close\n");
+	/* 開啟終端機本身緩衝區返饋 */
+	system("stty echo");
 }
 
 
-/** * @brief 判斷鍵盤緩衝區有無資料函數
+/** * @brief 獲取鍵盤方向鍵轉車子方向函數
  	* @param None
- 	* @return int, 緩衝區有資料(1), 反之(0)
+ 	* @return None
 **	**/
-int Modbus_Handshake::_kbhit(void)
+void Modbus_Handshake::keyborad_to_cardir(void)
 {
-	bytesWaiting = 0;
-    ioctl(STDIN, FIONREAD, &bytesWaiting);
-    return bytesWaiting;
+	/* 讀取鍵盤文件內容,若讀取資料結構錯誤,跳回迴圈開頭 */
+	// if( read(keys_fd,&kb,sizeof(kb)) != sizeof(kb) ) continue;
+	/* 讀取鍵盤文件內容 */
+	read(keys_fd,&kb,sizeof(kb));
+	/* 若事件為按鈕按下事件 */
+	if( kb.type == EV_KEY )
+	{	/* 獲取鍵值與該鍵按放狀態 */
+		if( kb.code == KEY_UP ) up = kb.value;
+		if( kb.code == KEY_DOWN ) down = kb.value;
+		if( kb.code == KEY_LEFT ) left = kb.value;
+		if( kb.code == KEY_RIGHT ) right = kb.value;
+		/* 打印獲取鍵值與該鍵按放狀態,除錯用 */
+		// printf("%d,%d\n",kb.code,kb.value);
+		/* 依鍵值與按放狀態換車子方向 */
+		yaw.f = left>0? 0.8 : right>0? -0.8 : 0;
+		vel.f = up>0? 0.8 : down>0? -0.8 : 0;
+		modbus_write_registers(mb,21,2,vel.ch);
+		modbus_write_registers(mb,25,2,vel.ch);
+	}
+}
+
+/** * @brief 發送車子速度指令
+ 	* @param None
+ 	* @return None
+**	**/
+void Modbus_Handshake::send_speed(void)
+{
+	// vel_d.f = 0.2;
+	// yaw_d.f = 0.2;
+	// modbus_write_registers(mb,14,2,vel_d.ch);
+	// modbus_write_registers(mb,18,2,yaw_d.ch);
+	// vel.f = 0.5; vel_d.f = 0.2;
+	// modbus_write_registers(mb,21,2,vel.ch);
+	// modbus_write_registers(mb,14,2,vel_d.ch);
+	// yaw.f = 0.5; yaw_d.f = 0.2;
+	// modbus_write_registers(mb,25,2,yaw.ch);
+	// modbus_write_registers(mb,18,2,yaw_d.ch);
+	vel.f = 0.5;
+	modbus_write_registers(mb,4,2,vel.ch);
+}
+
+float Modbus_Handshake::getvel(void)
+{
+	return vel.f;
+}
+float Modbus_Handshake::getyaw(void)
+{
+	return yaw.f;
 }
 
 

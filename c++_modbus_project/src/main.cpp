@@ -7,8 +7,11 @@
 
 /* System Includes ------------------------------------------*/
 /* System Includes Begin */
-#include <unistd.h>
 #include <iostream>
+#include <linux/input.h>
+#include <fcntl.h>
+#include <unistd.h>
+
 /* System Includes End */
 /* User Includes --------------------------------------------*/
 /* User Includes Begin */
@@ -59,41 +62,21 @@
 **	**/
 int main(int argc, char **argv)
 {
-	uint8_t i;
-	int delay_time=0;
-	char c[255];
-
 	/* 隨便顯示些東西證明程式運作 */
 	std::cout << "modbus" << std::endl;
+	/* 關閉終端機本身緩衝區返饋 */
+	system("stty -echo");
 	/* 建立modbus通訊物件 */
 	Modbus_Handshake MH("192.168.0.161");
 
-    while (1)
+	/* main loop */
+	while(1)
 	{
-		if( delay_time == 500 )
-		{
-			printf("program runiong...\n");
-			delay_time = 0;
-		}
-		else
-		{
-			delay_time++;
-			usleep(1000);
-		}
-		fflush(stdout);
-		i=0;
-		while( MH._kbhit() )
-		{
-			c[i] = getchar();
-			i++;
-		}
-		if(i != 0)
-		{
-			printf("%d:\n",i);
-			for( int j=0;j<i; j++ )
-			printf("%d\n",c[j]);
-		}
-    }
+		// MH.keyborad_to_cardir();
+		MH.send_speed();
+		usleep(100*1000);
+		// printf("%d,%d\n",MH.getvel(),MH.getyaw());
+	}
 
 	/* main quit */
 	return 0;
