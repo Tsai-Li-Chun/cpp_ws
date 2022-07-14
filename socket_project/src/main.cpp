@@ -7,16 +7,12 @@
 
 /* System Includes ------------------------------------------*/
 /* System Includes Begin */
-#include <iostream>
-#include <linux/input.h>
-#include <fcntl.h>
-#include <unistd.h>
-
+#include <stdio.h>
+#include <sys/socket.h>
 /* System Includes End */
 /* User Includes --------------------------------------------*/
 /* User Includes Begin */
-#include "main_modbus.hpp"
-#include "Modbus_Handshake.hpp"
+#include "main_socket.hpp"
 /* User Includes End */
 
 /* namespace ------------------------------------------------*/
@@ -55,30 +51,14 @@
 /* ---------------------------------------------------------*/
 /* Program Begin */
 
-/** * @brief  Program entry point.
- 	* @param argc(int) Number of input parameters
- 	* @param argv(int) input parameters
- 	* @return (int) Program Error.
-**	**/
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
-	/* 隨便顯示些東西證明程式運作 */
-	std::cout << "modbus" << std::endl;
-	/* 關閉終端機本身緩衝區返饋 */
-	system("stty -echo");
-	/* 建立modbus通訊物件 */
-	Modbus_Handshake MH("192.168.0.161");
+	int socketfd = 0;
+	socketfd = socket(AF_INET, SOCK_STREAM, 0);
 
-	/* main loop */
-	while(1)
-	{
-		// MH.keyborad_to_cardir();
-		MH.send_speed();
-		usleep(100*1000);
-		// printf("%d,%d\n",MH.getvel(),MH.getyaw());
-	}
+	// if(socketfd == -1)
+	// 	printf("Fail to create a socket");
 
-	/* main quit */
 	return 0;
 }
 

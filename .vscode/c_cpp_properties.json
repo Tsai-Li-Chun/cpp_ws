@@ -3,7 +3,8 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/c++_modbus_project/inc/**"
+                "${workspaceFolder}/c++_modbus_project/inc/**",
+                "${workspaceFolder}/socket_project/inc/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",
