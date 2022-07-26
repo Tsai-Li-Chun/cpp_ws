@@ -1,12 +1,12 @@
 /** ******************************************************
-	* @file		main.h
+	* @file		main_server.hpp
 	* @author	Tsai,Li-chun
 	******************************************************
 **	**/
 
 /* Define to prevent recursive inclusi ----------------------*/
-#ifndef __main_HPP__
-#define __main_HPP__
+#ifndef __main_server_HPP__
+#define __main_server_HPP__
 
 
 /* System Includes ------------------------------------------*/
@@ -42,6 +42,6 @@
 /* Function End */
 
 
-#endif /*__ main_HPP__ */
+#endif /* __main_server_HPP__ */
 
 /* ***** END OF main.HPP ***** */

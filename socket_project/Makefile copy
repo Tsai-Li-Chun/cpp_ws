@@ -10,7 +10,6 @@
 #	target
 ######################################
 target_s = server
-target_c = client
 
 ############################################################################
 #	project file paths
@@ -42,18 +41,14 @@ CFLAGS = -std=c++11 -MMD -MP $(opt) $(inc_path)
 ############################################################################
 #	source code
 ######################################
-c_sources_s	= \
+c_sources = \
 	$(src_path)main_server.cpp
-c_sources_c	= \
-	$(src_path)main_client.cpp
 
 ############################################################################
 #	object file
 ######################################
-obj_tmp_s	= $(subst $(src_path), $(obj_path), $(c_sources_s))
-obj_s		= $(patsubst %.cpp, %.o, $(obj_tmp_s))
-obj_tmp_c	= $(subst $(src_path), $(obj_path), $(c_sources_c))
-obj_c		= $(patsubst %.cpp, %.o, $(obj_tmp_c))
+obj_tmp	= $(subst $(src_path), $(obj_path), $(c_sources))
+obj     = $(patsubst %.cpp, %.o, $(obj_tmp))
 
 ############################################################################
 #	dependency file
@@ -63,14 +58,9 @@ dep     = $(patsubst %.o, %.d, $(obj))
 ############################################################################
 # default action: build all
 ######################################
-ser: $(target_s)
+ser: $(target)
 	@echo "target $< complete"
-$(target_s): $(obj_s)
-	g++ $^ -o $@ $(libs)
-
-cli: $(target_c)
-	@echo "target $< complete"
-$(target_c): $(obj_c)
+$(target): $(obj)
 	g++ $^ -o $@ $(libs)
 
 ############################################################################
@@ -86,5 +76,5 @@ ${obj_path}%.o: ${src_path}%.cpp Makefile
 #######################################
 .PHONY: clean
 clean:
-	rm -f *.o *.d $(target_s) $(target_c)
+	rm -f *.o *.d $(target)
 	rm -f $(obj_path)*.o $(obj_path)*.d
