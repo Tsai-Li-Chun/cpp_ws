@@ -2,14 +2,20 @@
 #	Generic Makefile (based on gcc)
 #	Author	：Tsai,Li-chun
 #	OS		：Ubuntu20.04 TLS
-#	Brief	：c++ modbus project
+#	Brief	：isPhoXiControlRunning
 # ------------------------------------------------
 
 
 ############################################################################
 #	target
 ######################################
-target_s = server
+target  = template_api_test
+
+############################################################################
+#	building variables
+######################################
+# optimization
+OPT = -O0
 
 ############################################################################
 #	project file paths
@@ -17,7 +23,9 @@ target_s = server
 # source code file paths
 src_path = src/
 # headle file paths
-inc_path = -Iinc/
+inc_path = -Iinc/ \
+		   -I/opt/PhotoneoSDK/Localization/include/PhoXi_API/ \
+		   -I/opt/PhotoneoSDK/Localization/include/ \
 # object file paths
 obj_path = build/
 
@@ -25,24 +33,19 @@ obj_path = build/
 # link script & libraries
 #######################################
 # libraries
-
-############################################################################
-#	building variables
-######################################
-# optimization
-opt = -O0
+libs = -Wl,-rpath,/opt/Photoneo/PhoXiControl-1.11.1/API/lib /opt/Photoneo/PhoXiControl-1.11.1/API/lib/libPhoXi_API_gcc9.3.0_Release.so -lrt
 
 ############################################################################
 #	compile gcc flags
 #######################################
 # Generate dependency information
-CFLAGS = -std=c++11 -MMD -MP $(opt) $(inc_path)
+CFLAGS = -std=c++11 -O0 -MMD -MP $(inc_path)
 
 ############################################################################
 #	source code
 ######################################
 c_sources = \
-	$(src_path)main_server.cpp
+	src/main.cpp \
 
 ############################################################################
 #	object file
@@ -58,7 +61,8 @@ dep     = $(patsubst %.o, %.d, $(obj))
 ############################################################################
 # default action: build all
 ######################################
-ser: $(target)
+$(shell if [ ! -e 'build' ]; then mkdir -p build; fi)
+all: $(target)
 	@echo "target $< complete"
 $(target): $(obj)
 	g++ $^ -o $@ $(libs)

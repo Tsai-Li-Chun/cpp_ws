@@ -61,6 +61,7 @@ dep     = $(patsubst %.o, %.d, $(obj))
 ############################################################################
 # default action: build all
 ######################################
+$(shell if [ ! -e 'build' ]; then mkdir -p build; fi)
 all: $(target)
 	@echo "target $< complete"
 $(target): $(obj)

@@ -3,11 +3,14 @@
         {
             "name": "Linux",
             "includePath": [
+                "/opt/PhotoneoSDK/Localization/include/PhoXi_API/**",
+                "/opt/PhotoneoSDK/Localization/include/**",
                 "${workspaceFolder}/c++_modbus_project/inc/**",
-                "${workspaceFolder}/socket_project/inc/**"
+                "${workspaceFolder}/socket_project/inc/**",
+                "${workspaceFolder}/Photoneo_isPhoXiControlRunning/inc/**"
             ],
             "defines": [],
-            "compilerPath": "/usr/bin/clang",
+            "compilerPath": "/usr/bin/g++",
             "cStandard": "c11",
             "cppStandard": "c++17",
             "intelliSenseMode": "clang-x64"
