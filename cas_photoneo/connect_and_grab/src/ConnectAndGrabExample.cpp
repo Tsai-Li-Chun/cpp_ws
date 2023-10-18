@@ -15,6 +15,8 @@
 
 /* print Devices Information function */
 void printDeviceInfoList(const pho::api::PhoXiDeviceInformation);
+/* software trigger single scan function */
+bool SoftwareTrigger_SingleScan(const pho::api::PPhoXi);
 
 /** * @brief  Program entry point.
  	* @param argc(int) Number of input parameters
@@ -84,7 +86,11 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-
+    /* software single scan trigger */
+    if(SoftwareTrigger_SingleScan(PhoXiDevice))
+        std::cout << "Scan Success" << std::endl;
+    else
+        std::cout << "Scan Failed" << std::endl;
 
     std::cin >> device_number; std::cout<<std::endl;
     /* Disconnect PhoXiControl device */
@@ -101,7 +107,7 @@ int main(int argc, char *argv[])
 }
 
 /** * @brief print Devices Information function.
- 	* @param vector<PhoXiDeviceInformation> Devices Information.
+ 	* @param PhoXiDeviceInformation Devices Information.
  	* @return None.
 **	**/
 void printDeviceInfoList(const pho::api::PhoXiDeviceInformation devicelist)
@@ -117,4 +123,135 @@ void printDeviceInfoList(const pho::api::PhoXiDeviceInformation devicelist)
         << (devicelist.Status.Attached? "Attached to PhoXi Control. " : "Not Attached to PhoXi Control. ")
         << (devicelist.Status.Ready? "Ready" : "Occupied")
         << std::endl << std::endl;
+}
+
+/** * @brief software trigger single scan function.
+ 	* @param device pho::api::PPhoXi.
+ 	* @return bool program error code.
+**	**/
+bool SoftwareTrigger_SingleScan(const pho::api::PPhoXi device)
+{
+    int FrameID = 0;
+    /* if the device is in acquisition mode, stop acquisition */
+    /* status checked to pause */
+    if(device->isAcquiring())
+        device->StopAcquisition();
+
+    /* clear acqisition frames buffer */
+    std::cout << "Clear Acqisition Buffer, Clear frames: ";
+    std::cout << device->ClearBuffer() << std::endl;
+
+    /* set trigger mode  */
+    device->TriggerMode = pho::api::PhoXiTriggerMode::Software;
+    /* start acquisition mode */
+    device->StartAcquisition();
+    /* if checked success, status checked to running */
+    if(device->isAcquiring())
+        std::cout << "PhoXiControl device setup Acqisition Successfully" << std::endl;
+    else
+    {   /* if setup acqisition mode failed, exit function */
+        std::cout << "PhoXiControl device setup Acqisition Failed" << std::endl;
+        return false;
+    }
+
+    /* trigger device to scan the frame */
+    FrameID = device->TriggerFrame();
+    /* if FrameID=0, it means that the frame cannot be scan */
+    if(FrameID == 0)
+        std::cout << "Trigger was Frame Failed, code=" << FrameID << std::endl;
+    else
+        std::cout << "Frame was Triggered, FrameID: " << FrameID << std::endl;
+    
+    /* retrieve the specified frame */
+    pho::api::PFrame frame = device->GetSpecificFrame(FrameID, pho::api::PhoXiTimeout::Infinity);
+    if(frame)
+    {   /* if retrieve success */
+        std::cout << "  Frame params: " << std::endl;
+        std::cout << "    Frame Index: "                << frame->Info.FrameIndex << std::endl;
+        std::cout << "    Frame Timestamp: "            << frame->Info.FrameTimestamp << " ms" << std::endl;
+        std::cout << "    Frame Acquisition duration: " << frame->Info.FrameDuration << " ms" << std::endl;
+        std::cout << "    Frame Computation duration: " << frame->Info.FrameComputationDuration << " ms" << std::endl;
+        std::cout << "    Frame Transfer duration: "    << frame->Info.FrameTransferDuration << " ms" << std::endl;
+        std::cout << "    Sensor Position: ["
+            << frame->Info.SensorPosition.x << "; "
+            << frame->Info.SensorPosition.y << "; "
+            << frame->Info.SensorPosition.z << "]"
+            << std::endl;
+        std::cout << "    Total scan count: "           << frame->Info.TotalScanCount << std::endl;
+        std::cout << "    Color Camera Position: ["
+            << frame->Info.ColorCameraPosition.x << "; "
+            << frame->Info.ColorCameraPosition.y << "; "
+            << frame->Info.ColorCameraPosition.z << "]"
+            << std::endl;
+        if (frame->Empty())
+        {
+            std::cout << "Frame is empty." << std::endl << std::endl;
+            return false;
+        }
+        std::cout << "  Frame data: " << std::endl;
+        if (!frame->PointCloud.Empty())
+        {
+            std::cout << "    PointCloud:    ("
+                << frame->PointCloud.Size.Width << " x "
+                << frame->PointCloud.Size.Height << ") Type: "
+                << frame->PointCloud.GetElementName()
+                << std::endl;
+        }
+        if (!frame->NormalMap.Empty())
+        {
+            std::cout << "    NormalMap:     ("
+                << frame->NormalMap.Size.Width << " x "
+                << frame->NormalMap.Size.Height << ") Type: "
+                << frame->NormalMap.GetElementName()
+                << std::endl;
+        }
+        if (!frame->DepthMap.Empty())
+        {
+            std::cout << "    DepthMap:      ("
+                << frame->DepthMap.Size.Width << " x "
+                << frame->DepthMap.Size.Height << ") Type: "
+                << frame->DepthMap.GetElementName()
+                << std::endl;
+        }
+        if (!frame->ConfidenceMap.Empty())
+        {
+            std::cout << "    ConfidenceMap: ("
+                << frame->ConfidenceMap.Size.Width << " x "
+                << frame->ConfidenceMap.Size.Height << ") Type: "
+                << frame->ConfidenceMap.GetElementName()
+                << std::endl;
+        }
+        if (!frame->Texture.Empty())
+        {
+            std::cout << "    Texture:       ("
+                << frame->Texture.Size.Width << " x "
+                << frame->Texture.Size.Height << ") Type: "
+                << frame->Texture.GetElementName()
+                << std::endl;
+        }
+        if (!frame->TextureRGB.Empty())
+        {
+            std::cout << "    TextureRGB:       ("
+                << frame->TextureRGB.Size.Width << " x "
+                << frame->TextureRGB.Size.Height << ") Type: "
+                << frame->TextureRGB.GetElementName()
+                << std::endl;
+        }
+        if (!frame->ColorCameraImage.Empty())
+        {
+            std::cout << "    ColorCameraImage:       ("
+                << frame->ColorCameraImage.Size.Width << " x "
+                << frame->ColorCameraImage.Size.Height << ") Type: "
+                << frame->ColorCameraImage.GetElementName()
+                << std::endl;
+        }
+    }
+    else
+    {   /* if retrieve fail */
+        std::cout << "Failed to retrieve the frame" << std::endl;
+        return false;
+    }
+    
+    
+    return true;
 }
