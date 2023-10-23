@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
     try 
 	{
         // localization.reset(new pho::sdk::PhoLocalization());
-        localization.reset(&PL);
+        localization.reset(new pho::sdk::PhoLocalization());
 		std::cout << "PhoLocalization reset Success" << std::endl;
     }
 	catch (const pho::sdk::AuthenticationException & ex)
@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
 	{
         pho::sdk::SceneSource scene;
         std::cout << "try SetSceneSource" << std::endl;
-        scene = pho::sdk::SceneSource::PhoXi(PhoXiDevice);
+        scene = pho::sdk::SceneSource::PhoXi("DHV-071");
         localization->SetSceneSource(scene);
 		std::cout << "SetSceneSource Success" << std::endl;
     }
