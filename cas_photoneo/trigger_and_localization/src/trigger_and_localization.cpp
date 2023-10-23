@@ -3,6 +3,14 @@
 #include <iostream>
 
 #include "PhoXi.h"
+#include "PhoLocalization.h"
+
+// using namespace pho::sdk;
+
+pho::api::PFrame frame;
+pho::api::PPhoXi PhoXiDevice;
+std::unique_ptr<pho::sdk::PhoLocalization> localization;
+pho::sdk::PhoLocalization PL;
 
 /* print Devices Information function */
 void printDeviceInfoList(const pho::api::PhoXiDeviceInformation);
@@ -16,6 +24,7 @@ bool SoftwareTrigger_SingleScan(const pho::api::PPhoXi);
 **	**/
 int main(int argc, char *argv[])
 {
+    char scan_or_exit = 's';
     /* create PhoXiControl software top class object */
     pho::api::PhoXiFactory Factory;
     /* to determine whether the PhoXiControl is running or not  */
@@ -27,71 +36,141 @@ int main(int argc, char *argv[])
     else
         std::cout << "PhoxiControl is running!" << std::endl;
 
-    /* get list of available devices on the network */
-    std::vector<pho::api::PhoXiDeviceInformation> DeviceList = Factory.GetDeviceList();
-    if(DeviceList.empty())
-    {   /* if not devices on the network... */
-        std::cout << "PhoXi Factory has found 0 devices" << std::endl;
-        return 0;
+    // /* get list of available devices on the network */
+    // std::vector<pho::api::PhoXiDeviceInformation> DeviceList = Factory.GetDeviceList();
+    // if(DeviceList.empty())
+    // {   /* if not devices on the network... */
+    //     std::cout << "PhoXi Factory has found 0 devices" << std::endl;
+    //     return 0;
+    // }
+    // /* print Devices Information */
+    // std::size_t i;
+    // for( i=0; i<DeviceList.size(); i++ )
+    // {
+    //     std::cout << "Device: " << i << std::endl;
+    //     printDeviceInfoList(DeviceList[i]);
+    // }
+
+    // int device_number;
+    // /* create PhoXiControl device control class object */
+    // /* try to connect device opened in PhoXiControl, if any */
+    // PhoXiDevice = Factory.CreateAndConnectFirstAttached();
+    // if(PhoXiDevice)
+    // {   /* if connection already exist */
+    //     std::cout << "You have already Device opened in PhoXicontrol, connected to Device: "
+    //         << (std::string)PhoXiDevice->HardwareIdentification << std::endl;
+    // }
+    // else
+    // {   /* if the connection does not exist, connect according to the input number */
+    //     std::cout << "You have no Device opened in PhoXiControl, Please select the Device number to connect: ";
+    //     std::cin >> device_number;
+    //     PhoXiDevice = Factory.CreateAndConnect(DeviceList[device_number].HWIdentification);
+    // }
+
+    // /* check if device was created */
+    // if(PhoXiDevice) /* if device create success */
+    //     std::cout << "Device create Successfully" << std::endl;
+    // else    
+    // {   /* if device create failed, exit the program */
+    //     std::cout << "Device create Failed" << std::endl;
+    //     return 0;
+    // }
+
+    // /* check if device is connected */
+    // if( PhoXiDevice->isConnected() )    /* if device connect success */
+    //     std::cout << "Your device have connected, device is: "
+    //         << (std::string)PhoXiDevice->HardwareIdentification << std::endl;
+    // else
+    // {   /* if device connect failed, exit the program */
+    //     std::cout << "Failed, Your device is not connected." << std::endl;
+    //     return 0;
+    // }
+
+    // // /* main loop, press 's' scan frane, press 'q' exit the loop */
+    // // while( scan_or_exit == 's' )
+    // // {
+    //     /* software single scan trigger */
+    //     if(SoftwareTrigger_SingleScan(PhoXiDevice))
+    //         std::cout << "Scan Success" << std::endl << std::endl;
+    //     else
+    //         std::cout << "Scan Failed" << std::endl << std::endl;
+    // //     /*  */
+    // //     std::cin >> scan_or_exit;
+    // // }
+
+    /* Initialize localization object. */
+    try 
+	{
+        // localization.reset(new pho::sdk::PhoLocalization());
+        localization.reset(&PL);
+		std::cout << "PhoLocalization reset Success" << std::endl;
     }
-    /* print Devices Information */
-    std::size_t i;
-    for( i=0; i<DeviceList.size(); i++ )
-    {
-        std::cout << "Device: " << i << std::endl;
-        printDeviceInfoList(DeviceList[i]);
+	catch (const pho::sdk::AuthenticationException & ex)
+	{
+        std::cout << ex.what() << std::endl;
+        return EXIT_FAILURE;
     }
 
-    int device_number;
-    /* create PhoXiControl device control class object */
-    /* try to connect device opened in PhoXiControl, if any */
-    pho::api::PPhoXi PhoXiDevice = Factory.CreateAndConnectFirstAttached();
-    if(PhoXiDevice)
-    {   /* if connection already exist */
-        std::cout << "You have already Device opened in PhoXicontrol, connected to Device: "
-            << (std::string)PhoXiDevice->HardwareIdentification << std::endl;
+    /* Set scene where to look for an object */
+    try
+	{
+        pho::sdk::SceneSource scene;
+        std::cout << "try SetSceneSource" << std::endl;
+        scene = pho::sdk::SceneSource::PhoXi(PhoXiDevice);
+        localization->SetSceneSource(scene);
+		std::cout << "SetSceneSource Success" << std::endl;
     }
-    else
-    {   /* if the connection does not exist, connect according to the input number */
-        std::cout << "You have no Device opened in PhoXiControl, Please select the Device number to connect: ";
-        std::cin >> device_number;
-        PhoXiDevice = Factory.CreateAndConnect(DeviceList[device_number].HWIdentification);
-    }
-
-    /* check if device was created */
-    if(PhoXiDevice) /* if device create success */
-        std::cout << "Device create Successfully" << std::endl;
-    else    
-    {   /* if device create failed, exit the program */
-        std::cout << "Device create Failed" << std::endl;
-        return 0;
+	catch (const pho::sdk::PhoLocalizationException & ex)
+	{
+        std::cout << "try SetSceneSource Error" << std::endl;
+        std::cout << "SetSceneSource Error: " << ex.what() << std::endl;
+        return EXIT_FAILURE;
     }
 
-    /* check if device is connected */
-    if( PhoXiDevice->isConnected() )    /* if device connect success */
-        std::cout << "Your device have connected, device is: "
-            << (std::string)PhoXiDevice->HardwareIdentification << std::endl;
-    else
-    {   /* if device connect failed, exit the program */
-        std::cout << "Failed, Your device is not connected." << std::endl;
-        return 0;
+    /* Load PLCF file containing a preprocessed model, localization settings, and stopping criteria. */
+    try
+	{
+        localization->LoadLocalizationConfiguration("trigger_and_localization.plcf");
+		std::cout << "LoadLocalizationConfiguration Success" << std::endl;
+    }
+	catch (const pho::sdk::IOException & ex)
+	{
+        std::cout << "Error loading plcf file: " << ex.what() << std::endl;
+        return EXIT_FAILURE;
     }
 
-    /* software single scan trigger */
-    if(SoftwareTrigger_SingleScan(PhoXiDevice))
-        std::cout << "Scan Success" << std::endl;
-    else
-        std::cout << "Scan Failed" << std::endl;
-
-    std::cin >> device_number; std::cout<<std::endl;
-    /* Disconnect PhoXiControl device */
-    PhoXiDevice->Disconnect(true,true);
-    /* if disconnection fails */
-    if(PhoXiDevice->isConnected())
-    {   /* if disconnection fails, exit program */
-        std::cout << "The device failed to disconnect" << std::endl;
-        return 0;
+    pho::sdk::AsynchroneResultQueue queue;
+    try
+	{
+        queue = localization->StartAsync(frame);
+        //If the scene and model were correctly set, calling StartAsync() starts a localization loop.
+        //Localized poses will begin to appear in the queue.
+        //The loop will run until any of the stopping criteria stored in the PLCF file is met.
+        //If no stopping criteria are set, the loop will run indefinitely or until localization->StopAsync() is called.
     }
+	catch (const pho::sdk::PhoLocalizationException & ex)
+	{
+        std::cout << "Error starting localization: " << ex.what() << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    pho::sdk::TransformationMatrix4x4 result;
+    std::cout << "Localization results:" << std::endl;
+    while (queue.GetNext(result))
+	{
+        std::cout << result.size() << std::endl;
+    }
+    std::cout << "Localization finished" << std::endl;
+
+
+    // /* Disconnect PhoXiControl device */
+    // PhoXiDevice->Disconnect(true,true);
+    // /* if disconnection fails */
+    // if(PhoXiDevice->isConnected())
+    // {   /* if disconnection fails, exit program */
+    //     std::cout << "The device failed to disconnect" << std::endl;
+    //     return 0;
+    // }
 
 
     return 0;
@@ -155,7 +234,7 @@ bool SoftwareTrigger_SingleScan(const pho::api::PPhoXi device)
         std::cout << "Frame was Triggered, FrameID: " << FrameID << std::endl;
     
     /* retrieve the specified frame */
-    pho::api::PFrame frame = device->GetSpecificFrame(FrameID, pho::api::PhoXiTimeout::Infinity);
+    frame = device->GetSpecificFrame(FrameID, pho::api::PhoXiTimeout::Infinity);
     if(frame)
     {   /* if retrieve success */
         std::cout << "  Frame params: " << std::endl;
@@ -236,7 +315,7 @@ bool SoftwareTrigger_SingleScan(const pho::api::PPhoXi device)
                 << frame->ColorCameraImage.GetElementName()
                 << std::endl;
         }
-        std::cout << "-----------------------------------------------------------------------------" << std::endl << std::endl;
+        std::cout << "-----------------------------------------------------------------------------"<< std::endl;
     }
     else
     {   /* if retrieve fail */

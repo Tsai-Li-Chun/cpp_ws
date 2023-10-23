@@ -93,7 +93,7 @@ int main(int argc, char **argv)
         //     scene = SceneSource::PhoXi("Device ID");
         //*.praw or *.ply files created by Photoneo PhoXi Control from 3D scans:
         //     scene = SceneSource::File("path to praw / ply file");
-        scene = SceneSource::File("template_api_test1.ply");
+        scene = SceneSource::File("template_api_test.ply");
         localization->SetSceneSource(scene);
 		std::cout << "SetSceneSource Success" << std::endl;
     }
