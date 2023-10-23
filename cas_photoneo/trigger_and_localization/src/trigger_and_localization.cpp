@@ -36,55 +36,55 @@ int main(int argc, char *argv[])
     else
         std::cout << "PhoxiControl is running!" << std::endl;
 
-    // /* get list of available devices on the network */
-    // std::vector<pho::api::PhoXiDeviceInformation> DeviceList = Factory.GetDeviceList();
-    // if(DeviceList.empty())
-    // {   /* if not devices on the network... */
-    //     std::cout << "PhoXi Factory has found 0 devices" << std::endl;
-    //     return 0;
-    // }
-    // /* print Devices Information */
-    // std::size_t i;
-    // for( i=0; i<DeviceList.size(); i++ )
-    // {
-    //     std::cout << "Device: " << i << std::endl;
-    //     printDeviceInfoList(DeviceList[i]);
-    // }
+    /* get list of available devices on the network */
+    std::vector<pho::api::PhoXiDeviceInformation> DeviceList = Factory.GetDeviceList();
+    if(DeviceList.empty())
+    {   /* if not devices on the network... */
+        std::cout << "PhoXi Factory has found 0 devices" << std::endl;
+        return 0;
+    }
+    /* print Devices Information */
+    std::size_t i;
+    for( i=0; i<DeviceList.size(); i++ )
+    {
+        std::cout << "Device: " << i << std::endl;
+        printDeviceInfoList(DeviceList[i]);
+    }
 
-    // int device_number;
-    // /* create PhoXiControl device control class object */
-    // /* try to connect device opened in PhoXiControl, if any */
-    // PhoXiDevice = Factory.CreateAndConnectFirstAttached();
-    // if(PhoXiDevice)
-    // {   /* if connection already exist */
-    //     std::cout << "You have already Device opened in PhoXicontrol, connected to Device: "
-    //         << (std::string)PhoXiDevice->HardwareIdentification << std::endl;
-    // }
-    // else
-    // {   /* if the connection does not exist, connect according to the input number */
-    //     std::cout << "You have no Device opened in PhoXiControl, Please select the Device number to connect: ";
-    //     std::cin >> device_number;
-    //     PhoXiDevice = Factory.CreateAndConnect(DeviceList[device_number].HWIdentification);
-    // }
+    int device_number;
+    /* create PhoXiControl device control class object */
+    /* try to connect device opened in PhoXiControl, if any */
+    PhoXiDevice = Factory.CreateAndConnectFirstAttached();
+    if(PhoXiDevice)
+    {   /* if connection already exist */
+        std::cout << "You have already Device opened in PhoXicontrol, connected to Device: "
+            << (std::string)PhoXiDevice->HardwareIdentification << std::endl;
+    }
+    else
+    {   /* if the connection does not exist, connect according to the input number */
+        std::cout << "You have no Device opened in PhoXiControl, Please select the Device number to connect: ";
+        std::cin >> device_number;
+        PhoXiDevice = Factory.CreateAndConnect(DeviceList[device_number].HWIdentification);
+    }
 
-    // /* check if device was created */
-    // if(PhoXiDevice) /* if device create success */
-    //     std::cout << "Device create Successfully" << std::endl;
-    // else    
-    // {   /* if device create failed, exit the program */
-    //     std::cout << "Device create Failed" << std::endl;
-    //     return 0;
-    // }
+    /* check if device was created */
+    if(PhoXiDevice) /* if device create success */
+        std::cout << "Device create Successfully" << std::endl;
+    else    
+    {   /* if device create failed, exit the program */
+        std::cout << "Device create Failed" << std::endl;
+        return 0;
+    }
 
-    // /* check if device is connected */
-    // if( PhoXiDevice->isConnected() )    /* if device connect success */
-    //     std::cout << "Your device have connected, device is: "
-    //         << (std::string)PhoXiDevice->HardwareIdentification << std::endl;
-    // else
-    // {   /* if device connect failed, exit the program */
-    //     std::cout << "Failed, Your device is not connected." << std::endl;
-    //     return 0;
-    // }
+    /* check if device is connected */
+    if( PhoXiDevice->isConnected() )    /* if device connect success */
+        std::cout << "Your device have connected, device is: "
+            << (std::string)PhoXiDevice->HardwareIdentification << std::endl;
+    else
+    {   /* if device connect failed, exit the program */
+        std::cout << "Failed, Your device is not connected." << std::endl;
+        return 0;
+    }
 
     // // /* main loop, press 's' scan frane, press 'q' exit the loop */
     // // while( scan_or_exit == 's' )
@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
 	{
         pho::sdk::SceneSource scene;
         std::cout << "try SetSceneSource" << std::endl;
-        scene = pho::sdk::SceneSource::PhoXi("DHV-071");
+        scene = pho::sdk::SceneSource::PhoXi(DeviceList[device_number].HWIdentification);
         localization->SetSceneSource(scene);
 		std::cout << "SetSceneSource Success" << std::endl;
     }
