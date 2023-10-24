@@ -1,11 +1,12 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <iomanip>
 
 #include "PhoXi.h"
 #include "PhoLocalization.h"
 
-// using namespace pho::sdk;
+using namespace pho::sdk;
 
 pho::api::PFrame frame;
 pho::api::PPhoXi PhoXiDevice;
@@ -142,7 +143,7 @@ int main(int argc, char *argv[])
     pho::sdk::AsynchroneResultQueue queue;
     try
 	{
-        queue = localization->StartAsync(frame);
+        queue = localization->StartAsync();
         //If the scene and model were correctly set, calling StartAsync() starts a localization loop.
         //Localized poses will begin to appear in the queue.
         //The loop will run until any of the stopping criteria stored in the PLCF file is met.
@@ -154,13 +155,24 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    pho::sdk::TransformationMatrix4x4 result;
-    std::cout << "Localization results:" << std::endl;
-    while (queue.GetNext(result))
-	{
-        std::cout << result.size() << std::endl;
+    pho::sdk::LocalizationPose result;
+    if( queue.GetNext(result) )
+    {
+        std::cout << "Localization:" << std::endl;
+        std::cout << "  results         :" << (result.Transformation.size()/4) << std::endl;
+        std::cout << "  ID              :" << result.ID << std::endl;
+        std::cout << "  Occluded        :" << ((result.Occluded==false)? "No" : "Yes") << std::endl;
+        std::cout << "  VisibleOverlap  :" << result.VisibleOverlap << std::endl;
+        std::cout << "  Transformatiom  :" << std::endl;
+        for(int i=0; i<4; i++)
+        {
+            for(int j=0; j<4; j++)
+                std::cout << result.Transformation.at(i).at(j) << " , ";
+            std::cout << std::endl;
+        }
     }
     std::cout << "Localization finished" << std::endl;
+
 
 
     // /* Disconnect PhoXiControl device */
