@@ -1,2 +1,4 @@
 **/build/*.*
 PhotoneoAPI/**
+cas_photoneo/**/build/*.*
+cas_photoneo/**/LOCALIZATION_DEBUG/*.*
