@@ -16,6 +16,8 @@ std::unique_ptr<pho::sdk::PhoLocalization> localization;
 void printDeviceInfoList(const pho::api::PhoXiDeviceInformation);
 /* software trigger single scan function */
 bool SoftwareTrigger_SingleScan(const pho::api::PPhoXi);
+//Print out profiles
+void printProfilesList(const std::vector<pho::api::PhoXiProfileDescriptor> &ProfilesInfo);
 
 /** * @brief  Program entry point.
  	* @param argc(int) Number of input parameters
@@ -83,6 +85,35 @@ int main(int argc, char *argv[])
     else
     {   /* if device connect failed, exit the program */
         std::cout << "Failed, Your device is not connected." << std::endl;
+        return 0;
+    }
+
+    std::vector<pho::api::PhoXiProfileDescriptor> ProfilesList = PhoXiDevice->Profiles;
+    if (!PhoXiDevice->Profiles.isLastOperationSuccessful())
+    {
+        std::cout << "Can not get profile list: " << PhoXiDevice->Profiles.GetLastErrorMessage() << std::endl;
+        return 0;
+    }
+    // Print out profiles
+    printProfilesList(ProfilesList);
+
+    std::string ActiveProfile = PhoXiDevice->ActiveProfile;
+    if (!PhoXiDevice->ActiveProfile.isLastOperationSuccessful())
+    {
+        std::cout << "Can not get active profile: " << PhoXiDevice->ActiveProfile.GetLastErrorMessage() << std::endl;
+        return 0;
+    }
+    std::cout << "Current ActiveProfile : " << ActiveProfile << std::endl;
+
+    std::string NewActiveProfile="lichun";
+    PhoXiDevice->ActiveProfile = NewActiveProfile;
+    if (PhoXiDevice->ActiveProfile.isLastOperationSuccessful())
+    {
+        std::cout << "Active profile set to : " << NewActiveProfile << std::endl;
+    }
+    else
+    {
+        std::cout << "Can not set active profile: " << PhoXiDevice->ActiveProfile.GetLastErrorMessage() << std::endl;
         return 0;
     }
 
@@ -174,14 +205,14 @@ int main(int argc, char *argv[])
 
 
 
-    // /* Disconnect PhoXiControl device */
-    // PhoXiDevice->Disconnect(true,true);
-    // /* if disconnection fails */
-    // if(PhoXiDevice->isConnected())
-    // {   /* if disconnection fails, exit program */
-    //     std::cout << "The device failed to disconnect" << std::endl;
-    //     return 0;
-    // }
+    /* Disconnect PhoXiControl device */
+    PhoXiDevice->Disconnect(true,true);
+    /* if disconnection fails */
+    if(PhoXiDevice->isConnected())
+    {   /* if disconnection fails, exit program */
+        std::cout << "The device failed to disconnect" << std::endl;
+        return 0;
+    }
 
 
     return 0;
@@ -336,4 +367,15 @@ bool SoftwareTrigger_SingleScan(const pho::api::PPhoXi device)
     
     
     return true;
+}
+
+void printProfilesList(const std::vector<pho::api::PhoXiProfileDescriptor> &ProfilesList)
+{
+    std::cout << std::boolalpha << true;
+    for (const pho::api::PhoXiProfileDescriptor &profile : ProfilesList)
+    {
+        std::cout << "Profile: " << std::endl;
+        std::cout << "  Name: "<< profile.Name << std::endl;
+        std::cout << "  Is factory profile: " << profile.IsFactory << std::endl;
+    }
 }
