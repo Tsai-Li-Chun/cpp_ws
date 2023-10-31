@@ -6,7 +6,8 @@
                 "/opt/Photoneo/PhoXiControl-1.11.1/API/include/",
                 "/opt/PhotoneoSDK/Localization/include/**",
                 "${workspaceFolder}/c++_modbus_project/inc/**",
-                "${workspaceFolder}/socket_project/inc/**"
+                "${workspaceFolder}/socket_project/inc/**",
+                "${workspaceFolder}/CoordinateTransform/inc"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/g++",
