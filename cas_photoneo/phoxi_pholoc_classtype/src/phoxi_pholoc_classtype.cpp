@@ -6,6 +6,11 @@
 #include "PhoXi.h"
 #include "PhoLocalization.h"
 
+#include <sys/shm.h>
+#include <unistd.h>
+#include <string.h>
+#include <stdio.h>
+
 // using namespace pho::sdk;
 
 pho::api::PFrame frame;
@@ -26,6 +31,29 @@ void printProfilesList(const std::vector<pho::api::PhoXiProfileDescriptor> &Prof
 **	**/
 int main(int argc, char *argv[])
 {
+    void* shm;
+    float pose[16]={0};
+    int shm_id = shmget(15, 1024, IPC_CREAT|0666);
+    if (shm_id != -1)
+    {
+        std::cout << "shmget Success: " << shm_id << std::endl;
+        printf("shm address= %p\n",shm);
+        // 2. 映射 SHM
+        shm = shmat(shm_id, NULL, 0);
+        if (shm != (void*)-1)
+            std::cout << "shmat Success" << std::endl;
+        else
+        {
+            std::cout << "shmat Failed" << std::endl;
+            return 0;
+        }
+    }
+    else
+    {
+        std::cout << "shmget Failed" << std::endl;
+        return 0;
+    }
+
     char scan_or_exit = 's';
     /* create PhoXiControl software top class object */
     pho::api::PhoXiFactory Factory;
@@ -197,12 +225,21 @@ int main(int argc, char *argv[])
         for(int i=0; i<4; i++)
         {
             for(int j=0; j<4; j++)
+            {
                 std::cout << result.Transformation.at(i).at(j) << " , ";
+                pose[i*4+j] = result.Transformation.at(i).at(j);
+            }
             std::cout << std::endl;
         }
     }
     std::cout << "Localization finished" << std::endl;
 
+    for(int k=0; k<16; k++)
+    {
+        std::cout << pose[k] << "   ";
+    }
+    std::cout << std::endl;
+    memcpy(shm, pose, sizeof(pose));
 
 
     /* Disconnect PhoXiControl device */
