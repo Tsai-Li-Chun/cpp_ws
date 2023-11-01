@@ -7,15 +7,14 @@
 
 /* System Includes ------------------------------------------*/
 /* System Includes Begin */
-#include <sys/ipc.h>
+#include <iostream>
 #include <sys/shm.h>
-#include <sys/types.h>
 #include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdlib>
 /* System Includes End */
 /* User Includes --------------------------------------------*/
 /* User Includes Begin */
+#include "define.h"
 /* User Includes End */
 
 /* namespace ------------------------------------------------*/
@@ -57,36 +56,56 @@
 int main(int argc, char** argv)
 {
 	float pose[16]={0};
-	printf("%ld\n",sizeof(pose));
-    // 1. 获取 SHM
-    int shm_id = shmget(15, 1024, IPC_CREAT | 0666);
-    printf("shm_id= %d\n",shm_id);
-    if (shm_id != -1)
-	{
-        // 2. 映射 SHM
-        void* shm = shmat(shm_id, NULL, 0);
-		printf("&shm= %p\n",&shm);
-        printf("shm= %p\n",shm);
-        if (shm != (void*)-1)
-		{
-            // 3. 读取 SHM
-            memcpy(pose, shm, sizeof(pose));
-			for(int k=0; k<16; k++)
-			{
-				printf("%f\t",pose[k]);
-			}
-			printf("\n");
-            // 4. 关闭 SHM
-            shmdt(shm);
-        } else {
-            perror("shmat:");
+    shmid_ds shm_ds;
+    int shm_id;
+    char wait_key;
+    void *shm_ptr;
+
+    /* create shared memory nattch */
+    shm_id = shmget(shm_key, shm_size, shm_flg);
+    if( shm_id != (-1) )
+    {
+        printf("Create shared memory Success. shm_id=: %d\n",shm_id);
+        shm_ptr = shmat(shm_id, NULL, 0);
+        if( shm_ptr != (void*)(-1) )
+            printf("Attach shared memroy Success. shm_ptr=: %p\n",shm_ptr);
+        else
+        {
+            printf("Create shared meeory Failed.\n");
+            perror(" -> shmat error code: ");
+            return EXIT_FAILURE;
         }
-    } else {
-        perror("shmget:");
     }
-    if (0 == shmctl(shm_id, IPC_RMID, NULL))
-        printf("delete shm success.\n");
-    return 0;
+    else
+    {
+        printf("Create shared meeory Failed.\n");
+        perror(" -> shmget error code: ");
+        return EXIT_FAILURE;
+    }
+
+    /* read data from shared memory. */
+    do
+    {
+        std::cin >> wait_key;
+        memcpy(pose, shm_ptr, sizeof(pose));
+        for(int k=0; k<16; k++)
+        {
+            printf("%f\t",pose[k]);
+        }
+        printf("\n");
+    }while( wait_key!='q' );
+
+    /* Detach and Remove shared memory */
+    if( shmdt(shm_ptr)!=(-1) )
+        printf("Detach shared meeory Success.\n");
+    else
+    {
+        printf("Detach shared meeory Failed.\n");
+        perror(" -> shmdt error code: ");
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
 }
 
 /* Program End */
