@@ -8,9 +8,10 @@
 /* System Includes ------------------------------------------*/
 /* System Includes Begin */
 #include <iostream>
+#include <cstdlib>
 #include <sys/shm.h>
 #include <string.h>
-#include <cstdlib>
+#include <unistd.h>
 /* System Includes End */
 /* User Includes --------------------------------------------*/
 /* User Includes Begin */
@@ -55,13 +56,12 @@
 
 int main(int argc, char** argv)
 {
-    float pose[16]={0};
-    for(int i=0; i<16; i++)
-        pose[i] = i+0.1;
-    
+    float pose[17]={0};
     shmid_ds shm_ds;
-    int shm_id,wait_key;
+    int shm_id,i;
+    char wait_key;
     void *shm_ptr;
+    float *shm_ptrf;    
 
     /* create shared memory nattch */
     shm_id = shmget(shm_key, shm_size, shm_flg);
@@ -86,10 +86,27 @@ int main(int argc, char** argv)
     }
 
     /* write data to shared memory. */
-    memcpy(shm_ptr, pose, sizeof(pose));
+    shm_ptrf = (float*)shm_ptr;
+    do
+    {
+        printf("Waiting for data request command ...\n");
+        memcpy(pose, shm_ptrf, sizeof(pose));
+        for(i=0; i<17; i++) printf("(%10.4f) ",pose[i]);
+        printf("\n");
+        if( pose[0] == 1.0f )
+        {
+            printf("Received data request command.\n");
+            pose[0] = 2.0f;
+            for(i=1; i<17; i++) pose[i] = i+0.1;
+            memcpy(shm_ptrf, pose, sizeof(pose));
+            printf("Finished writing to shared memory.\n");
+        }
+        sleep(1);
+    }while( pose[0] != 4.0f );
 
     /* Detach and Remove shared memory */
-    std::cin >> wait_key;
+    printf("Recevied Remove shared memory command.\n");
+    sleep(5);
     if( shmdt(shm_ptr)!=(-1) )
     {
         printf("Detach shared meeory Success.\n");

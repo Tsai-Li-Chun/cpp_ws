@@ -11,6 +11,7 @@
 #include <sys/shm.h>
 #include <string.h>
 #include <cstdlib>
+#include <unistd.h>
 /* System Includes End */
 /* User Includes --------------------------------------------*/
 /* User Includes Begin */
@@ -55,11 +56,12 @@
 
 int main(int argc, char** argv)
 {
-	float pose[16]={0};
+	float pose[17]={0};
     shmid_ds shm_ds;
-    int shm_id;
+    int shm_id,i;
     char wait_key;
     void *shm_ptr;
+    float *shm_ptrf;
 
     /* create shared memory nattch */
     shm_id = shmget(shm_key, shm_size, shm_flg);
@@ -84,17 +86,40 @@ int main(int argc, char** argv)
     }
 
     /* read data from shared memory. */
+    shm_ptrf = (float*)shm_ptr;
     do
     {
+        printf("Press Q to exit the program, press R to read from shared memory: ");
         std::cin >> wait_key;
-        memcpy(pose, shm_ptr, sizeof(pose));
-        for(int k=0; k<16; k++)
+        if( wait_key == 'r' )
         {
-            printf("%f\t",pose[k]);
+            /* send request */
+            printf("Send request, pose[0]=1.0\n");
+            pose[0] = 1.0f;
+            for(i=1; i<17; i++) pose[i] = 0.0f;
+            memcpy(shm_ptrf, pose, sizeof(pose));
+            /* wait for response */
+            while( pose[0] != 2.0f ) 
+            {
+                printf("Waiting for data to return ...\n");
+                memcpy(pose, shm_ptrf, sizeof(pose));
+                for(i=0; i<17; i++) printf("(%10.4f) ",pose[i]);
+                printf("\n");
+                sleep(1);
+            }
+            /* send reset signal */
+            printf("Response received. Send reset signal.\n");
+            for(i=0; i<17; i++) pose[i] = 0.0f;
+            memcpy(shm_ptrf, pose, sizeof(pose));
         }
-        printf("\n");
     }while( wait_key!='q' );
 
+    /* send remove shared memory signal */
+    printf("send remove shared memory signal.\n");
+    for(i=0; i<17; i++) pose[i] = 0.0f;
+    pose[0] = 4.0f;
+    memcpy(shm_ptrf, pose, sizeof(pose));
+    
     /* Detach and Remove shared memory */
     if( shmdt(shm_ptr)!=(-1) )
         printf("Detach shared meeory Success.\n");
