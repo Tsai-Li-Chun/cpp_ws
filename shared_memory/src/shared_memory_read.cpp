@@ -83,7 +83,24 @@ int main(int argc, char** argv)
         printf("Create shared meeory Failed.\n");
         perror(" -> shmget error code: ");
         return EXIT_FAILURE;
+    } 
+    if( shmctl(shm_id, IPC_STAT, &shm_ds ) == 0 )
+    {
+        printf("shm_ds.shm_perm.uid = %d\n",shm_ds.shm_perm.uid);
+        printf("shm_ds.shm_perm.mode= %d\n",shm_ds.shm_perm.mode);
+        printf("shm_ds.shm_perm.gid = %d\n",shm_ds.shm_perm.gid);
+        printf("shm_ds.shm_perm.cuid= %d\n",shm_ds.shm_perm.cuid);
+        printf("shm_ds.shm_perm.cgid= %d\n",shm_ds.shm_perm.cgid);
+        printf("shm_ds.shm_segsz    = %ld\n",shm_ds.shm_segsz);
+        printf("shm_ds.shm_nattch   = %ld\n",shm_ds.shm_nattch);
+        printf("shm_ds.shm_lpid     = %d\n",shm_ds.shm_lpid);
+        printf("shm_ds.shm_cpid     = %d\n",shm_ds.shm_cpid);
+        printf("shm_ds.shm_ctime    = %ld\n",shm_ds.shm_ctime);
+        printf("shm_ds.shm_atime    = %ld\n",shm_ds.shm_atime);
+        printf("shm_ds.shm_dtime    = %ld\n",shm_ds.shm_dtime);
     }
+    else
+        perror(" -> shmctl error code: ");
 
     /* read data from shared memory. */
     shm_ptrf = (float*)shm_ptr;
@@ -119,7 +136,7 @@ int main(int argc, char** argv)
     for(i=0; i<17; i++) pose[i] = 0.0f;
     pose[0] = 4.0f;
     memcpy(shm_ptrf, pose, sizeof(pose));
-    
+
     /* Detach and Remove shared memory */
     if( shmdt(shm_ptr)!=(-1) )
         printf("Detach shared meeory Success.\n");
