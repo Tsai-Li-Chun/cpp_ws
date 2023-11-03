@@ -23,6 +23,8 @@
 #define shm_key (key_t)15
 #define shm_size (size_t)1024
 #define shm_flg (int)(IPC_CREAT|0666)
+#define shm_rw_twoway (int)0
+#define shm_rw_readonly (int)SHM_RDONLY
 
 /* Define End */
 

@@ -53,21 +53,21 @@ public:
 	/* Destructor */
 	~shared_memory_controller();
 
-	/* create and get shared memory */
-	int8_t get_shm(key_t key, size_t size, int flg);
-	/* attach to the shared memory */
+	/* create and get shared memory segment */
+	int get_shm(key_t key, size_t size, int flg);
+	/* attach to the shared memory segment */
 	void* attach_shm(int id, void* ptr, int flg);
-	/* detach from shared memory */
+	/* detach from shared memory segment */
 	int8_t detach_shm(void* ptr);
-	/* remove from shared memory */
+	/* remove from shared memory segment */
 	int8_t remove_shm(int id);
 	/* display information of the shm */
-	void shmds_information(void);
+	int shmds_information(void);
 
 	/* write data to shared memory. */
-	void* write_shm(void);
+	void* write_shm(void* source, size_t size);
 	/* read data from shared memory. */
-	void* read_shm(void);
+	void* read_shm(void* destination, size_t size);
 };
 
 /* Extern Class End */

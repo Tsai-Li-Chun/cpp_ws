@@ -46,7 +46,8 @@ c_sources_w	= \
 	$(src_path)shared_memory_write.cpp \
 	$(src_path)shm_controller.cpp
 c_sources_r	= \
-	$(src_path)shared_memory_read.cpp
+	$(src_path)shared_memory_read.cpp \
+	$(src_path)shm_controller.cpp
 
 ############################################################################
 #	object file
