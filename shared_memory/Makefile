@@ -43,7 +43,8 @@ CFLAGS = -std=c++11 -MMD -MP $(opt) $(inc_path)
 #	source code
 ######################################
 c_sources_w	= \
-	$(src_path)shared_memory_write.cpp
+	$(src_path)shared_memory_write.cpp \
+	$(src_path)shm_controller.cpp
 c_sources_r	= \
 	$(src_path)shared_memory_read.cpp
 
