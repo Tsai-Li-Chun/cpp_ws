@@ -8,6 +8,7 @@
                 "${workspaceFolder}/c++_modbus_project/inc/**",
                 "${workspaceFolder}/socket_project/inc/**",
                 "${workspaceFolder}/shared_memory/inc/**",
+                "${workspaceFolder}/cas_photoneo/phoxi_pholoc_classtype/inc/**",
                 "${workspaceFolder}/CoordinateTransform/inc"
             ],
             "defines": [],

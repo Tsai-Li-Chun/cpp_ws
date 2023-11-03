@@ -25,7 +25,7 @@ src_path = src/
 # headle file paths
 # -I/opt/PhotoneoSDK/Localization/include/PhoXi_API/
 inc_path = -Iinc/ \
-		   -I/opt/PhotoneoSDK/Localization/include/PhoXi_API \
+		   -I/opt/Photoneo/PhoXiControl-1.11.1/API/include/ \
 		   -I/opt/PhotoneoSDK/Localization/include/ \
 		   -I/opt/PhotoneoSDK/Localization/include/Common \
 		   -I/opt/PhotoneoSDK/Localization/include/PhoLocalization_SDK \
@@ -42,8 +42,8 @@ obj_path = build/
 # link script & libraries
 #######################################
 # libraries
-libs = -Wl,-rpath,/opt/PhotoneoSDK/Localization/lib:/opt/PhotoneoSDK/Localization/bin/3rdParty/Vtk:/opt/PhotoneoSDK/Localization/bin/3rdParty/gcc9.3.0:/opt/PhotoneoSDK/Localization/bin/3rdParty/Python:/opt/PhotoneoSDK/Localization/bin/3rdParty/OpenCV:/opt/PhotoneoSDK/Localization/bin/3rdParty/Pcl:/opt/PhotoneoSDK/Localization/bin/3rdParty/Libpng:/opt/PhotoneoSDK/Localization/bin/3rdParty/OpenSSL:/opt/PhotoneoSDK/Localization/bin/3rdParty/YAML:/opt/PhotoneoSDK/Localization/bin/3rdParty/CUrl:/opt/PhotoneoSDK/Localization/bin/3rdParty/LibSSH2:/opt/PhotoneoSDK/Localization/bin/3rdParty/Libtiff \
-				  /opt/PhotoneoSDK/Localization/lib/libPhoXi_API_gcc9.3.0_Release.so.1.9.5 \
+libs = -Wl,-rpath,/opt/Photoneo/PhoXiControl-1.11.1/API/lib:/opt/PhotoneoSDK/Localization/lib:/opt/PhotoneoSDK/Localization/bin/3rdParty/Vtk:/opt/PhotoneoSDK/Localization/bin/3rdParty/gcc9.3.0:/opt/PhotoneoSDK/Localization/bin/3rdParty/Python:/opt/PhotoneoSDK/Localization/bin/3rdParty/OpenCV:/opt/PhotoneoSDK/Localization/bin/3rdParty/Pcl:/opt/PhotoneoSDK/Localization/bin/3rdParty/Libpng:/opt/PhotoneoSDK/Localization/bin/3rdParty/OpenSSL:/opt/PhotoneoSDK/Localization/bin/3rdParty/YAML:/opt/PhotoneoSDK/Localization/bin/3rdParty/CUrl:/opt/PhotoneoSDK/Localization/bin/3rdParty/LibSSH2:/opt/PhotoneoSDK/Localization/bin/3rdParty/Libtiff \
+				  /opt/Photoneo/PhoXiControl-1.11.1/API/lib/libPhoXi_API_gcc9.3.0_Release.so \
 				  /opt/PhotoneoSDK/Localization/lib/libPCLTools_ClientConfig.a \
 				  /opt/PhotoneoSDK/Localization/lib/libPhoLibrary_dynamic_Release.so \
 				  /opt/PhotoneoSDK/Localization/lib/libPhoLocalization_SDK_gcc9.3.0_Release.so.1.4.0 \
@@ -114,13 +114,15 @@ libs = -Wl,-rpath,/opt/PhotoneoSDK/Localization/lib:/opt/PhotoneoSDK/Localizatio
 #	compile gcc flags
 #######################################
 # Generate dependency information
-CFLAGS = -std=c++11 -O0 -MMD -MP $(inc_path)
+CFLAGS = -std=c++11 $(OPT) -MMD -MP $(inc_path)
 
 ############################################################################
 #	source code
 ######################################
 c_sources = \
 	src/phoxi_pholoc_classtype.cpp \
+	src/photoneo_controller.cpp \
+	src/shm_controller.cpp
 
 ############################################################################
 #	object file

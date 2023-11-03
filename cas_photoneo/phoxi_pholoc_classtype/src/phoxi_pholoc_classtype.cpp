@@ -1,21 +1,61 @@
+/** ******************************************************
+	* @file		phoxi_pholoc_classtype.cpp
+	* @author	Tsai,Li-chun
+	******************************************************
+**	**/
+
+
+/* System Includes ------------------------------------------*/
+/* System Includes Begin */
 #include <vector>
 #include <string>
 #include <iostream>
 #include <iomanip>
-
-#include "PhoXi.h"
-#include "PhoLocalization.h"
-
 #include <sys/shm.h>
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
+/* System Includes End */
+/* User Includes --------------------------------------------*/
+/* User Includes Begin */
+#include "photoneo_controller.hpp"
+#include "shm_controller.hpp"
+/* User Includes End */
 
-// using namespace pho::sdk;
+/* namespace ------------------------------------------------*/
+/* namespace Begin */
+/* namespace End */
+
+
+/* Define ---------------------------------------------------*/
+/* Define Begin */
+/* Define End */
+
+
+/* Typedef --------------------------------------------------*/
+/* Typedef Begin */
+/* Typedef End */
+
+
+/* Class --------------------------------------------------*/
+/* Class Begin */
+/* Class End */
+
+
+/* Variables ------------------------------------------------*/
+/* Variables Begin */
 
 pho::api::PFrame frame;
 pho::api::PPhoXi PhoXiDevice;
 std::unique_ptr<pho::sdk::PhoLocalization> localization;
+shared_memory_controller shm_ctl;
+photoneo_controller pho_ctl;
+
+/* Variables End */
+
+
+/* Function -------------------------------------------------*/
+/* Function Begin */
 
 /* print Devices Information function */
 void printDeviceInfoList(const pho::api::PhoXiDeviceInformation);
@@ -24,12 +64,21 @@ bool SoftwareTrigger_SingleScan(const pho::api::PPhoXi);
 //Print out profiles
 void printProfilesList(const std::vector<pho::api::PhoXiProfileDescriptor> &ProfilesInfo);
 
-/** * @brief  Program entry point.
- 	* @param argc(int) Number of input parameters
+/* Function End */
+
+
+
+/* ---------------------------------------------------------*/
+/* ⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩ Program ⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩ ---------------------------*/
+/* ---------------------------------------------------------*/
+/* Program Begin */
+
+/** * @brief Program entry point.
+	* @param argc(int) Number of input parameters
  	* @param argv(int) input parameters
  	* @return (int) Program Error.
 **	**/
-int main(int argc, char *argv[])
+int main(int argc, char **argv)
 {
     void* shm;
     float pose[16]={0};
@@ -251,7 +300,6 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-
     return 0;
 }
 
@@ -416,3 +464,11 @@ void printProfilesList(const std::vector<pho::api::PhoXiProfileDescriptor> &Prof
         std::cout << "  Is factory profile: " << profile.IsFactory << std::endl;
     }
 }
+
+/* Program End */
+/* ---------------------------------------------------------*/
+/* ⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧ Program ⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧ ---------------------------*/
+/* ---------------------------------------------------------*/
+
+
+/* ***** END OF phoxi_pholoc_classtype.cpp ***** */
