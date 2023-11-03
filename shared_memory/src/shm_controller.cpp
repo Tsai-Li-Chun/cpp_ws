@@ -56,8 +56,8 @@
 shared_memory_controller::shared_memory_controller()
 {
 	shm_id = 0;
-	error_code = 0;
-	shm_ptr_void = nullptr;
+	return_code = 0;
+	shm_void_ptr = nullptr;
 }
 /** * @brief Destructor
  	* @param None
@@ -88,7 +88,7 @@ int8_t shared_memory_controller::get_shm(key_t key, size_t size, int flg)
 void* shared_memory_controller::attach_shm(int id, void* ptr, int flg)
 {
 
-	return shm_ptr_void;
+	return shm_void_ptr;
 }
 
 /** * @brief detach from shared memory
@@ -98,7 +98,7 @@ void* shared_memory_controller::attach_shm(int id, void* ptr, int flg)
 int8_t shared_memory_controller::detach_shm(void* ptr)
 {
 
-	return error_code;
+	return return_code;
 }
 
 /** * @brief remove from shared memory
@@ -108,7 +108,7 @@ int8_t shared_memory_controller::detach_shm(void* ptr)
 int8_t shared_memory_controller::remove_shm(int id)
 {
 
-	return error_code;
+	return return_code;
 }
 
 /** * @brief display information of the shm
@@ -128,7 +128,7 @@ void* shared_memory_controller::write_shm(void)
 {
 
 
-	return ptr_error_code;
+	return return_code_ptr;
 }
 
 /** * @brief read data from shared memory
@@ -138,7 +138,7 @@ void* shared_memory_controller::write_shm(void)
 void* shared_memory_controller::read_shm(void)
 {
 
-	return ptr_error_code;
+	return return_code_ptr;
 }
 
 

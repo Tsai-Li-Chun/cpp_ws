@@ -42,9 +42,9 @@ class shared_memory_controller
 private:
 	shmid_ds shm_ds;
     int8_t shm_id;
-	int8_t error_code;
-    void *shm_ptr_void;
-    void *ptr_error_code;
+	int8_t return_code;
+    void *shm_void_ptr;
+    void *return_code_ptr;
 
 /* public members */
 public:
