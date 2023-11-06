@@ -65,11 +65,24 @@
 **	**/
 int main(int argc, char **argv)
 {
+    char key=0;
+
+    pho::sdk::AsynchroneResultQueue queue;
+    pho::sdk::LocalizationPose result;
     photoneo_controller pho_ctl;
     pho_ctl.GetAvailableDevices();
     pho_ctl.ConnectPhoXiDevice();
     pho_ctl.GetAndSetProfile();
     pho_ctl.SoftwareTrigger();
+    pho_ctl.Localization_StartUp();
+
+    do
+    {
+        std::cout << "press 's' calculate localization, press 'q' exit the loop: ";
+        std::cin >> key;
+        if(key=='s') pho_ctl.calculate_localization();
+    }while( key!='q');
+
     pho_ctl.CorrectDisconnect();
     return 0;
 }

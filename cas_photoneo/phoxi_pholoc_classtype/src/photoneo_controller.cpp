@@ -1124,7 +1124,6 @@ bool photoneo_controller::SetProfile(int32_t count)
 void photoneo_controller::DataHandling(void)
 {
     /* check if we have SampleFrame Data */
-    int a=0;
     if (!SampleFrame || SampleFrame->Empty())
     {
         std::cout << "Frame does not exist, or has no content!" << std::endl;
@@ -1233,6 +1232,7 @@ void photoneo_controller::CorrectDisconnect(void)
         return;
     }
     PhoXiDevice->Disconnect(Entry);
+    // std::cout << std::endl;
     //The call PhoXiDevice without Logout will be called automatically by destructor
 }
 
@@ -1247,6 +1247,126 @@ void photoneo_controller::printProfilesList(size_t count, const pho::api::PhoXiP
     std::cout << "    Is factory profile: " << profile.IsFactory << std::endl;
 }
 
+/** * @brief photoneo localization start up
+    * @param None
+ 	* @return bool, error code
+**	**/
+bool photoneo_controller::Localization_StartUp(void)
+{
+    if( loc_init() )
+        if( loc_loadPLCF() )
+            if( loc_SetSceneSource() )
+                return true;
+    return false;
+}
+
+/** * @brief initialize localization object
+    * @param None
+ 	* @return bool, error code
+**	**/
+bool photoneo_controller::loc_init(void)
+{
+    try 
+	{
+        localization.reset(new pho::sdk::PhoLocalization());
+        // localization.reset(pho_loc_ptr);
+		std::cout << "PhoLocalization reset Success" << std::endl;
+        return true;
+    }
+	catch (const pho::sdk::AuthenticationException & ex)
+	{
+        std::cout << "PhoLocalization reset Failed: " << ex.what() << std::endl;
+        return false;
+    }
+}
+
+/** * @brief set scene Source
+    * @param None
+ 	* @return bool, error code
+**	**/
+bool photoneo_controller::loc_SetSceneSource(void)
+{
+    try
+	{
+        scene = pho::sdk::SceneSource::PhoXi(DeviceList[0].HWIdentification);
+        localization->SetSceneSource(scene);
+		std::cout << "SetSceneSource Success" << std::endl;
+        return true;
+    }
+	catch (const pho::sdk::PhoLocalizationException & ex)
+	{
+        std::cout << "SetSceneSource Error: " << ex.what() << std::endl;
+        return false;
+    }
+}
+
+/** * @brief load PLCF file
+    * @param None
+ 	* @return bool, error code
+**	**/
+bool photoneo_controller::loc_loadPLCF(void)
+{
+    try
+	{
+        localization->LoadLocalizationConfiguration("phoxi_pholoc_classtype.plcf");
+		std::cout << "LoadLocalizationConfiguration Success" << std::endl;
+        return true;
+    }
+	catch (const pho::sdk::IOException & ex)
+	{
+        std::cout << "Error loading plcf file: " << ex.what() << std::endl;
+        return false;
+    }
+}
+
+/** * @brief calculate the position of the target object in frame
+    * @param None
+ 	* @return float*, calculation result
+**	**/
+void photoneo_controller::calculate_localization(void)
+{
+    try
+	{
+        ResultList.clear();
+        queue = localization->StartAsync();
+    }
+	catch (const pho::sdk::PhoLocalizationException & ex)
+	{
+        std::cout << "Error starting localization: " << ex.what() << std::endl;
+    }
+
+    while( queue.GetNext(result) )
+    {
+        printLocResult(result);
+        ResultList.push_back(result);
+        std::cout << "current capacity occupied by vector: ";
+        std::cout << ResultList.size() << " / " << ResultList.capacity() << std::endl;
+        if( ResultList.size() >= ResultList.capacity() )
+            break;
+    }
+    std::cout << "Localization finished" << std::endl;
+    std::cout << "------------------------------------------------" << std::endl << std::endl;
+}
+
+/** * @brief display localization calculate result
+    * @param None
+ 	* @return float*, calculation result
+**	**/
+void photoneo_controller::printLocResult(const pho::sdk::LocalizationPose &r)
+{
+    std::cout << "Localization:" << std::endl;
+    std::cout << "  ID              :" << result.ID << std::endl;
+    std::cout << "  Occluded        :" << ((result.Occluded==false)? "No" : "Yes") << std::endl;
+    std::cout << "  VisibleOverlap  :" << result.VisibleOverlap << std::endl;
+    std::cout << "  Transformatiom  :" << std::endl;
+    for(for_count=0; for_count<4; for_count++)
+    {
+        std::cout << result.Transformation.at(for_count).at(0) << " , ";
+        std::cout << result.Transformation.at(for_count).at(1) << " , ";
+        std::cout << result.Transformation.at(for_count).at(2) << " , ";
+        std::cout << result.Transformation.at(for_count).at(3) << std::endl;
+    }
+}
 
 void photoneo_controller::PrintFrameInfo(const pho::api::PFrame &Frame)
 {
@@ -1262,7 +1382,7 @@ void photoneo_controller::PrintFrameInfo(const pho::api::PFrame &Frame)
         << FrameInfo.SensorPosition.y << "; "
         << FrameInfo.SensorPosition.z << "]"
         << std::endl;
-    PrintMatrix("Camera calibration matrix", FrameInfo.CameraMatrix);
+    PrintMatrix3("Camera calibration matrix", FrameInfo.CameraMatrix);
     PrintDistortionCoefficients("Frame Distortion Coefficients", FrameInfo.DistortionCoefficients);
     std::cout << "    Camera binning height: " << FrameInfo.CameraBinning.Height << std::endl;
     std::cout << "    Camera binning width: " << FrameInfo.CameraBinning.Width << std::endl;
@@ -1383,12 +1503,12 @@ void photoneo_controller::PrintProcessingSettings(const pho::api::PhoXiProcessin
 void photoneo_controller::PrintCoordinatesSettings(const pho::api::PhoXiCoordinatesSettings &CoordinatesSettings)
 {
     std::cout << "  CoordinatesSettings: " << std::endl;
-    PrintMatrix("CustomRotationMatrix", CoordinatesSettings.CustomTransformation.Rotation);
+    PrintMatrix3("CustomRotationMatrix", CoordinatesSettings.CustomTransformation.Rotation);
     PrintVector("CustomTranslationVector", CoordinatesSettings.CustomTransformation.Translation);
     PrintVector("RobotTranslationVector", CoordinatesSettings.RobotTransformation.Translation);
     std::cout << "    CoordinateSpace: "   << std::string(CoordinatesSettings.CoordinateSpace) << std::endl;
     std::cout << "    RecognizeMarkers: "  << CoordinatesSettings.RecognizeMarkers << std::endl;
-    std::cout << "    SaveTransformations: " << CoordinatesSettings.SaveTransformations << std::endl;
+    // std::cout << "    SaveTransformations: " << CoordinatesSettings.SaveTransformations << std::endl;
     std::cout << "    MarkerScale: "
         << CoordinatesSettings.MarkersSettings.MarkerScale.Width << " x "
         << CoordinatesSettings.MarkersSettings.MarkerScale.Height
@@ -1404,7 +1524,7 @@ void photoneo_controller::PrintCalibrationSettings(const pho::api::PhoXiCalibrat
         << CalibrationSettings.PixelSize.Width << " x "
         << CalibrationSettings.PixelSize.Height
         << std::endl;
-    PrintMatrix("CameraMatrix", CalibrationSettings.CameraMatrix);
+    PrintMatrix3("CameraMatrix", CalibrationSettings.CameraMatrix);
     PrintDistortionCoefficients("DistortionCoefficients", CalibrationSettings.DistortionCoefficients);
 }
 
@@ -1416,7 +1536,7 @@ void photoneo_controller::PrintAdditionalCalibrationSettings(const pho::api::Pho
 }
 
 void photoneo_controller::PrintCoordinateTransformation(const pho::api::PhoXiCoordinateTransformation& transformation) {
-    PrintMatrix("RotationMatrix", transformation.Rotation);
+    PrintMatrix3("RotationMatrix", transformation.Rotation);
     PrintVector("TranslationVector", transformation.Translation);
 }
 
@@ -1437,7 +1557,7 @@ void photoneo_controller::PrintVector(const std::string &name, const pho::api::P
         << std::endl;
 }
 
-void photoneo_controller::PrintMatrix(const std::string &name, const pho::api::CameraMatrix64f &matrix)
+void photoneo_controller::PrintMatrix3(const std::string &name, const pho::api::CameraMatrix64f &matrix)
 {
     if (matrix.Empty())
     {

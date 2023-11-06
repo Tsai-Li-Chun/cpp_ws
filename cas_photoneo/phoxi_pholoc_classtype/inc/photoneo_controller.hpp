@@ -58,15 +58,31 @@ private:
     pho::api::PFrame SampleFrame;
     std::vector <pho::api::PhoXiDeviceInformation> DeviceList;
     std::vector<pho::api::PhoXiProfileDescriptor> ProfilesList;
+
+    pho::sdk::SceneSource scene;
+    std::unique_ptr<pho::sdk::PhoLocalization> localization;
+    pho::sdk::AsynchroneResultQueue queue;
+    pho::sdk::LocalizationPose result;
+    std::vector<pho::sdk::LocalizationPose> ResultList;
+    
+
     std::string FileCameraFolder = "";
     std::string OutputFolder = "";
 
+    /* display localization calculate result */
+    void printLocResult(const pho::sdk::LocalizationPose &r);
     /* get profiles */
     int32_t GetSettingProfiles(void);
     /* set profile */
     bool SetProfile(int32_t count);
     /* display setting profile */
     void printProfilesList(size_t count, const pho::api::PhoXiProfileDescriptor &profile);
+    /* initialize localization object */
+    bool loc_init(void);
+    /* set scene Source */
+    bool loc_SetSceneSource(void);
+    /* load PLCF file */
+    bool loc_loadPLCF(void);
 
     template<class T>
     bool ReadLine(T &Output) const
@@ -85,7 +101,7 @@ private:
 /* public members */
 public:
 	/* Constructor */
-    photoneo_controller() {};
+    photoneo_controller() {ResultList.reserve(20);};
 	/* Destructor */
     ~photoneo_controller() {};
     
@@ -127,6 +143,11 @@ public:
     /* retrieve PointCloud information + store the Frame as a ply structure */
     void DataHandling(void);
 
+    /* photoneo localization start up */
+    bool Localization_StartUp(void);
+    /* calculate the position of the target object in frame */
+    void calculate_localization(void);
+
     /* disconnect from the current device */
     void CorrectDisconnect(void);
 
@@ -140,7 +161,7 @@ public:
     void PrintAdditionalCalibrationSettings(const pho::api::PhoXiAdditionalCameraCalibration& CalibrationSettings, const std::string& source);
     void PrintResolution(const pho::api::PhoXiSize& Resolution);
     void PrintCoordinateTransformation(const pho::api::PhoXiCoordinateTransformation& transformation);
-    void PrintMatrix(const std::string &name, const pho::api::CameraMatrix64f &matrix);
+    void PrintMatrix3(const std::string &name, const pho::api::CameraMatrix64f &matrix);
     void PrintVector(const std::string &name, const pho::api::Point3_64f &vector);
     void PrintDistortionCoefficients(const std::string &name, const std::vector<double> & distCoeffs);
 
