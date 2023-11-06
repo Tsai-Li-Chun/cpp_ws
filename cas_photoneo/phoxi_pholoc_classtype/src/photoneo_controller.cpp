@@ -65,12 +65,12 @@ void photoneo_controller::GetAvailableDevices(void)
     std::cout << "PhoXi API Version: " << Factory.GetAPIVersion() << std::endl;
 
     DeviceList = Factory.GetDeviceList();
-    std::cout << "PhoXi Factory found " << DeviceList.size() << " devices." << std::endl << std::endl;
+    std::cout << "PhoXi Factory found " << DeviceList.size() << " devices." << std::endl;
     pho::api::PhoXiDeviceInformation *DeviceInfo;
-    for (std::size_t i = 0; i < DeviceList.size(); ++i)
+    for (for_count = 0; for_count < DeviceList.size(); ++for_count)
     {
-        DeviceInfo = &DeviceList[i];
-        std::cout << "Device: " << i << std::endl;
+        DeviceInfo = &DeviceList[for_count];
+        std::cout << "Device: " << for_count << std::endl;
         std::cout << "  Name:                    " << DeviceInfo->Name << std::endl;
         std::cout << "  Hardware Identification: " << DeviceInfo->HWIdentification << std::endl;
         std::cout << "  Type:                    " << std::string(DeviceInfo->Type) << std::endl;
@@ -82,8 +82,9 @@ void photoneo_controller::GetAvailableDevices(void)
         std::cout << "  Status:                  "
             << (DeviceInfo->Status.Attached ? "Attached to PhoXi Control. " : "Not Attached to PhoXi Control. ")
             << (DeviceInfo->Status.Ready    ? "Ready to connect"            : "Occupied")
-            << std::endl << std::endl;
+            << std::endl;
     }
+    std::cout << "------------------------------------------------" << std::endl << std::endl;
 }
 
 /** * @brief select how to connect
@@ -100,7 +101,7 @@ void photoneo_controller::ConnectPhoXiDevice(void)
         std::cout << "  3. Connect by IP address" << std::endl;
         std::cout << "  4. Connect first device Attached to PhoXi Control - if any" << std::endl;
         std::cout << "  5. Connect to file camera in folder: " << FileCameraFolder << std::endl;
-        std::cout << "  6. Refresh GetDeviceList" << std::endl << std::endl;
+        std::cout << "  6. Refresh GetDeviceList" << std::endl;
         std::cout << "Please enter the choice: ";
 
         std::size_t Index;
@@ -138,6 +139,7 @@ void photoneo_controller::ConnectPhoXiDevice(void)
             std::cout << "You are connected to " << std::string(PhoXiDevice->GetType())
                 << " with Hardware Identification " << std::string(PhoXiDevice->HardwareIdentification)
                 << std::endl;
+            std::cout << "------------------------------------------------" << std::endl << std::endl;
             break;
         }
     }
@@ -149,7 +151,7 @@ void photoneo_controller::ConnectPhoXiDevice(void)
 **	**/
 void photoneo_controller::ConnectPhoXiDeviceBySerial(void)
 {
-    std::cout << std::endl << "Please enter the Hardware Identification Number: ";
+    std::cout << "Please enter the Hardware Identification Number: ";
     std::string HardwareIdentification;
     if (!ReadLine(HardwareIdentification))
     {
@@ -175,7 +177,7 @@ void photoneo_controller::ConnectPhoXiDeviceBySerial(void)
 **	**/
 void photoneo_controller::ConnectPhoXiDeviceByPhoXiDeviceInformationEntry(void)
 {
-    std::cout << std::endl << "Please enter the Index listed from GetDeviceList call: ";
+    std::cout << "Please enter the Index listed from GetDeviceList call: ";
 
     std::size_t Index;
     if (!ReadLine(Index))
@@ -213,7 +215,7 @@ void photoneo_controller::ConnectPhoXiDeviceByPhoXiDeviceInformationEntry(void)
 **	**/
 void photoneo_controller::ConnectPhoXiDeviceByIPAddress(void)
 {
-    std::cout << std::endl << "Please enter device type:" << std::endl;
+    std::cout << "Please enter device type:" << std::endl;
     std::cout << "  1. PhoXi Scanner" << std::endl;
     std::cout << "  2. PhoXi MotionCam3D" << std::endl;
     std::cout << "Please enter your choice: ";
@@ -272,15 +274,17 @@ void photoneo_controller::ConnectPhoXiDeviceByIPAddress(void)
 **	**/
 void photoneo_controller::ConnectFirstAttachedPhoXiDevice(void)
 {
-    PhoXiDevice = Factory.CreateAndConnectFirstAttached();
-    if (PhoXiDevice)
+    PhoXiDevice = Factory.Create(DeviceList[0]);
+    if (!PhoXiDevice)
     {
-        std::cout << "Connection to the device " << std::string(PhoXiDevice->HardwareIdentification) << " was Successful!" << std::endl;
+        std::cout << "Device " << DeviceList[0].HWIdentification << " was not created" << std::endl;
+        return;
     }
+
+    if (PhoXiDevice->Connect())
+        std::cout << "Connection to the device " << DeviceList[0].HWIdentification << " was Successful!" << std::endl;
     else
-    {
-        std::cout << "There is no attached device, or the device is not ready!" << std::endl;
-    }
+        std::cout << "Connection to the device " << DeviceList[0].HWIdentification << " was Unsuccessful!" << std::endl;
 }
 
 /** * @brief connect using device camera-file
@@ -332,9 +336,9 @@ void photoneo_controller::BasicDeviceState(void)
 
     std::vector <std::string> SupportedFeatures = PhoXiDevice->Features.GetSupportedFeatures();
     std::cout << "  This device have these features supported:";
-    for (std::size_t i = 0; i < SupportedFeatures.size(); ++i)
+    for (for_count = 0; for_count < SupportedFeatures.size(); ++for_count)
     {
-        std::cout << " " << SupportedFeatures[i] << ";";
+        std::cout << " " << SupportedFeatures[for_count] << ";";
     }
     std::cout << std::endl << std::endl;
 
@@ -375,11 +379,11 @@ void photoneo_controller::BasicDeviceState(void)
             throw std::runtime_error(PhoXiDevice->SupportedCapturingModes.GetLastErrorMessage().c_str());
         }
         std::cout << "  SupportedCapturingModes: " << std::endl;
-        for (std::size_t i = 0; i < SupportedCapturingModes.size(); ++i)
+        for (for_count = 0; for_count < SupportedCapturingModes.size(); ++for_count)
         {
             std::cout << "    (" 
-                << std::to_string(SupportedCapturingModes[i].Resolution.Width) << " x "
-                << std::to_string(SupportedCapturingModes[i].Resolution.Height) << ")"
+                << std::to_string(SupportedCapturingModes[for_count].Resolution.Width) << " x "
+                << std::to_string(SupportedCapturingModes[for_count].Resolution.Height) << ")"
                 << std::endl;
         }
     }
@@ -573,9 +577,9 @@ void photoneo_controller::Freerun_loop5(void)
     }
 
     /* get the frame, loop 5 times */
-    for (std::size_t i = 0; i < 5; ++i)
+    for (for_count = 0; for_count < 5; ++for_count)
     {
-        std::cout << "Waiting for frame " << i << std::endl;
+        std::cout << "Waiting for frame " << for_count << std::endl;
         /* get the frame */
         pho::api::PFrame Frame = PhoXiDevice->GetFrame();
         /* display */
@@ -589,6 +593,68 @@ void photoneo_controller::Freerun_loop5(void)
             std::cout << "Failed to retrieve the frame!";
         }
     }
+}
+
+/** * @brief capture frame in free-mode
+	* @param None
+ 	* @return None
+**	**/
+void photoneo_controller::Freerun(void)
+{
+    /* Check if the device is connected */
+    if (!PhoXiDevice || !PhoXiDevice->isConnected())
+    {
+        std::cout << "Device is not created, or not connected!" << std::endl;
+        return;
+    }
+    /* if it is not in Freerun mode, we need to switch the modes */
+    if (PhoXiDevice->TriggerMode != pho::api::PhoXiTriggerMode::Freerun)
+    {
+        std::cout << "Device is not in Freerun mode" << std::endl;
+        if (PhoXiDevice->isAcquiring())
+        {
+            std::cout << "Stopping acquisition" << std::endl;
+            /* if the device is in Acquisition mode, we need to stop the acquisition */
+            if (!PhoXiDevice->StopAcquisition())
+            {
+                throw std::runtime_error("Error in StopAcquistion");
+            }
+        }
+        std::cout << "Switching to Freerun mode " << std::endl;
+        /* modify the value of PhoXiDevice->TriggerMode to enable the device to operate */
+        PhoXiDevice->TriggerMode = pho::api::PhoXiTriggerMode::Freerun;
+        /* check if the operation was successful */
+        if (!PhoXiDevice->TriggerMode.isLastOperationSuccessful())
+        {
+            throw std::runtime_error(PhoXiDevice->TriggerMode.GetLastErrorMessage().c_str());
+        }
+    }
+
+    /* start the device acquisition, if necessary */
+    if (!PhoXiDevice->isAcquiring())
+        if (!PhoXiDevice->StartAcquisition())
+            throw std::runtime_error("Error in StartAcquisition");
+
+    /* clear the current Acquisition buffer */
+    int ClearedFrames = PhoXiDevice->ClearBuffer();
+    std::cout << ClearedFrames << " were cleared from the cyclic buffer" << std::endl;
+    /* check the state of the Acquisition call */
+    if (!PhoXiDevice->isAcquiring())
+    {
+        std::cout << "Device is not acquiring" << std::endl;
+        return;
+    }
+
+    /* get the frame */
+    pho::api::PFrame Frame = PhoXiDevice->GetFrame();
+    /* display */
+    if (Frame)
+    {
+        PrintFrameInfo(Frame);
+        PrintFrameData(Frame);
+    }
+    else
+        std::cout << "Failed to retrieve the frame!";
 }
 
 /** * @brief capture frame in Software-Trigger, loop 5 times
@@ -646,9 +712,9 @@ void photoneo_controller::SoftwareTrigger_loop5(void)
     }
 
     /* get the frame, loop 5 times */
-    for (std::size_t i = 0; i < 5; ++i)
+    for (for_count = 0; for_count < 5; ++for_count)
     {
-        std::cout << "Triggering the " << i << "-th frame" << std::endl;
+        std::cout << "Triggering the " << for_count << "-th frame" << std::endl;
         int FrameID = PhoXiDevice->TriggerFrame();
         if (FrameID < 0)
         {
@@ -662,7 +728,7 @@ void photoneo_controller::SoftwareTrigger_loop5(void)
         }
 
         /* call for a frame with specific FrameID */
-        std::cout << "Waiting for frame " << i << std::endl;
+        std::cout << "Waiting for frame " << for_count << std::endl;
         pho::api::PFrame Frame = PhoXiDevice->GetSpecificFrame(FrameID);
         /* display */
         if (Frame)
@@ -675,6 +741,78 @@ void photoneo_controller::SoftwareTrigger_loop5(void)
             std::cout << "Failed to retrieve the frame!";
         }
     }
+}
+
+/** * @brief capture frame in Software-Trigger
+	* @param None
+ 	* @return None
+**	**/
+void photoneo_controller::SoftwareTrigger(void)
+{
+    /* Check if the device is connected */
+    if (!PhoXiDevice || !PhoXiDevice->isConnected())
+    {
+        std::cout << "Device is not created, or not connected!" << std::endl;
+        return;
+    }
+    /* if it is not in Software trigger mode, we need to switch the modes */
+    if (PhoXiDevice->TriggerMode != pho::api::PhoXiTriggerMode::Software)
+    {
+        std::cout << "Device is not in Software trigger mode" << std::endl;
+        if (PhoXiDevice->isAcquiring())
+        {
+            std::cout << "Stopping acquisition" << std::endl;
+            /* if the device is in Acquisition mode, we need to stop the acquisition */
+            if (!PhoXiDevice->StopAcquisition())
+            {
+                throw std::runtime_error("Error in StopAcquistion");
+            }
+        }
+        std::cout << "Switching to Software trigger mode " << std::endl;
+        /* modify the value of PhoXiDevice->TriggerMode to enable the device to operate */
+        PhoXiDevice->TriggerMode = pho::api::PhoXiTriggerMode::Software;
+        /* check if the operation was successful */
+        if (!PhoXiDevice->TriggerMode.isLastOperationSuccessful())
+            throw std::runtime_error(PhoXiDevice->TriggerMode.GetLastErrorMessage().c_str());
+    }
+
+    /* start the device acquisition, if necessary */
+    if (!PhoXiDevice->isAcquiring())
+        if (!PhoXiDevice->StartAcquisition())
+            throw std::runtime_error("Error in StartAcquisition");
+
+    /* clear the current Acquisition buffer */
+    int ClearedFrames = PhoXiDevice->ClearBuffer();
+    std::cout << ClearedFrames << " frames were cleared from the cyclic buffer" << std::endl;
+    /* check the state of the Acquisition call */
+    if (!PhoXiDevice->isAcquiring())
+    {
+        std::cout << "Device is not acquiring" << std::endl;
+        return;
+    }
+
+    int FrameID = PhoXiDevice->TriggerFrame();
+    if (FrameID < 0)
+    {
+        /* if negative number is returned trigger was unsuccessful */
+        std::cout << "Trigger was unsuccessful! code=" << FrameID << std::endl;
+        return;
+    }
+    else
+        std::cout << "Frame was triggered, Frame Id: " << FrameID << std::endl;
+
+    /* call for a frame with specific FrameID */
+    std::cout << "Waiting for frame " << FrameID << std::endl;
+    pho::api::PFrame Frame = PhoXiDevice->GetSpecificFrame(FrameID);
+    /* display */
+    if (Frame)
+    {
+        PrintFrameInfo(Frame);
+        PrintFrameData(Frame); 
+    }
+    else
+        std::cout << "Failed to retrieve the frame!";
+    std::cout << "------------------------------------------------" << std::endl << std::endl;
 }
 
 /** * @brief capture frame in Software-Trigger-Async, loop 5 times
@@ -748,9 +886,9 @@ void photoneo_controller::SoftwareTriggerAsyncGrab_loop5(void)
 
     /* get the frame, loop 5 times */
     int FrameID = -1;
-    for (std::size_t i = 0; i < 5; ++i)
+    for (for_count = 0; for_count < 5; ++for_count)
     {
-        std::cout << "Triggering the " << i << "-th frame" << std::endl;
+        std::cout << "Triggering the " << for_count << "-th frame" << std::endl;
         FrameID = PhoXiDevice->TriggerFrame();
         if (FrameID < 0)
         {
@@ -772,8 +910,9 @@ void photoneo_controller::SoftwareTriggerAsyncGrab_loop5(void)
     PhoXiDevice->DisableAsyncGetFrame();
 }
 
-/** * @brief change the settings of the device
-	* @param None
+/** * @brief change the settings of the device,
+    *        restore to the original settings after completion
+    * @param None
  	* @return None
 **	**/
 void photoneo_controller::ChangeSettings(void)
@@ -822,16 +961,16 @@ void photoneo_controller::ChangeSettings(void)
 
     int CurrentShutterMultiplier = PhoXiDevice->CapturingSettings->ShutterMultiplier;
 
-    //To change the setting, just assign a new value
+    /* to change the setting, just assign a new value */
     PhoXiDevice->CapturingSettings->ShutterMultiplier = CurrentShutterMultiplier + 1;
 
-    //You can check if the operation succeed
+    /* check if the operation succeed */
     if (!PhoXiDevice->CapturingSettings.isLastOperationSuccessful())
     {
         throw std::runtime_error(PhoXiDevice->CapturingSettings.GetLastErrorMessage().c_str());
     }
 
-    //Get the current Output configuration
+    /* get the current Output configuration */
     pho::api::FrameOutputSettings CurrentOutputSettings = PhoXiDevice->OutputSettings;
     pho::api::FrameOutputSettings NewOutputSettings = CurrentOutputSettings;
     NewOutputSettings.SendPointCloud = true;
@@ -841,26 +980,26 @@ void photoneo_controller::ChangeSettings(void)
     NewOutputSettings.SendTexture = true;
     NewOutputSettings.SendColorCameraImage = true;
     NewOutputSettings.SendEventMap = true;
-    //Send all outputs
+    /* send all outputs */
     PhoXiDevice->OutputSettings = NewOutputSettings;
 
-    //Trigger the frame
+    /* trigger the frame */
     int FrameID = PhoXiDevice->TriggerFrame();
-    //Check if the frame was successfully triggered
+    /* check if the frame was successfully triggered */
     if (FrameID < 0)
     {
         throw std::runtime_error("Software trigger failed! code=" + std::to_string(FrameID));
     }
 
-    //Retrieve the frame
+    /* retrieve the frame */
     pho::api::PFrame Frame = PhoXiDevice->GetSpecificFrame(FrameID);
     if (Frame)
     {
-        //Save the frame for next 
+        /* save the frame for next  */
         SampleFrame = Frame;
     }
 
-    //Change the setting back
+    /* change the setting back */
     PhoXiDevice->OutputSettings = CurrentOutputSettings;
     PhoXiDevice->CapturingSettings->ShutterMultiplier = CurrentShutterMultiplier;
 
@@ -869,36 +1008,36 @@ void photoneo_controller::ChangeSettings(void)
         throw std::runtime_error(PhoXiDevice->CapturingSettings.GetLastErrorMessage().c_str());
     }
 
-    //Try to change device resolution
+    /* try to change device resolution */
     if (PhoXiDevice->SupportedCapturingModes.isEnabled() && PhoXiDevice->SupportedCapturingModes.CanGet()
         && PhoXiDevice->CapturingMode.isEnabled() 
         && PhoXiDevice->CapturingMode.CanSet() && PhoXiDevice->CapturingMode.CanGet())
     {
-        //Retrieve current capturing mode
+        /* retrieve current capturing mode */
         pho::api::PhoXiCapturingMode CurrentCapturingMode = PhoXiDevice->CapturingMode;
         if (!PhoXiDevice->CapturingMode.isLastOperationSuccessful())
         {
             throw std::runtime_error(PhoXiDevice->CapturingMode.GetLastErrorMessage().c_str());
         }
 
-        //Get all supported modes
+        /* get all supported modes */
         std::vector <pho::api::PhoXiCapturingMode> SupportedCapturingModes = PhoXiDevice->SupportedCapturingModes;
         if (!PhoXiDevice->SupportedCapturingModes.isLastOperationSuccessful())
         {
             throw std::runtime_error(PhoXiDevice->SupportedCapturingModes.GetLastErrorMessage().c_str());
         }
 
-        //Cycle trough all other Supported modes, change the settings and grab a frame
-        for (std::size_t i = 0; i < SupportedCapturingModes.size(); ++i)
+        /* cycle trough all other Supported modes, change the settings and grab a frame */
+        for (for_count = 0; for_count < SupportedCapturingModes.size(); ++for_count)
         {
-            if (!(SupportedCapturingModes[i] == CurrentCapturingMode))
+            if (!(SupportedCapturingModes[for_count] == CurrentCapturingMode))
             {
-                PhoXiDevice->CapturingMode = SupportedCapturingModes[i];
+                PhoXiDevice->CapturingMode = SupportedCapturingModes[for_count];
                 if (!PhoXiDevice->CapturingMode.isLastOperationSuccessful())
                 {
                     throw std::runtime_error(PhoXiDevice->CapturingMode.GetLastErrorMessage().c_str());
                 }
-                //Trigger Frame
+                /* trigger Frame */
                 int FrameID = PhoXiDevice->TriggerFrame();
                 if (FrameID < 0)
                 {
@@ -915,7 +1054,7 @@ void photoneo_controller::ChangeSettings(void)
             }
         }
 
-        //Change the mode back
+        /* change the mode back */
         PhoXiDevice->CapturingMode = CurrentCapturingMode;
         if (!PhoXiDevice->CapturingMode.isLastOperationSuccessful())
         {
@@ -925,16 +1064,73 @@ void photoneo_controller::ChangeSettings(void)
     }
 }
 
-void photoneo_controller::DataHandling()
+/** * @brief get and set Profile
+    * @param None
+ 	* @return None
+**	**/
+void photoneo_controller::GetAndSetProfile(void)
 {
-    //Check if we have SampleFrame Data
+    SetProfile(GetSettingProfiles());
+}
+
+/** * @brief get profiles
+    * @param None
+ 	* @return int16_t, number of obtained profiles.
+**	**/
+int32_t photoneo_controller::GetSettingProfiles(void)
+{
+    ProfilesList = PhoXiDevice->Profiles;
+    if (!PhoXiDevice->Profiles.isLastOperationSuccessful())
+    {
+        std::cout << "Can not get profile list: " << PhoXiDevice->Profiles.GetLastErrorMessage() << std::endl;
+        return (-1);
+    }
+    std::cout << "Get setting profiles Successully!" << std::endl;
+    std::cout << "------------------------------------------------" << std::endl;
+    std::cout << std::boolalpha;
+    for( for_count=0; for_count<ProfilesList.size(); for_count++ )
+        printProfilesList(for_count, ProfilesList[for_count]);
+
+    return for_count;
+}
+
+/** * @brief set setting profiles
+    * @param None
+ 	* @return bool, operation result
+**	**/
+bool photoneo_controller::SetProfile(int32_t count)
+{
+    std::cout << "Please enter the profile number to using:";
+    std::size_t Index;
+    while( (!ReadLine(Index)) || (Index>=count) )
+        std::cout << "Incorrect input! Please re-enter:";
+
+    PhoXiDevice->ActiveProfile = ProfilesList[Index].Name;
+    if (PhoXiDevice->ActiveProfile.isLastOperationSuccessful())
+        std::cout << "active profile set to : " << ProfilesList[Index].Name << " Soccesully" << std::endl;
+    else
+    {
+        std::cout << "Can not set active profile: " << PhoXiDevice->ActiveProfile.GetLastErrorMessage() << std::endl;
+        return false;
+    }
+    std::cout << "------------------------------------------------" << std::endl << std::endl;
+    return true;
+}
+
+/** * @brief retrieve PointCloud information + store the Frame as a ply structure
+    * @param None
+ 	* @return None
+**	**/
+void photoneo_controller::DataHandling(void)
+{
+    /* check if we have SampleFrame Data */
+    int a=0;
     if (!SampleFrame || SampleFrame->Empty())
     {
         std::cout << "Frame does not exist, or has no content!" << std::endl;
-        return;
     }
 
-    //We will count the number of measured points
+    /* we will count the number of measured points */
     if (!SampleFrame->PointCloud.Empty())
     {
         int MeasuredPoints = 0;
@@ -1014,7 +1210,11 @@ void photoneo_controller::DataHandling()
 #endif
 }
 
-void photoneo_controller::CorrectDisconnect()
+/** * @brief disconnect from the current device
+    * @param None
+ 	* @return None
+**	**/
+void photoneo_controller::CorrectDisconnect(void)
 {
     if (!PhoXiDevice->isConnected()) {
         std::cout << "Device is not connected." << std::endl;
@@ -1035,6 +1235,18 @@ void photoneo_controller::CorrectDisconnect()
     PhoXiDevice->Disconnect(Entry);
     //The call PhoXiDevice without Logout will be called automatically by destructor
 }
+
+/** * @brief display setting profile
+    * @param PhoXiProfileDescriptor, profile profile descriptor
+ 	* @return None
+**	**/
+void photoneo_controller::printProfilesList(size_t count, const pho::api::PhoXiProfileDescriptor &profile)
+{
+    std::cout << "Profile [" << count << "] :" << std::endl;
+    std::cout << "    Name: "<< profile.Name << std::endl;
+    std::cout << "    Is factory profile: " << profile.IsFactory << std::endl;
+}
+
 
 void photoneo_controller::PrintFrameInfo(const pho::api::PFrame &Frame)
 {
@@ -1262,16 +1474,16 @@ void photoneo_controller::PrintDistortionCoefficients(const std::string& name, c
     int brackets = 0;
     currentDistCoeffsSS << "(";
     currentDistCoeffsSS << distCoeffs[0];
-    for (size_t i = 1; i < distCoeffs.size(); ++i)
+    for (for_count = 1; for_count < distCoeffs.size(); ++for_count)
     {
-        if (i == 4 || i == 5 || i == 8 || i == 12 || i == 14)
+        if (for_count == 4 || for_count == 5 || for_count == 8 || for_count == 12 || for_count == 14)
         {
             currentDistCoeffsSS << "[";
             ++brackets;
         }
-        currentDistCoeffsSS << ", " << distCoeffs[i];
+        currentDistCoeffsSS << ", " << distCoeffs[for_count];
     }
-    for (int j = 0; j < brackets; ++j)
+    for (for_count = 0; for_count < brackets; ++for_count)
     {
         currentDistCoeffsSS << "]";
     }

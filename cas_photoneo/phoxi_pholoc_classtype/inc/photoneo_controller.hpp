@@ -52,13 +52,43 @@ class photoneo_controller
 {
 /* private members */
 private:
+    size_t for_count;
     pho::api::PhoXiFactory Factory;
     pho::api::PPhoXi PhoXiDevice;
     pho::api::PFrame SampleFrame;
     std::vector <pho::api::PhoXiDeviceInformation> DeviceList;
+    std::vector<pho::api::PhoXiProfileDescriptor> ProfilesList;
     std::string FileCameraFolder = "";
     std::string OutputFolder = "";
 
+    /* get profiles */
+    int32_t GetSettingProfiles(void);
+    /* set profile */
+    bool SetProfile(int32_t count);
+    /* display setting profile */
+    void printProfilesList(size_t count, const pho::api::PhoXiProfileDescriptor &profile);
+
+    template<class T>
+    bool ReadLine(T &Output) const
+    {
+        std::string Input;
+        std::getline(std::cin, Input);
+        std::stringstream InputSteam(Input);
+        return (InputSteam >> Output) ? true : false;
+    }
+    bool ReadLine(std::string &Output) const
+    {
+        std::getline(std::cin, Output);
+        return true;
+    }
+
+/* public members */
+public:
+	/* Constructor */
+    photoneo_controller() {};
+	/* Destructor */
+    ~photoneo_controller() {};
+    
     /* get availble devices */
     void GetAvailableDevices(void);
     /* select how to connect */
@@ -81,16 +111,25 @@ private:
 
     /* capture frame in free-mode, loop 5 times */
     void Freerun_loop5(void);
+    /* capture frame in free-mode, loop 5 times */
+    void Freerun(void);
     /*  capture frame in Software-Trigger, loop 5 times */
     void SoftwareTrigger_loop5(void);
+    /*  capture frame in Software-Trigger, loop 5 times */
+    void SoftwareTrigger(void);
     /* capture frame in Software-Trigger-Async, loop 5 times */
     void SoftwareTriggerAsyncGrab_loop5(void);
 
     /* change the settings of the device */
     void ChangeSettings(void);
-    /*  */
+    /* get and set Profile */
+    void GetAndSetProfile(void);
+    /* retrieve PointCloud information + store the Frame as a ply structure */
     void DataHandling(void);
+
+    /* disconnect from the current device */
     void CorrectDisconnect(void);
+
 
     void PrintFrameInfo(const pho::api::PFrame &Frame);
     void PrintFrameData(const pho::api::PFrame &Frame);
@@ -105,26 +144,6 @@ private:
     void PrintVector(const std::string &name, const pho::api::Point3_64f &vector);
     void PrintDistortionCoefficients(const std::string &name, const std::vector<double> & distCoeffs);
 
-    template<class T>
-    bool ReadLine(T &Output) const
-    {
-        std::string Input;
-        std::getline(std::cin, Input);
-        std::stringstream InputSteam(Input);
-        return (InputSteam >> Output) ? true : false;
-    }
-    bool ReadLine(std::string &Output) const
-    {
-        std::getline(std::cin, Output);
-        return true;
-    }
-
-/* public members */
-public:
-	/* Constructor */
-    photoneo_controller() {};
-	/* Destructor */
-    ~photoneo_controller() {};
 };
 
 /* Extern Class End */
