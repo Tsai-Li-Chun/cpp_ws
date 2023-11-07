@@ -29,6 +29,8 @@
 /* Define ---------------------------------------------------*/
 /* Define Begin */
 
+#define results_MAXsize 20
+
 #if defined(_WIN32)
     #define DELIMITER "\\"
 #elif defined (__linux__)
@@ -101,7 +103,7 @@ private:
 /* public members */
 public:
 	/* Constructor */
-    photoneo_controller() {ResultList.reserve(20);};
+    photoneo_controller() {ResultList.reserve(results_MAXsize);};
 	/* Destructor */
     ~photoneo_controller() {};
     
@@ -147,6 +149,8 @@ public:
     bool Localization_StartUp(void);
     /* calculate the position of the target object in frame */
     void calculate_localization(void);
+    /* get localization results */
+    void GetLocResults(std::vector<pho::sdk::LocalizationPose>* results);
 
     /* disconnect from the current device */
     void CorrectDisconnect(void);

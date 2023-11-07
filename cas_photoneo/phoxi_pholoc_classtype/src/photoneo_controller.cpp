@@ -1348,6 +1348,20 @@ void photoneo_controller::calculate_localization(void)
     std::cout << "------------------------------------------------" << std::endl << std::endl;
 }
 
+/** * @brief calculate the position of the target object in frame
+    * @param None
+ 	* @return float*, calculation result
+**	**/
+void photoneo_controller::GetLocResults(std::vector<pho::sdk::LocalizationPose> *results)
+{
+    results->clear();
+    for( for_count=0; for_count<ResultList.size(); for_count++ )
+    {
+        results->push_back(ResultList[for_count]);
+        // std::cout << "writing " << results->size() << " / " << results->capacity() << std::endl;
+    }
+}
+
 /** * @brief display localization calculate result
     * @param None
  	* @return float*, calculation result
