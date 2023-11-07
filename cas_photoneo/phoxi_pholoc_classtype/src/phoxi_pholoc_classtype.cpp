@@ -90,12 +90,12 @@ int main(int argc, char **argv)
     pho_ctl.GetAvailableDevices();
     pho_ctl.ConnectPhoXiDevice();
     pho_ctl.GetAndSetProfile();
-    pho_ctl.SoftwareTrigger();
+    // pho_ctl.SoftwareTrigger();
     pho_ctl.Localization_StartUp();
-    
+
+    printf("Waiting for data request command ...\n");
     do
     {
-        printf("Waiting for data request command ...\n");
         shm_ctl.read_shm(ResultList_array, 1*sizeof(float));
         if( ResultList_array[0] == 1.0f )
         {
@@ -105,7 +105,8 @@ int main(int argc, char **argv)
             data_size = result_vector2array(&ResultList_vector, ResultList_array);
             ResultList_array[0] = 2.0f;     ResultList_array[1] = (float)data_size;
             shm_ctl.write_shm(ResultList_array, data_size*sizeof(float));
-            printf("Finished writing to shared memory.\n");
+            printf("Finished writing to shared memory.\n\n");
+            printf("Waiting for data request command ...\n");
         }
         sleep(1);
     }while( ResultList_array[0] != 4.0f );
@@ -121,36 +122,20 @@ int main(int argc, char **argv)
 
 int64_t result_vector2array(std::vector<pho::sdk::LocalizationPose> *vector, float *array)
 {
-    static size_t vector_size,array_size,i;
+    static size_t vector_size,array_size,i,j,k;
     vector_size = vector->size();
     array_size = 2;
     for( i=0; i<vector_size; i++ )
     {
-        std::cout << i << " / " << array_size << std::endl;
         array[array_size] = (float)vector->at(i).ID; array_size++;
-        std::cout << i << " / " << array_size << std::endl;
         array[array_size] = (float)vector->at(i).Occluded; array_size++;
-        std::cout << i << " / " << array_size << std::endl;
         array[array_size] = (float)vector->at(i).VisibleOverlap; array_size++;
-        std::cout << i << " / " << array_size << std::endl;
-        array[array_size] = vector->at(i).Transformation.at(0).at(0); array_size++;
-        std::cout << i << " / " << array_size << std::endl;
-        array[array_size] = vector->at(i).Transformation.at(0).at(1); array_size++;
-        array[array_size] = vector->at(i).Transformation.at(0).at(2); array_size++;
-        array[array_size] = vector->at(i).Transformation.at(0).at(3); array_size++;
-        array[array_size] = vector->at(i).Transformation.at(1).at(0); array_size++;
-        array[array_size] = vector->at(i).Transformation.at(1).at(1); array_size++;
-        array[array_size] = vector->at(i).Transformation.at(1).at(2); array_size++;
-        array[array_size] = vector->at(i).Transformation.at(1).at(3); array_size++;
-        array[array_size] = vector->at(i).Transformation.at(2).at(0); array_size++;
-        array[array_size] = vector->at(i).Transformation.at(2).at(1); array_size++;
-        array[array_size] = vector->at(i).Transformation.at(2).at(2); array_size++;
-        array[array_size] = vector->at(i).Transformation.at(2).at(3); array_size++;
-        array[array_size] = vector->at(i).Transformation.at(3).at(0); array_size++;
-        array[array_size] = vector->at(i).Transformation.at(3).at(1); array_size++;
-        array[array_size] = vector->at(i).Transformation.at(3).at(2); array_size++;
-        array[array_size] = vector->at(i).Transformation.at(3).at(3); array_size++;
-        std::cout << i << " / " << array_size << std::endl;
+        for( j=0; j<4; j++ )
+            for( k=0; k<4; k++ )
+            {
+                array[array_size] = vector->at(i).Transformation.at(j).at(k);
+                array_size++;
+            }
     }
     return array_size;
 }

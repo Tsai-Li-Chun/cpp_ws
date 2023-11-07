@@ -1225,14 +1225,15 @@ void photoneo_controller::CorrectDisconnect(void)
     //To Stop the device, just
     PhoXiDevice->StopAcquisition();
     //If you want to disconnect and logout the device from PhoXi Control, so it will then be available for other devices, call
-    std::cout << "Do you want to logout the device? (0 if NO / 1 if YES) ";
+    
+    /* std::cout << "Do you want to logout the device? (0 if NO / 1 if YES) ";
     bool Entry;
     if (!ReadLine(Entry))
     {
         return;
-    }
-    PhoXiDevice->Disconnect(Entry);
-    // std::cout << std::endl;
+    } */
+    if( PhoXiDevice->Disconnect(true, true) )
+        std::cout << "The device Success to disconnect" << std::endl;
     //The call PhoXiDevice without Logout will be called automatically by destructor
 }
 
@@ -1339,7 +1340,7 @@ void photoneo_controller::calculate_localization(void)
     {
         printLocResult(result);
         ResultList.push_back(result);
-        std::cout << "current capacity occupied by vector: ";
+        std::cout << "  current capacity occupied by vector: ";
         std::cout << ResultList.size() << " / " << ResultList.capacity() << std::endl;
         if( ResultList.size() >= ResultList.capacity() )
             break;
@@ -1375,10 +1376,10 @@ void photoneo_controller::printLocResult(const pho::sdk::LocalizationPose &r)
     std::cout << "  Transformatiom  :" << std::endl;
     for(for_count=0; for_count<4; for_count++)
     {
-        std::cout << result.Transformation.at(for_count).at(0) << " , ";
-        std::cout << result.Transformation.at(for_count).at(1) << " , ";
-        std::cout << result.Transformation.at(for_count).at(2) << " , ";
-        std::cout << result.Transformation.at(for_count).at(3) << std::endl;
+        std::cout << "    " << result.Transformation.at(for_count).at(0) << " , ";
+        std::cout << "    " << result.Transformation.at(for_count).at(1) << " , ";
+        std::cout << "    " << result.Transformation.at(for_count).at(2) << " , ";
+        std::cout << "    " << result.Transformation.at(for_count).at(3) << std::endl;
     }
 }
 

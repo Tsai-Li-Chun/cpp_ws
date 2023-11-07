@@ -71,6 +71,7 @@ int main(int argc, char** argv)
     if( ptr == (void*)(-1) ) return EXIT_FAILURE;
 	/* display information of the shm */
     shm_ctl.shmds_information(); 
+    std::cout << "----------------------------------" << std::endl << std::endl;
 
     /* read data from shared memory. */
     do
@@ -80,16 +81,16 @@ int main(int argc, char** argv)
         if( wait_key == 'r' )
         {
             /* send request */
-            printf("Send request, pose[0]=1.0\n");
+            printf("Send request for data command\n");
             pose[0] = 1.0f;
             // for(i=1; i<17; i++) pose[i] = 0.0f;
             shm_ctl.write_shm(pose, 1*sizeof(float));
             /* wait for response */
+            printf("Waiting for data to return ...\n");
             while( pose[0] != 2.0f )
             {
                 shm_ctl.read_shm(pose, 2*sizeof(float));
-                printf("Waiting for data to return ...\n");
-                printf("pose[0]=%10.4f , pose[1]=%10.4f\n",pose[0],pose[1]);
+                // printf("pose[0]=%10.4f , pose[1]=%10.4f\n",pose[0],pose[1]);
                 sleep(1);
             }
             shm_ctl.read_shm(pose, (size_t)pose[1]*sizeof(float));
