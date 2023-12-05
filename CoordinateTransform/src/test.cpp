@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 
 #include "CoordinateTransformation.h"
 #include "M5Manipulator.h"
@@ -70,4 +70,6 @@ int main() {
 	//Pose m5_robot_root_to_flange;
 
 	//m5_robot_root_to_flange.SetData(1379.956, 289.447, 572.48);
+
+	return 0;
 }
