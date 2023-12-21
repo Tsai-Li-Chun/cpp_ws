@@ -8,15 +8,11 @@
 /* System Includes ------------------------------------------*/
 /* System Includes Begin */
 #include <iostream>
-#include <linux/input.h>
-#include <fcntl.h>
-#include <unistd.h>
-
 /* System Includes End */
 /* User Includes --------------------------------------------*/
 /* User Includes Begin */
 #include "main_modbus.hpp"
-#include "Modbus_Handshake.hpp"
+#include "wise4060_HandShake.hpp"
 /* User Includes End */
 
 /* namespace ------------------------------------------------*/
@@ -64,19 +60,13 @@ int main(int argc, char **argv)
 {
 	/* 隨便顯示些東西證明程式運作 */
 	std::cout << "modbus" << std::endl;
-	/* 關閉終端機本身緩衝區返饋 */
-	system("stty -echo");
 	/* 建立modbus通訊物件 */
-	Modbus_Handshake MH("192.168.0.161");
+	wise4060_HandShake wise4060(wise4060_IP, wise4060_port, wise4060_slave);
 
-	/* main loop */
-	while(1)
-	{
-		// MH.keyborad_to_cardir();
-		MH.send_speed();
-		usleep(100*1000);
-		// printf("%d,%d\n",MH.getvel(),MH.getyaw());
-	}
+	// /* main loop */
+	// while(1)
+	// {
+	// }
 
 	/* main quit */
 	return 0;

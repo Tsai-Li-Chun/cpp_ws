@@ -5,7 +5,7 @@
             "includePath": [
                 "/opt/Photoneo/PhoXiControl-1.11.1/API/include/",
                 "/opt/PhotoneoSDK/Localization/include/**",
-                "${workspaceFolder}/c++_modbus_project/inc/**",
+                "${workspaceFolder}/modbus_project/inc/**",
                 "${workspaceFolder}/socket_project/inc/**",
                 "${workspaceFolder}/shared_memory/inc/**",
                 "${workspaceFolder}/cas_photoneo/phoxi_pholoc_classtype/inc/**",

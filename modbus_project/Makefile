@@ -45,7 +45,7 @@ CFLAGS = -std=c++11 -O0 -MMD -MP $(inc_path)
 ######################################
 c_sources = \
 	src/main.cpp \
-	src/Modbus_Handshake.cpp \
+	src/wise4060_HandShake.cpp \
 
 ############################################################################
 #	object file
