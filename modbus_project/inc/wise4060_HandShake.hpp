@@ -26,6 +26,19 @@
 
 /* Extern Typedef -------------------------------------------*/
 /* Extern Typedef Begin */
+
+union modbus_u16tofloat
+{
+    float f;
+    uint16_t ch[ (sizeof(float))/sizeof(uint16_t) ];
+};
+
+union modbus_u8tou16
+{
+    uint16_t u16;
+    uint8_t u8[ (sizeof(uint16_t))/sizeof(uint8_t) ];
+};
+
 /* Extern Typedef End */
 
 
@@ -40,6 +53,15 @@ private:
 	/* create modbus_communication_structure */
 	modbus_t* mb;
 
+	/* libmodbus return value(ReturnCode) */
+	int rc;
+	/* for temporary IO status */
+	uint8_t DIO_tmp=0;
+	/* for status of each input channel */
+	uint8_t DI_status[wise4060_input_quantity];
+	/* for status of each output channel */
+	uint8_t DO_status[wise4060_output_quantity];
+
 	/* 設定連結函數 */
 	int Modbus_slave_connect(int slave);
 
@@ -52,10 +74,23 @@ public:
 	/* 解建構函數 */
 	~wise4060_HandShake();
 
-	bool wise4060_readDI(uint8_t channel);
-	uint8_t wise4060_readALLDI(void);
-	bool wise4060_writeDO(uint8_t channel);
-	uint8_t wise4060_writeALLDO(void);
+	/* read single input channel function */
+	int wise4060_readDI(DI_Address channel);
+	/* read ALL input channel function */
+	int wise4060_readALLDI(void);
+	/* read single output channel function */
+	int wise4060_readDO(DO_Address channel);
+	/* read ALL output channel function */
+	int wise4060_readALLDO(void);
+	/* write single output channel function */
+	int wise4060_writeDO(DO_Address channel,const int onoff);
+	/* write ALL output channel function */
+	int wise4060_writeALLDO(const uint8_t *onoff);
+
+	/* get DI_status value */
+	void get_DI_status(uint8_t *din);
+	/* get DO_status value */
+	void get_DO_status(uint8_t *dout);
 };
 
 /* Extern Class End */

@@ -24,6 +24,8 @@
 #define wise4060_IP "192.168.1.6"
 #define wise4060_port 502
 #define wise4060_slave 1
+#define wise4060_input_quantity 4
+#define wise4060_output_quantity 4
 
 /* Define End */
 
@@ -36,19 +38,19 @@
 /* Extern Class -------------------------------------------*/
 /* Extern Class Begin */
 
-enum class DI_Address:uint8_t
+enum class DI_Address:int
 {
-	DI_0 = 1,
-	DI_1 = 2,
-	DI_2 = 3,
-	DI_3 = 4
+	DI_0 = 0,
+	DI_1 = 1,
+	DI_2 = 2,
+	DI_3 = 3
 };
-enum class DO_Address:uint8_t
+enum class DO_Address:int
 {
-	DO_0 = 17,
-	DO_1 = 18,
-	DO_2 = 19,
-	DO_3 = 20
+	DO_0 = 16,
+	DO_1 = 17,
+	DO_2 = 18,
+	DO_3 = 19
 };
 
 /* Extern Class End */

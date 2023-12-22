@@ -7,8 +7,9 @@
 
 /* System Includes ------------------------------------------*/
 /* System Includes Begin */
-#include <stdio.h>
 #include <iostream>
+#include <stdio.h>
+#include <string.h>
 /* System Includes End */
 /* User Includes --------------------------------------------*/
 /* User Includes Begin */
@@ -63,6 +64,12 @@ wise4060_HandShake::wise4060_HandShake(const char* IP, int port, int slave)
 	mb = modbus_new_tcp(IP,port);
 	if( Modbus_slave_connect(slave) != 0 )
 		printf("Modbus TCP Mode Setup Failure!\n");
+	
+	/* reset the variable to zero  */
+	for(int i=0; i<wise4060_input_quantity; i++)
+		DI_status[i]=0xFF;
+	for(int i=0; i<wise4060_output_quantity; i++)
+		DO_status[i]=0xFF;
 }
 
 /** * @brief Constructor - RTU Mode
@@ -80,6 +87,12 @@ wise4060_HandShake::wise4060_HandShake(const char* device, int BR, char parity, 
 	mb = modbus_new_rtu(device,BR,parity,data_bit,stop_bit);
 	if( Modbus_slave_connect(slave) != 0 )
 		printf("Modbus RTU Mode Setup Failure!\n");
+	
+	/* reset the variable to zero  */
+	for(int i=0; i<wise4060_input_quantity; i++)
+		DI_status[i]=0xFF;
+	for(int i=0; i<wise4060_output_quantity; i++)
+		DO_status[i]=0xFF;
 }
 
 /** * @brief Setup SlaveID & Connect
@@ -144,14 +157,96 @@ wise4060_HandShake::~wise4060_HandShake()
 	printf("modbus connect close\n");
 }
 
-/** * @brief 
- 	* @param uint8_t channel, specify the channel to read
- 	* @return bool, result execution
+/** * @brief read single input channel function
+ 	* @param DI_Address channel, specify the channel to read
+ 	* @return int, result execution
 **	**/
-bool wise4060_HandShake::wise4060_readDI(uint8_t channel)
+int wise4060_HandShake::wise4060_readDI(DI_Address channel)
 {
-	
-	return false;
+	int addr = (int)channel;
+	int shift = addr - (int)DI_Address::DI_0;
+	rc = modbus_read_input_bits(mb, addr, 1, &DI_status[shift]);
+	return rc;
+}
+
+/** * @brief read ALL input channel function
+ 	* @param None
+ 	* @return int, result execution
+**	**/
+int wise4060_HandShake::wise4060_readALLDI(void)
+{
+	int addr = (int)DI_Address::DI_0;
+	rc = modbus_read_input_bits(mb, addr, wise4060_input_quantity, DI_status);
+	return rc;
+}
+
+/** * @brief read single output channel function
+ 	* @param DO_Address channel, specify the channel to read
+ 	* @return int, result execution
+**	**/
+int wise4060_HandShake::wise4060_readDO(DO_Address channel)
+{
+	int addr = (int)channel;
+	int shift = addr - (int)DO_Address::DO_0;
+	rc = modbus_read_bits(mb, addr, 1, &DO_status[shift]);
+	return rc;
+}
+
+/** * @brief read ALL output channel function
+ 	* @param None
+ 	* @return int, result execution
+**	**/
+int wise4060_HandShake::wise4060_readALLDO(void)
+{
+	int addr = (int)DO_Address::DO_0;
+	rc = modbus_read_bits(mb, addr, wise4060_output_quantity, DO_status);
+	return rc;
+}
+
+/** * @brief write single output channel function
+ 	* @param uint8_t channel, specify the channel to write
+ 	* @param int onoff, output status
+ 	* @return int, result execution
+**	**/
+int wise4060_HandShake::wise4060_writeDO(DO_Address channel,const int onoff)
+{
+	int addr = (int)channel;
+	int shift = addr - (int)DO_Address::DO_0;
+	rc = modbus_write_bit(mb, addr, onoff);
+	DO_status[shift] = (uint8_t)onoff;
+	return rc;
+}
+
+/** * @brief write ALL output channel function
+ 	* @param uint8_t[4] channel, specify the channel to write
+ 	* @return int, result execution
+**	**/
+int wise4060_HandShake::wise4060_writeALLDO(const uint8_t *onoff)
+{
+	int addr = (int)DO_Address::DO_0;
+	rc = modbus_write_bits(mb, addr, wise4060_output_quantity, onoff);
+	memcpy(DO_status, onoff, wise4060_output_quantity);
+	return rc;
+}
+
+/** * @brief get DI_status value
+ 	* @param uint8_t *din, returning specified value using pointers
+ 	* @return None
+**	**/
+void wise4060_HandShake::get_DI_status(uint8_t *din)
+{
+	// memcpy(din, DI_status, wise4060_input_quantity);
+	for(int i=0; i<wise4060_input_quantity; i++)
+		din[i] = DI_status[i];
+}
+
+/** * @brief get DO_status value
+ 	* @param uint8_t *dout, returning specified value using pointers
+ 	* @return None
+**	**/
+void wise4060_HandShake::get_DO_status(uint8_t *dout)
+{
+	memcpy(dout, DO_status, wise4060_output_quantity);
 }
 
 /* Program End */
