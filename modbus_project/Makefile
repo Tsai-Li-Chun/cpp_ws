@@ -9,7 +9,8 @@
 ############################################################################
 #	target
 ######################################
-target  = modbus
+target_wise4060  = wise4060_modbus
+target_deltaDRV  = deltaDRV_modbus
 
 ############################################################################
 #	building variables
@@ -38,39 +39,54 @@ libs = -L/usr/local/lib -lmodbus
 #	compile gcc flags
 #######################################
 # Generate dependency information
-CFLAGS = -std=c++11 -O0 -MMD -MP $(inc_path)
+CFLAGS = -std=c++11 $(OPT) -MMD -MP $(inc_path)
 
 ############################################################################
 #	source code
 ######################################
-c_sources = \
-	src/main.cpp \
-	src/wise4060_HandShake.cpp \
+c_sources_wise4060 = \
+	src/wise4060_test.cpp \
+	src/wise4060_HandShake.cpp
+c_sources_deltaDRV = \
+	src/deltaDRV_test.cpp \
+	src/deltaDRV_modbus_HandShake.cpp
+
 
 ############################################################################
 #	object file
 ######################################
-obj_tmp	= $(subst $(src_path), $(obj_path), $(c_sources))
-obj     = $(patsubst %.cpp, %.o, $(obj_tmp))
+obj_tmp_wise4060 = $(subst $(src_path), $(obj_path), $(c_sources_wise4060))
+obj_wise4060     = $(patsubst %.cpp, %.o, $(obj_tmp_wise4060))
+obj_tmp_deltaDRV = $(subst $(src_path), $(obj_path), $(c_sources_deltaDRV))
+obj_deltaDRV     = $(patsubst %.cpp, %.o, $(obj_tmp_deltaDRV))
 
 ############################################################################
 #	dependency file
 ######################################
-dep     = $(patsubst %.o, %.d, $(obj))
+dep_wise4060 = $(patsubst %.o, %.d, $(obj_wise4060))
+dep_deltaDRV = $(patsubst %.o, %.d, $(obj_deltaDRV))
 
 ############################################################################
 # default action: build all
 ######################################
 $(shell if [ ! -e 'build' ]; then mkdir -p build; fi)
-all: $(target)
+all: wise4060 deltaDRV
+
+wise4060: $(target_wise4060)
 	@echo "target $< complete"
-$(target): $(obj)
+$(target_wise4060): $(obj_wise4060)
+	g++ $^ -o $@ $(libs)
+
+deltaDRV: $(target_deltaDRV)
+	@echo "target $< complete"
+$(target_deltaDRV): $(obj_deltaDRV)
 	g++ $^ -o $@ $(libs)
 
 ############################################################################
 # build the application
 #######################################
--include $(dep)
+-include $(dep_wise4060)
+-include $(dep_deltaDRV)
 ${obj_path}%.o: ${src_path}%.cpp Makefile
 	g++ $(CFLAGS) -c $< -o $@
 

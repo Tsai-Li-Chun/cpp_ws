@@ -12,7 +12,6 @@
 /* System Includes End */
 /* User Includes --------------------------------------------*/
 /* User Includes Begin */
-#include "main_modbus.hpp"
 #include "wise4060_HandShake.hpp"
 /* User Includes End */
 
