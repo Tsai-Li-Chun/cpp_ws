@@ -7,6 +7,7 @@
 
 /* System Includes ------------------------------------------*/
 /* System Includes Begin */
+#include <iostream>
 /* System Includes End */
 /* User Includes --------------------------------------------*/
 /* User Includes Begin */
@@ -56,7 +57,11 @@
 **	**/
 int main(int argc, char **argv)
 {
-	deltaDRV_modbus_HandShake deltaDRV_modbus_HS;
+	deltaDRV_modbus_HandShake deltaDRV_modbus_HS(DRV_modbus_IP, DRV_modbus_port, DRV_modbus_slave);
+	modbus_u16tofloat a;
+	std::cout << sizeof(a.f) << std::endl;
+	std::cout << sizeof(a.u16) << std::endl;
+	std::cout << sizeof(servo_onoff_adr) << std::endl;
 
 	/* main quit */
 	return 0;
