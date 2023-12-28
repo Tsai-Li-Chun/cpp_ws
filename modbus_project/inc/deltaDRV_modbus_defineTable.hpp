@@ -21,9 +21,9 @@
 /* Define ---------------------------------------------------*/
 /* Define Begin */
 
-#define DRV_modbus_IP "192.168.1.2"
+#define DRV_modbus_IP "192.168.1.1"
 #define DRV_modbus_port 502
-#define DRV_modbus_slave 1
+#define DRV_modbus_slave 2
 
 /* Define End */
 
@@ -46,6 +46,7 @@ enum class servo_onoff_adr:int
 	axis34 	= 2,
 	j1j2 	= 6,
 	j3j4 	= 7,
+	end		= (j3j4+servo_onoff_len)
 };
 enum class servo_onoff_cmd:uint16_t
 {	/* Servo oN/OFF command */
@@ -82,7 +83,8 @@ enum class robot_info_PUU_adr:int
 	j1 = 152,
 	j2 = 154,
 	j3 = 156,
-	j4 = 158
+	j4 = 158,
+	end= (j4+robot_info_PUU_len)
 };
 #define robot_info_veloctiy_len 2
 #define robot_info_veloctiy_Resolution (float)0.1 /* rpm */
@@ -97,7 +99,8 @@ enum class robot_info_vel_adr:int
 	j1 = 184,
 	j2 = 186,
 	j3 = 188,
-	j4 = 190
+	j4 = 190,
+	end= (j4+robot_info_veloctiy_len) 
 };
 #define robot_info_current_len 2
 #define robot_info_current_Resolution (float)0.01 /* % percent */
@@ -112,10 +115,11 @@ enum class robot_info_cur_adr:int
 	j1 = 216,
 	j2 = 218,
 	j3 = 220,
-	j4 = 222
+	j4 = 222,
+	end= (j4+robot_info_current_len)
 };
-#define robot_info_Cartesian_len 2
-#define robot_info_Cartesian_Resolution (float)1 /* to be confirmed */
+#define robot_info_CartesianPos_len 2
+#define robot_info_CartesianPos_Resolution (float)1 /* to be confirmed */
 enum class robot_info_CartesianPos_adr:int
 {	/* Robot Information "Cartesion Posture" */
 	X = 240,
@@ -124,18 +128,20 @@ enum class robot_info_CartesianPos_adr:int
 	RX = 246,
 	RY = 248,
 	RZ = 250,
-	Speed = 254
+	Speed = 254,
+	end = (Speed+robot_info_CartesianPos_len)
 };
 #define robot_info_jDegPos_len 2
 #define robot_info_jDegPos_Resolution (float)0.001 /* Degree(?) */
 enum class robot_info_jDegPos_adr:int
 {	/* Servo Motor Information "Degree Position" */
+	j5 = 336,
+	j6 = 338,
 	j1 = 360,
 	j2 = 362,
 	j3 = 364,
 	j4 = 366,
-	j5 = 336,
-	j6 = 338
+	end= (j4+robot_info_jDegPos_len)
 };
 #define robot_info_temp_len 1
 enum class robot_info_temp_adr:int
@@ -145,7 +151,8 @@ enum class robot_info_temp_adr:int
 	j3 = 274,
 	j4 = 275,
 	j5 = 276,
-	j6 = 277
+	j6 = 277,
+	end= (j6+robot_info_temp_len)
 };
 #define robot_info_FramePosture_len 1
 enum class robot_info_FramePosture_adr:int
@@ -153,13 +160,15 @@ enum class robot_info_FramePosture_adr:int
 	/* Robot Information "Cartesion Posture" */
 	userframe = 226,
 	toolframe = 227,
-	Posture = 228
+	Posture = 228,
+	end = (Posture+robot_info_FramePosture_len)
 };
 #define robot_info_JRC_len 1
 enum class robot_info_JRC_adr:int
 {	/* Robot Information "Joint index" */
 	j1234 = 268,
-	j56	  = 269
+	j56	  = 269,
+	end = (j56+robot_info_JRC_len)
 };
 #define robot_status_len 1
 enum class robot_status_adr:int
@@ -168,7 +177,8 @@ enum class robot_status_adr:int
 	system 	 = 312,
 	OPmode 	 = 313,
 	TPmode 	 = 315,
-	DRVready = 514
+	DRVready = 514,
+	end = (DRVready+robot_status_len)
 };
 #define error_code_len 1
 enum class error_code_adr:int
@@ -185,13 +195,15 @@ enum class error_code_adr:int
 	j4 		= 335,
 	system 	= 480,
 	DRV		= 511,
-	warning = 526
+	warning = 526,
+	end = (warning+error_code_len)
 };
 #define user_DIO_moniter_len 2
 enum class user_DIO_moniter_adr:int
 {	/* Digital Input & Output */
 	DI = 762,
-	DO = 764
+	DO = 764,
+	end = (DO+user_DIO_moniter_len)
 };
 #define user_DO_setup_len 1
 #define user_DO_setup_cmd(do) (0x0001<<do)
@@ -212,7 +224,8 @@ enum class JOG_config_adr:int
 	JOG_dec 	= 780,
 	JOG_dis 	= 800,
 	JOG_ang		= 802,
-	JOG_speed	= 804
+	JOG_speed	= 804,
+	end = (JOG_speed+JOG_config_speed_len)
 };
 enum class JOG_config_motion_cmd:uint16_t
 {	/* JOG motion */
@@ -322,7 +335,8 @@ enum class goto_target_adr:int
 	UFTF	= 828,
 	posture	= 829,
 	CoordinateSystem = 830,
-	TFgroup	= 831
+	TFgroup	= 831,
+	end = (TFgroup+goto_target_len)
 };
 enum class goto_posture_cmd:uint16_t
 {
@@ -355,15 +369,18 @@ enum class RL_script_cmd:uint16_t
 	stop = 3,
 	pause = 4,
 	step = 5,
-	open_and_run = 6
+	open_and_run = 6,
+	end = (open_and_run+RL_control_len)
 };
 #define device_data_len 1
 enum class device_data_adr:int
 {	
 	/* User self-service */
 	Buffer = 4096,
+	Buffer_end = 0x1FFF,
 	/* User self-service(?) */
-	Latch = 12288
+	Latch = 12288,
+	Latch_end = 0x3FFF
 };
 #define DMCNET_Equipmen_len 1
 enum class DMCNET_Equipmen_adr:int
