@@ -131,21 +131,12 @@ int deltaDRV_modbus_HandShake::Modbus_slave_connect(int slave)
 	* @param int32_t(puu), returned data
  	* @return int, result execution
 **	**/
-int deltaDRV_modbus_HandShake::robot_info_PUU(robot_info_PUU_adr adr, int32_t *puu)
+int deltaDRV_modbus_HandShake::read_deltaDRV_info_PUU(deltaDRV_info_PUU *puu)
 {
-	rc = modbus_read_registers(mb, static_cast<int>(adr),
-								   static_cast<int>(robot_info_PUU_len),
+	int8_t len=0;
+	rc = modbus_read_registers(mb, static_cast<int>(deltaDRV_info_PUU_adr::axis1),
+								   static_cast<int>(deltaDRV_info_PUU_len),
 								   tmp_u16i32.u16 );
-	*puu = tmp_u16i32.i32;
-	return rc;
-}
-/** * @brief read robot information ALL PUU
-	* @param int32_t(puu), returned data
- 	* @return int, result execution
-**	**/
-int deltaDRV_modbus_HandShake::robot_info_PUU_ALL(int32_t *puu)
-{
-
 	return rc;
 }
 

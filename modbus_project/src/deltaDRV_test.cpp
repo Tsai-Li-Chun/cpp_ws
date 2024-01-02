@@ -58,9 +58,6 @@
 int main(int argc, char **argv)
 {
 	deltaDRV_modbus_HandShake deltaDRV_modbus_HS(DRV_modbus_IP, DRV_modbus_port, DRV_modbus_slave);
-	int32_t j1_PUU;
-	std::cout << deltaDRV_modbus_HS.robot_info_PUU(robot_info_PUU_adr::j1, &j1_PUU) << std::endl;
-	std::cout << j1_PUU << std::endl;
 	/* main quit */
 	return 0;
 }
