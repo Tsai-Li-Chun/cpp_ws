@@ -37,17 +37,19 @@
 /* Extern Variables Begin */
 
 /* deltaDRV robot servo status */
-struct deltaDRV_servo_status
+struct ServoOnOff
 {
-    uint16_t j6j5;
+    uint16_t _j6j5;
     uint16_t ex_axis21;
     uint16_t ex_axis43;
     uint16_t j4j3;
-    uint16_t j2j1;
+    uint16_t j2j1_;
 };
 /* deltaDRV robot information joint PUU  */
-struct deltaDRV_info_PUU
+struct InfoPUU
 {
+    int32_t _j5;
+    int32_t j6;
     int32_t ex_axis1;
     int32_t ex_axis2;
     int32_t ex_axis3;
@@ -55,13 +57,13 @@ struct deltaDRV_info_PUU
     int32_t j1;
     int32_t j2;
     int32_t j3;
-    int32_t j4;
-    int32_t j5;
-    int32_t j6;
+    int32_t j4_;
 };
 /* deltaDRV robot information joint velocity  */
-struct deltaDRV_info_vel
+struct InfoVel
 {
+    float _j5;
+    float j6;
     float ex_axis1;
     float ex_axis2;
     float ex_axis3;
@@ -69,13 +71,13 @@ struct deltaDRV_info_vel
     float j1;
     float j2;
     float j3;
-    float j4;
-    float j5;
-    float j6;
+    float j4_;
 };
 /* deltaDRV robot information joint current  */
-struct deltaDRV_info_cur
+struct InfoCur
 {
+    float _j5;
+    float j6;
     float ex_axis1;
     float ex_axis2;
     float ex_axis3;
@@ -83,60 +85,60 @@ struct deltaDRV_info_cur
     float j1;
     float j2;
     float j3;
-    float j4;
-    float j5;
-    float j6;
+    float j4_;
 };
 /* deltaDRV robot information Cartesian Position  */
-struct deltaDRV_info_CartesianPos
+struct InfoCartesianPos
 {
-    float X;
+    float _X;
     float Y;
     float Z;
     float RX;
     float RY;
     float RZ;
-    float Speed;
+    float Speed_;
 };
 /* deltaDRV robot information joint Degree Position  */
-struct deltaDRV_info_jDegPos
+struct InfojDegPos
 {
-    float j1;
+    float _j1;
     float j2;
     float j3;
     float j4;
     float j5;
-    float j6;
+    float j6_;
 };
 /* deltaDRV robot information joint Temperature  */
-struct deltaDRV_info_temp
+struct InfoTemp
 {
-    float j1;
+    float _j1;
     float j2;
     float j3;
     float j4;
     float j5;
-    float j6;
+    float j6_;
 };
 /* deltaDRV robot Frame Posture  */
-struct deltaDRV_info_FramePosture
+struct InfoFramePosture
 {
-    int16_t user_frame;
-    int16_t tool_frame;
-    int16_t posture;
+    int16_t _userFrame;
+    int16_t toolFrame;
+    int16_t posture_;
 };
 /* deltaDRV Robot System Status  */
-struct deltaDRV_status
+struct RobotStatus
 {
-    int16_t motion;
+    int16_t _motion;
     int16_t system;
     int16_t OPmode;
     int16_t TPmode;
-    int16_t DRVready;
+    int16_t DRVready_;
 };
 /* deltaDRV Joint error code  */
-struct deltaDRV_ErrorCode
+struct ErrorCode
 {
+    uint16_t _j5;
+    uint16_t j6;
     uint16_t ex_axis1;
     uint16_t ex_axis2;
     uint16_t ex_axis3;
@@ -145,14 +147,12 @@ struct deltaDRV_ErrorCode
     uint16_t j2;
     uint16_t j3;
     uint16_t j4;
-    uint16_t j5;
-    uint16_t j6;
     uint16_t system;
     uint16_t DRV;
-    uint16_t warning;
+    uint16_t warning_;
 };
 /* deltaDRV JOG config status */
-struct deltaDRV_JOGConfig
+struct JOGConfig
 {
     uint16_t motion;
     uint32_t ACC;
@@ -162,27 +162,27 @@ struct deltaDRV_JOGConfig
     uint16_t speed;
 };
 /* deltaDRV goto target */
-struct deltaDRV_GOTOTarget
+struct gotoTarget
 {
     uint16_t PositionFlag;
     // uint16_t ex_axis12;
     // uint16_t ex_axis34;
     // uint16_t JointIndex1234;
     // uint16_t JointIndex56;
-    deltaDRV_info_CartesianPos CarPos;
+    InfoCartesianPos CarPos;
     uint16_t UFTF;
     uint16_t posture;
     uint16_t CoordinateSystem;
     uint16_t TFgroup;
 };
 /* deltaDRV DI & DO data  */
-struct deltaDRV_DIO_moniter
+struct UserDIO_moniter
 {
     uint32_t DI;
     uint32_t DO;
 };
-/* deltaDRV Joint error code  */
-struct deltaDRV_RLStatus
+/* deltaDRV Robot Language Control */
+struct RL_control
 {
     uint16_t executive_status;
     uint16_t executive_line;

@@ -126,20 +126,111 @@ int deltaDRV_modbus_HandShake::Modbus_slave_connect(int slave)
 	return 0;
 }
 
-/** * @brief read robot information PUU
- 	* @param robot_info_PUU_adr(adr), modbus register address
-	* @param int32_t(puu), returned data
+/** * @brief read delta robot servo on/off
+ 	* @param ServoOnOff*(servo), ServoOnOff pointer for storing the result.
  	* @return int, result execution
 **	**/
-int deltaDRV_modbus_HandShake::read_deltaDRV_info_PUU(deltaDRV_info_PUU *puu)
+int deltaDRV_modbus_HandShake::read_deltaDRV_Servo(ServoOnOff *servo)
 {
-	int8_t len=0;
-	rc = modbus_read_registers(mb, static_cast<int>(deltaDRV_info_PUU_adr::axis1),
-								   static_cast<int>(deltaDRV_info_PUU_len),
-								   tmp_u16i32.u16 );
+	u16tmp_ptr = &_deltaDRV_servo_status._j6j5;
+	for( int i=0; i<ServoOnOff_qan; i++ )
+	{
+		rc = modbus_read_registers(mb, ServoOnOff_adr[i], ServoOnOff_len, u16tmp_ptr);
+		if(rc==(-1)) return (-1);
+		u16tmp_ptr++;
+	}
 	return rc;
 }
 
+/** * @brief read robot information PUU
+ 	* @param InfoPUU*(puu), InfoPUU pointer for storing the result.
+ 	* @return int, result execution
+**	**/
+int deltaDRV_modbus_HandShake::read_deltaDRV_info_PUU(InfoPUU *puu)
+{
+	i32tmp_ptr = &_deltaDRV_info_PUU._j5;
+	for( int i=0; i<InfoPUU_qan; i++ )
+	{
+		rc = modbus_read_registers(mb, InfoPUU_adr[i], InfoPUU_len, tmp_u16i32.u16);
+		if(rc==(-1)) return (-1);
+		*i32tmp_ptr = tmp_u16i32.i32;
+		i32tmp_ptr++;
+	}
+	*puu = _deltaDRV_info_PUU;
+	return rc;
+}
+
+/** * @brief read robot information veloctiy
+ 	* @param InfoVel*(vel), InfoVel pointer for storing the result.
+ 	* @return int, result execution
+**	**/
+int deltaDRV_modbus_HandShake::read_deltaDRV_info_vel(InfoVel *vel)
+{
+	ftmp_ptr = &_deltaDRV_info_vel._j5;
+	for( int i=0; i<InfoVel_qan; i++ )
+	{
+		rc = modbus_read_registers(mb, InfoVel_adr[i], InfoVel_len, tmp_u16float.u16);
+		if(rc==(-1)) return (-1);
+		*ftmp_ptr = tmp_u16float.f*InfoVel_Resolution;
+		ftmp_ptr++;
+	}
+	*vel = _deltaDRV_info_vel;
+	return rc;
+}
+
+/** * @brief read robot information current
+ 	* @param InfoCur*(cur), InfoCur pointer for storing the result.
+ 	* @return int, result execution
+**	**/
+int deltaDRV_modbus_HandShake::read_deltaDRV_info_cur(InfoCur *cur)
+{
+	ftmp_ptr = &_deltaDRV_info_cur._j5;
+	for( int i=0; i<InfoCur_qan; i++ )
+	{
+		rc = modbus_read_registers(mb, InfoCur_adr[i], InfoCur_len, tmp_u16float.u16);
+		if(rc==(-1)) return (-1);
+		*ftmp_ptr = tmp_u16float.f*InfoCur_Resolution;
+		ftmp_ptr++;
+	}
+	*cur = _deltaDRV_info_cur;
+	return rc;
+}
+
+/** * @brief read robot information Cartesian Position
+ 	* @param InfoCartesianPos*(cur), InfoCartesianPos pointer for storing the result.
+ 	* @return int, result execution
+**	**/
+int deltaDRV_modbus_HandShake::read_deltaDRV_info_CartesianPos(InfoCartesianPos *cp)
+{
+	ftmp_ptr = &_deltaDRV_info_CartesianPos._X;
+	for( int i=0; i<InfoCartesianPos_qan; i++ )
+	{
+		rc = modbus_read_registers(mb, InfoCartesianPos_adr[i], InfoCartesianPos_len, tmp_u16float.u16);
+		if(rc==(-1)) return (-1);
+		*ftmp_ptr = tmp_u16float.f*InfoCartesianPos_Resolution;
+		ftmp_ptr++;
+	}
+	*cp = _deltaDRV_info_CartesianPos;
+	return rc;
+}
+
+/** * @brief read robot information joint Degree Position
+ 	* @param InfojDegPos*(jdp), InfojDegPos pointer for storing the result.
+ 	* @return int, result execution
+**	**/
+int deltaDRV_modbus_HandShake::read_deltaDRV_info_jDegPos(InfojDegPos *jdp)
+{
+	ftmp_ptr = &_deltaDRV_info_jDegPos._j1;
+	for( int i=0; i<InfojDegPos_qan; i++ )
+	{
+		rc = modbus_read_registers(mb, InfojDegPos_adr[i], InfojDegPos_len, tmp_u16float.u16);
+		if(rc==(-1)) return (-1);
+		*ftmp_ptr = tmp_u16float.f*InfojDegPos_Resolution;
+		ftmp_ptr++;
+	}
+	*jdp = _deltaDRV_info_jDegPos;
+	return rc;
+}
 
 /* Program End */
 /* ---------------------------------------------------------*/

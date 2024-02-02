@@ -63,37 +63,32 @@ private:
 	/* libmodbus return value(ReturnCode) */
 	int rc;
 	/* data buffer */
-	modbus_u16tofloat tmp_u16float;
-	modbus_u16tou32	  tmp_u16u32;
-	modbus_u16toi32	  tmp_u16i32;
+	float*				ftmp_ptr;
+	uint16_t*			u16tmp_ptr;
+	int16_t*			i16tmp_ptr;
+	uint32_t*			u32tmp_ptr;
+	int32_t*			i32tmp_ptr;
+	modbus_u16tofloat 	tmp_u16float;
+	modbus_u16tou32	  	tmp_u16u32;
+	modbus_u16toi32	  	tmp_u16i32;
+	/* delta DRVcontrol robot informatiom */
+	ServoOnOff 		 _deltaDRV_servo_status;
+	InfoPUU 		 _deltaDRV_info_PUU;
+	InfoVel 		 _deltaDRV_info_vel;
+	InfoCur			 _deltaDRV_info_cur;
+	InfoCartesianPos _deltaDRV_info_CartesianPos;
+	InfojDegPos		 _deltaDRV_info_jDegPos;
+	InfoTemp		 _deltaDRV_info_temp;
+	InfoFramePosture _deltaDRV_info_FramePosture;
+	RobotStatus 	 _deltaDRV_status;
+	ErrorCode 		 _deltaDRV_ErrorCode;
+	JOGConfig 		 _deltaDRV_JOGConfig;
+	gotoTarget 		 _deltaDRV_GOTOTarget;
+	UserDIO_moniter  _deltaDRV_DIO_moniter;
+	RL_control 		 _deltaDRV_RLStatus;
 
 	/* 設定連結函數 */
 	int Modbus_slave_connect(int slave);
-
-	/* read delta robot servo on/off */
-	int read_deltaDRV_Servo(servo_onoff_adr adr, deltaDRV_servo_status *servo);
-	/* read delta robot JOG config */
-	int read_deltaDRV_JOGConfig(JOG_config_adr adr, deltaDRV_JOGConfig *jog);
-	/* setup JOG one config */
-	int setup_JOGConfigMotion(JOG_config_adr adr, JOG_config_motion_cmd motion);
-	int setup_JOGConfigAcc(JOG_config_adr adr, uint32_t acc);
-	int setup_JOGConfigDec(JOG_config_adr adr, uint32_t *dec);
-	int setup_JOGConfigDis(JOG_config_adr adr, uint32_t *dis);
-	int setup_JOGConfigAng(JOG_config_adr adr, uint32_t *ang);
-	int setup_JOGConfigSpeed(JOG_config_adr adr, uint16_t *speed);
-	/* read delta robot goto target */
-	int read_deltaDRV_gotoTarget(goto_target_adr adr, deltaDRV_GOTOTarget *gotoT);
-	/* setup target one cartesian coordinate position */
-	int setup_gotoTargetX(goto_target_adr adr, float x);
-	int setup_gotoTargetY(goto_target_adr adr, float y);
-	int setup_gotoTargetZ(goto_target_adr adr, float z);
-	int setup_gotoTargetRX(goto_target_adr adr, float rx);
-	int setup_gotoTargetRY(goto_target_adr adr, float ry);
-	int setup_gotoTargetRZ(goto_target_adr adr, float rz);
-	/* setup target one config */
-	int setup_gotoTargetUFTF(goto_target_adr adr, uint16_t uftf);
-	int setup_gotoTargetPosture(goto_target_adr adr, goto_posture_cmd pos);
-	int setup_gotoTargetCoordinateSystem(goto_target_adr adr, goto_CoordinateSystem_cmd cs);
 
 /* public members */
 public:
@@ -102,45 +97,49 @@ public:
 	/* destructor */
 	~deltaDRV_modbus_HandShake();
 
+	/* read delta robot servo on/off */
+	int read_deltaDRV_Servo(ServoOnOff *servo);
 	/* read robot information PUU */
-	int read_deltaDRV_info_PUU(deltaDRV_info_PUU *puu);
+	int read_deltaDRV_info_PUU(InfoPUU *puu);
 	/* read robot information veloctiy */
-	int read_deltaDRV_info_vel(deltaDRV_info_vel_adr adr, deltaDRV_info_vel *vel);
+	int read_deltaDRV_info_vel(InfoVel *vel);
 	/* read robot information current */
-	int read_deltaDRV_info_cur(deltaDRV_info_cur_adr adr, deltaDRV_info_cur *cur);
+	int read_deltaDRV_info_cur(InfoCur *cur);
 	/* read robot information Cartesian Position */
-	int read_deltaDRV_info_CartesianPos(deltaDRV_info_CartesianPos_adr adr, deltaDRV_info_CartesianPos *cp);
+	int read_deltaDRV_info_CartesianPos(InfoCartesianPos *cp);
 	/* read robot information joint Degree Position */
-	int read_deltaDRV_info_jDegPos(deltaDRV_info_jDegPos_adr adr, deltaDRV_info_jDegPos *jdp);
+	int read_deltaDRV_info_jDegPos(InfojDegPos *jdp);
 	/* read robot information Temperature */
-	int read_deltaDRV_info_temp(deltaDRV_info_temp_adr adr, deltaDRV_info_temp *temp);
+	int read_deltaDRV_info_temp(InfoTemp *temp);
 	/* read robot information Frame Posture */
-	int read_deltaDRV_info_FramePosture(deltaDRV_info_FramePosture_adr adr, deltaDRV_info_FramePosture *fp);
+	int read_deltaDRV_info_FramePosture(InfoFramePosture *fp);
 	// /* read robot information Joint index */
-	// int read_deltaDRV_info_JRC(deltaDRV_info_JRC_adr adr, uint16_t *jrc);
+	// int read_deltaDRV_info_JRC(uint16_t *jrc);
 	/* read Robot System Status */
-	int read_deltaDRV_status(deltaDRV_status_adr adr, deltaDRV_status *status);
+	int read_deltaDRV_status(RobotStatus *rs);
 	/* read Joint error code */
-	int read_deltaDRV_ErrorCode(error_code_adr adr, deltaDRV_ErrorCode *code);
+	int read_deltaDRV_ErrorCode(ErrorCode *code);
 	/* read DI & DO data */
-	int read_deltaDRV_userDIO(user_DIO_moniter_adr adr, deltaDRV_DIO_moniter *data);
-	/* read target position status */
-	int read_deltaDRV_gotoTargetFlag(goto_target_adr adr, uint16_t *flg);
+	int read_deltaDRV_userDIO(UserDIO_moniter *data);
+	/* read delta robot JOG config */
+	int read_deltaDRV_JOGConfig(JOGConfig *jog);
+	/* read delta robot goto target */
+	int read_deltaDRV_gotoTarget(gotoTarget *gotoT);
 	/* read Robot Language status */
-	int read_deltaDRV_RLStatus(RL_control_adr adr, deltaDRV_RLStatus *status);
+	int read_deltaDRV_RLStatus(RL_control *status);
 
 	/* setup delta robot servo on/off */
-	int setup_Servo(servo_onoff_adr adr, deltaDRV_servo_status servo);
+	int setup_Servo(ServoOnOff servo);
 	/* delta robot alarm reset */
-	int setup_AlarmReset(servo_alarm_reset_adr adr, servo_alarm_reset_cmd cmd);	
+	int setup_AlarmReset(ServoAlarmReset_cmd cmd);	
 	/* setup JOG config */
-	int setup_JOGConfig(JOG_config_adr adr, deltaDRV_JOGConfig jog);
+	int setup_JOGConfig(JOGConfig jog);
 	/* setup goto target */
-	int setup_gotoTarget(goto_target_adr adr, deltaDRV_GOTOTarget gotoT);
+	int setup_gotoTarget(gotoTarget gotoT);
 	/* setup Robot Language Control */
-	int setup_RLControl(RL_control_adr adr, deltaDRV_RLStatus rl);
+	int setup_RLControl(RL_control rl);
 	/* setup DO status */
-	int setup_userDO(user_DO_setup_adr adr, uint16_t *status);
+	int setup_userDO(uint16_t *status);
 };
 
 

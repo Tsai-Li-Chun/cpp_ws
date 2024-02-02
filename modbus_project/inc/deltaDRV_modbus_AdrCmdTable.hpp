@@ -38,198 +38,187 @@
 
 /* DRV modbus address Table */
 /* --------------------------------------------------------------------- */
-#define servo_onoff_len 1
-enum class servo_onoff_adr:int
-{	/* Servo oN/OFF modbus address */
-	_j5j6 	= 0,
+
+/* Servo ON/OFF modbus address and command */
+#define ServoOnOff_len 1
+#define ServoOnOff_qan 5
+const int ServoOnOff_adr[ServoOnOff_qan] = {0, 1, 2, 6, 7};
+enum class ServoOnOff_con:int
+{	j5j6 	= 0,
 	axis12	= 1,
 	axis34 	= 2,
-	j1j2 	= 6,
-	j3j4 	= 7,
-	end		= (j3j4+servo_onoff_len)
-};
-enum class servo_onoff_cmd:uint16_t
-{	/* Servo oN/OFF command */
-	H_ON 	= 0x0100,
+	j1j2 	= 3,
+	j3j4 	= 4		};
+enum class ServoOnOff_cmd:uint16_t
+{	H_ON 	= 0x0100,
 	L_ON 	= 0x0001,
 	HL_ON	= 0x0101,
-	HL_OFF	= 0x0000
-};
-#define servo_alarm_reset_len 1
-enum class servo_alarm_reset_adr:int
-{	/* Servo Alarm Reset */
-	_j5j6 	= 32,
-	axis12	= 33,
-	axis34	= 34,
-	j1j2 	= 38,
-	j3j4 	= 39,
-	ALL 	= 384
-};
-enum class servo_alarm_reset_cmd:uint16_t
-{	/* Servo oN/OFF command */
-	H_reset	= 0x0100,
+	HL_OFF	= 0x0000	};
+/* Servo Alarm Reset and command */
+#define ServoAlarmReset_len 1
+#define ServoAlarmReset_qan 6
+const int ServoAlarmReset_adr[ServoAlarmReset_qan] = {32, 33, 34, 38, 39, 384};
+enum class ServoAlarmReset_con:int
+{	j5j6 	= 0,
+	axis12	= 1,
+	axis34	= 2,
+	j1j2 	= 3,
+	j3j4 	= 4,
+	ALL 	= 5	};
+enum class ServoAlarmReset_cmd:uint16_t
+{	H_reset	= 0x0100,
 	L_reset	= 0x0001,
-	HL_reset= 0x0101
-};
-#define deltaDRV_info_PUU_len 2
-enum class deltaDRV_info_PUU_adr:int
-{	/* Robot Information "Joint Position" PUU */
-	_j5 = 128,
-	j6 = 130,
-	axis1 = 132,
-	axis2 = 134,
-	axis3 = 136,
-	axis4 = 138,
-	j1 = 152,
-	j2 = 154,
-	j3 = 156,
-	j4 = 158,
-	end= (j4+deltaDRV_info_PUU_len)
-};
-#define deltaDRV_info_veloctiy_len 2
-#define deltaDRV_info_veloctiy_Resolution (float)0.1 /* rpm */
-enum class deltaDRV_info_vel_adr:int
-{	/* Robot Information "Joint Velocity" 0.1rpm */
-	_j5= 160,
-	j6 = 162,
-	axis1 = 164,
-	axis2 = 166,
-	axis3 = 168,
-	axis4 = 170,
-	j1 = 184,
-	j2 = 186,
-	j3 = 188,
-	j4 = 190,
-	end= (j4+deltaDRV_info_veloctiy_len) 
-};
-#define deltaDRV_info_current_len 2
-#define deltaDRV_info_current_Resolution (float)0.01 /* % percent */
-enum class deltaDRV_info_cur_adr:int
-{	/* Robot Information "Joint Current" 0.01% */
-	_j5= 192,
-	j6 = 194,
-	axis1 = 196,
-	axis2 = 198,
-	axis3 = 200,
-	axis4 = 202,
-	j1 = 216,
-	j2 = 218,
-	j3 = 220,
-	j4 = 222,
-	end= (j4+deltaDRV_info_current_len)
-};
-#define deltaDRV_info_CartesianPos_len 2
-#define deltaDRV_info_CartesianPos_Resolution (float)1 /* to be confirmed */
-enum class deltaDRV_info_CartesianPos_adr:int
-{	/* Robot Information "Cartesion Posture" */
-	_X= 240,
-	Y = 242,
-	Z = 244,
-	RX = 246,
-	RY = 248,
-	RZ = 250,
-	Speed = 254,
-	end = (Speed+deltaDRV_info_CartesianPos_len)
-};
-#define deltaDRV_info_jDegPos_len 2
-#define deltaDRV_info_jDegPos_Resolution (float)0.001 /* Degree(?) */
-enum class deltaDRV_info_jDegPos_adr:int
-{	/* Servo Motor Information "Degree Position" */
-	_j5= 336,
-	j6 = 338,
-	j1 = 360,
-	j2 = 362,
-	j3 = 364,
-	j4 = 366,
-	end= (j4+deltaDRV_info_jDegPos_len)
-};
-#define deltaDRV_info_temp_len 1
-enum class deltaDRV_info_temp_adr:int
-{	/* Robot Information Temperature */
-	_j1= 272,
-	j2 = 273,
-	j3 = 274,
-	j4 = 275,
-	j5 = 276,
-	j6 = 277,
-	end= (j6+deltaDRV_info_temp_len)
-};
-#define deltaDRV_info_FramePosture_len 1
-enum class deltaDRV_info_FramePosture_adr:int
-{	/* Robot Information "Robot Frame" */
-	/* Robot Information "Cartesion Posture" */
-	_userframe= 226,
-	toolframe = 227,
-	Posture = 228,
-	end = (Posture+deltaDRV_info_FramePosture_len)
-};
-// #define deltaDRV_info_JRC_len 1
-// enum class deltaDRV_info_JRC_adr:int
-// {	/* Robot Information "Joint index" */
-// 	j1234 = 268,
-// 	j56	  = 269,
-// 	end = (j56+deltaDRV_info_JRC_len)
-// };
-#define deltaDRV_status_len 1
-enum class deltaDRV_status_adr:int
-{	/* Robot System Status */
-	_motion	= 224,
-	system	= 312,
-	OPmode	= 313,
-	TPmode	= 315,
-	DRVready= 514,
-	end = (DRVready+deltaDRV_status_len)
-};
-#define error_code_len 1
-enum class error_code_adr:int
-{	/* error code */
-	_j5		= 320,
-	j6 		= 321,
-	axis1	= 322,
-	axis2	= 323,
-	axis3	= 324,
-	axis4	= 325,
-	j1 		= 332,
-	j2 		= 333,
-	j3 		= 334,
-	j4 		= 335,
-	system 	= 480,
-	DRV		= 511,
-	warning = 526,
-	end = (warning+error_code_len)
-};
-#define user_DIO_moniter_len 2
-enum class user_DIO_moniter_adr:int
-{	/* Digital Input & Output */
-	_DI= 762,
-	DO = 764,
-	end = (DO+user_DIO_moniter_len)
-};
-#define user_DO_setup_len 1
-#define user_DO_setup_cmd(bit) (0x0001<<bit)
-enum class user_DO_setup_adr:int
-{	/* Digital Output */
-	DI = 766
-};
-#define JOG_config_motion_len 1
-#define JOG_config_acc_len 2
-#define JOG_config_dec_len 2
-#define JOG_config_dis_len 2
-#define JOG_config_ang_len 2
-#define JOG_config_speed_len 1
-enum class JOG_config_adr:int
-{	/* JOG config */
-	_motion	= 768,
-	acc 	= 778,
-	dec 	= 780,
-	dis 	= 800,
-	ang		= 802,
-	speed	= 804,
-	end = (speed+JOG_config_speed_len)
-};
-enum class JOG_config_motion_cmd:uint16_t
-{	/* JOG motion */
-	j5_jog_add = 1,
+	HL_reset= 0x0101	};
+/* Robot Information "Joint Position" PUU */
+#define InfoPUU_len 2
+#define InfoPUU_qan 10
+const int InfoPUU_adr[InfoPUU_qan] = {128, 130, 132, 134, 136, 138, 152, 154, 156, 158};
+enum class InfoPUU_con:int
+{	j5 = 0,
+	j6 = 1,
+	axis1 = 2,
+	axis2 = 3,
+	axis3 = 4,
+	axis4 = 5,
+	j1 = 6,
+	j2 = 7,
+	j3 = 8,
+	j4 = 9	};
+/* Robot Information "Joint Velocity" 0.1rpm */
+#define InfoVel_len 2
+#define InfoVel_qan 10
+#define InfoVel_Resolution (float)0.1 /* rpm */
+const int InfoVel_adr[InfoVel_qan] = {160, 162, 164, 166, 168, 170, 184, 186, 188, 190};
+enum class InfoVel_con:int
+{	j5 = 0,
+	j6 = 1,
+	axis1 = 2,
+	axis2 = 3,
+	axis3 = 4,
+	axis4 = 5,
+	j1 = 6,
+	j2 = 7,
+	j3 = 8,
+	j4 = 9	};
+/* Robot Information "Joint Current" 0.01% */
+#define InfoCur_len 2
+#define InfoCur_qan 10
+#define InfoCur_Resolution (float)0.01 /* % percent */
+const int InfoCur_adr[InfoCur_qan] = {192, 194, 196, 198, 200, 202, 216, 218, 220, 222};
+enum class InfoCur_con:int
+{	j5 = 0,
+	j6 = 1,
+	axis1 = 2,
+	axis2 = 3,
+	axis3 = 4,
+	axis4 = 5,
+	j1 = 6,
+	j2 = 7,
+	j3 = 8,
+	j4 = 9	};
+/* Robot Information "Cartesion Posture" */
+#define InfoCartesianPos_len 2
+#define InfoCartesianPos_qan 7
+#define InfoCartesianPos_Resolution (float)0.001 /* to be confirmed */
+const int InfoCartesianPos_adr[InfoCartesianPos_qan] = {240, 242, 244, 246, 248, 250, 254};
+enum class InfoCartesianPos_con:int
+{	X= 0,
+	Y = 1,
+	Z = 2,
+	RX = 3,
+	RY = 4,
+	RZ = 5,
+	Speed = 6	};
+/* Servo Motor Information "Degree Position" */
+#define InfojDegPos_len 2
+#define InfojDegPos_qan 6
+#define InfojDegPos_Resolution (float)0.001 /* Degree(?) */
+const int InfojDegPos_adr[InfojDegPos_qan] = {360, 362, 364, 366, 336, 338};
+enum class InfojDegPos_con:int
+{	j1 = 0,
+	j2 = 1,
+	j3 = 2,
+	j4 = 3,
+	j5 = 4,
+	j6 = 5	};
+/* Robot Information Temperature */
+#define InfoTemp_len 1
+#define InfoTemp_qan 6
+const int InfoTemp_adr[InfoTemp_qan] = {272, 273, 274, 275, 276, 277};
+enum class InfoTemp_con:int
+{	j1 = 0,
+	j2 = 1,
+	j3 = 2,
+	j4 = 3,
+	j5 = 4,
+	j6 = 5	};
+/* Robot Information "Robot Frame" and "Cartesion Posture" */
+#define InfoFramePosture_len 1
+#define InfoFramePosture_qan 3
+const int InfoFramePosture_adr[InfoFramePosture_qan] = {226, 227, 228};
+enum class InfoFramePosture_con:int
+{	userframe= 0,
+	toolframe= 1,
+	Posture = 2		};
+/* Robot Information "Joint index" */
+#define InfoJRC_len 1
+#define InfoJRC_qan 2
+const int InfoJRC_adr[InfoJRC_qan] = {268, 269};
+enum class InfoJRC_con:int
+{	j1234 = 0,
+	j56	  = 1		};
+/* Robot System Status */
+#define RobotStatus_len 1
+#define RobotStatus_qan 5
+const int RobotStatus_adr[RobotStatus_qan] = {224, 312, 313, 315, 514};
+enum class RobotStatus_con:int
+{	motion	= 0,
+	system	= 1,
+	OPmode	= 2,
+	TPmode	= 3,
+	DRVready= 4	};
+/* error code */
+#define ErrorCode_len 1
+#define ErrorCode_qan 13
+const int ErrorCode_adr[ErrorCode_qan] = {320, 321, 322, 323, 324, 325, 332, 333, 334, 335, 480, 511, 526};
+enum class ErrorCode_con:int
+{	j5		= 0,
+	j6 		= 1,
+	axis1	= 2,
+	axis2	= 3,
+	axis3	= 4,
+	axis4	= 5,
+	j1 		= 6,
+	j2 		= 7,
+	j3 		= 8,
+	j4 		= 9,
+	system 	= 10,
+	DRV		= 11,
+	warning = 12	};
+/* Digital Input & Output */
+#define UserDIO_moniter_len 2
+#define UserDIO_moniter_qan 2
+const int UserDIO_moniter_adr[UserDIO_moniter_qan] = {762, 764};
+enum class UserDIO_moniter_con:int
+{	DI = 762,
+	DO = 764	};
+/* Digital Output */
+#define UserDO_setup_len 1
+#define UserDO_setup_cmd(bit) (0x0001<<bit)
+#define UserDO_setup_adr 766
+/* JOG config */
+#define JOGConfig_qan 6
+const int JOGConfig_len[JOGConfig_qan] = {1, 2, 2, 2, 2, 1};
+const int JOGConfig_adr[JOGConfig_qan] = {768, 778, 780, 800, 802, 804};
+enum class JOGConfig_con:int
+{	motion	= 0,
+	acc 	= 1,
+	dec 	= 2,
+	dis 	= 3,
+	ang		= 4,
+	speed	= 5	};
+enum class JOGConfigMotion_cmd:uint16_t
+{	j5_jog_add = 1,
 	j5_jog_dec = 2,
 	j6_jog_add = 3,
 	j6_jog_dec = 4,
@@ -316,104 +305,97 @@ enum class JOG_config_motion_cmd:uint16_t
 	axis2_movGOTO = 319,
 	axis3_movGOTO = 320,
 	axis4_movGOTO = 321,
-	stop = 1000
-};
-#define goto_target_flag_len 1
-#define goto_target_axis_len 1
-#define goto_target_JI_len 1
-#define goto_target_JI_len 1
-#define goto_target_CarPos_len 2
-#define goto_target_UFTF_len 1
-#define goto_target_posture_len 1
-#define goto_target_CoordinateSystem_len 1
-#define goto_target_TFgroup_len 1
-enum class goto_target_adr:int
-{	/* goto target information */
-	_flag = 799,
-	axis12= 810,
-	axis34= 811,
-	JI1234= 814,
-	JI56  = 815,
-	X	  = 816,
-	Y	  = 818,
-	Z	  = 820,
-	RX	  = 822,
-	RY	  = 824,
-	RZ	  = 826,
-	UFTF	= 828,
-	posture	= 829,
-	CoordinateSystem = 830,
-	TFgroup	= 831,
-	end = (TFgroup+goto_target_TFgroup_len)
-};
-enum class goto_posture_cmd:uint16_t
-{
-	RNU = 0,
+	stop = 1000					};
+/* goto target information */
+#define gotoTarget_qan 15
+const int gotoTarget_len[gotoTarget_qan] = {1,   1,   1,   1,   1,   2,   2,   2,   2,   2,   2,   1,   1,   1,   1};
+const int gotoTarget_adr[gotoTarget_qan] = {799, 810, 811, 814, 815, 816, 818, 820, 822, 824, 826, 828, 829, 830, 831};
+enum class gotoTarget_con:int
+{	flag = 0,
+	axis12= 1,
+	axis34= 2,
+	JI1234= 3,
+	JI56  = 4,
+	X	  = 5,
+	Y	  = 6,
+	Z	  = 7,
+	RX	  = 8,
+	RY	  = 9,
+	RZ	  = 10,
+	UFTF	= 11,
+	posture	= 12,
+	CoordinateSystem = 13,
+	TFgroup	= 14	};
+enum class gotoPosture_cmd:uint16_t
+{	RNU = 0,
 	LNU = 1,
 	RND = 2,
 	LND = 3,
 	RHU = 4,
 	LHU = 5,
 	RHD = 6,
-	LHD = 7
-};
-enum class goto_CoordinateSystem_cmd:uint16_t
-{
-	WCS = 0,
-	PCS = 1
-};
+	LHD = 7	};
+enum class gotoCoordinateSystem_cmd:uint16_t
+{	WCS = 0,
+	PCS = 1	};
+/* Robot Language Control */
 #define RL_control_len 1
-enum class RL_control_adr:int
-{	/* Robot Language Control */
-	_executive_status= 531,
-	executive_line 	= 532,
-	script_ID 		= 544,
-	script_control 	= 552
-};
+#define RL_control_qan 4
+const int RL_control_adr[RL_control_qan] = {531, 532, 544, 552};
+enum class RL_control_con:int
+{	executive_status= 0,
+	executive_line 	= 1,
+	script_ID 		= 2,
+	script_control 	= 3	};
 enum class RL_script_cmd:uint16_t
-{	/* Robot Language Control */
-	open = 1,
+{	open = 1,
 	run = 2,
 	stop = 3,
 	pause = 4,
 	step = 5,
-	open_and_run = 6,
-	end = (open_and_run+RL_control_len)
-};
-#define device_data_len 1
-enum class device_data_adr:int
+	open_and_run = 6	};
+/* delta DRVcontrol User self-service area */
+#define DeviceData_len 1
+#define DeviceData_qan 4
+const int DeviceData_adr[DeviceData_qan] = {4086, 8191, 12288, 16383};
+enum class DeviceData_con:int
 {	
 	/* User self-service */
-	Buffer = 4096,
-	Buffer_end = 0x1FFF,
+	Buffer = 0,
+	Buffer_end = 1,
 	/* User self-service(?) */
-	Latch = 12288,
-	Latch_end = 0x3FFF
+	Latch = 2,
+	Latch_end = 3
 };
+/* DMCNET DIO */
 #define DMCNET_Equipmen_len 1
-enum class DMCNET_Equipmen_adr:int
-{	/* DMCNET DIO */
-	_DMCNET_Equipmen_DI3 = 0x9820,
-	DMCNET_Equipmen_DI4  = 0x9828,
-	DMCNET_Equipmen_DI5  = 0x9830,
-	DMCNET_Equipmen_DI6  = 0x9838,
-	DMCNET_Equipmen_DI7  = 0x9840,
-	DMCNET_Equipmen_DI8  = 0x9848,
-	DMCNET_Equipmen_DI9  = 0x9850,
-	DMCNET_Equipmen_DI10 = 0x9858,
-	DMCNET_Equipmen_DI11 = 0x9860,
-	DMCNET_Equipmen_DI12 = 0x9868,
-	DMCNET_Equipmen_DO3  = 0x9c20,
-	DMCNET_Equipmen_DO4  = 0x9c28,
-	DMCNET_Equipmen_DO5  = 0x9c30,
-	DMCNET_Equipmen_DO6  = 0x9c38,
-	DMCNET_Equipmen_DO7  = 0x9c40,
-	DMCNET_Equipmen_DO8  = 0x9c48,
-	DMCNET_Equipmen_DO9  = 0x9c50,
-	DMCNET_Equipmen_DO10 = 0x9c58,
-	DMCNET_Equipmen_DO11 = 0x9c60,
-	DMCNET_Equipmen_DO12 = 0x9c68
-};
+#define DMCNET_Equipmen_qan 20
+const int DMCNET_Equipmen_adr[DMCNET_Equipmen_qan] =
+								   { 0x9820, 0x9828, 0x9830, 0x9838, 0x9840,
+									 0x9848, 0x9850, 0x9858, 0x9860, 0x9868,
+									 0x9c20, 0x9c28, 0x9c30, 0x9c38, 0x9c40,
+									 0x9c48, 0x9c50, 0x9c58, 0x9c60, 0x9c68	};
+enum class DMCNET_Equipmen_con:int
+{	DMCNET_Equipmen_DI3 = 0,
+	DMCNET_Equipmen_DI4  = 1,
+	DMCNET_Equipmen_DI5  = 2,
+	DMCNET_Equipmen_DI6  = 3,
+	DMCNET_Equipmen_DI7  = 4,
+	DMCNET_Equipmen_DI8  = 5,
+	DMCNET_Equipmen_DI9  = 6,
+	DMCNET_Equipmen_DI10 = 7,
+	DMCNET_Equipmen_DI11 = 8,
+	DMCNET_Equipmen_DI12 = 9,
+	DMCNET_Equipmen_DO3  = 10,
+	DMCNET_Equipmen_DO4  = 11,
+	DMCNET_Equipmen_DO5  = 12,
+	DMCNET_Equipmen_DO6  = 13,
+	DMCNET_Equipmen_DO7  = 14,
+	DMCNET_Equipmen_DO8  = 15,
+	DMCNET_Equipmen_DO9  = 16,
+	DMCNET_Equipmen_DO10 = 17,
+	DMCNET_Equipmen_DO11 = 18,
+	DMCNET_Equipmen_DO12 = 19	};
 /* --------------------------------------------------------------------- */
 /* DRV modbus address Table END */
 
