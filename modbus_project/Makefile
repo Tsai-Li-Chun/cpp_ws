@@ -11,6 +11,7 @@
 ######################################
 target_wise4060  = wise4060_modbus
 target_deltaDRV  = deltaDRV_modbus
+target_clss  = cas_lab_safetysystem
 
 ############################################################################
 #	building variables
@@ -50,6 +51,9 @@ c_sources_wise4060 = \
 c_sources_deltaDRV = \
 	src/deltaDRV_test.cpp \
 	src/deltaDRV_modbus_HandShake.cpp
+c_sources_clss = \
+	src/cas_lab_safetysystem.cpp \
+	src/wise4060_HandShake.cpp
 
 
 ############################################################################
@@ -59,18 +63,21 @@ obj_tmp_wise4060 = $(subst $(src_path), $(obj_path), $(c_sources_wise4060))
 obj_wise4060     = $(patsubst %.cpp, %.o, $(obj_tmp_wise4060))
 obj_tmp_deltaDRV = $(subst $(src_path), $(obj_path), $(c_sources_deltaDRV))
 obj_deltaDRV     = $(patsubst %.cpp, %.o, $(obj_tmp_deltaDRV))
+obj_tmp_clss = $(subst $(src_path), $(obj_path), $(c_sources_clss))
+obj_clss     = $(patsubst %.cpp, %.o, $(obj_tmp_clss))
 
 ############################################################################
 #	dependency file
 ######################################
 dep_wise4060 = $(patsubst %.o, %.d, $(obj_wise4060))
 dep_deltaDRV = $(patsubst %.o, %.d, $(obj_deltaDRV))
+dep_clss = $(patsubst %.o, %.d, $(obj_clss))
 
 ############################################################################
 # default action: build all
 ######################################
 $(shell if [ ! -e 'build' ]; then mkdir -p build; fi)
-all: wise4060 deltaDRV
+all: wise4060 deltaDRV clss
 
 wise4060: $(target_wise4060)
 	@echo "target $< complete"
@@ -82,11 +89,17 @@ deltaDRV: $(target_deltaDRV)
 $(target_deltaDRV): $(obj_deltaDRV)
 	g++ $^ -o $@ $(libs)
 
+clss: $(target_clss)
+	@echo "target $< complete"
+$(target_clss): $(obj_clss)
+	g++ $^ -o $@ $(libs)
+
 ############################################################################
 # build the application
 #######################################
 -include $(dep_wise4060)
 -include $(dep_deltaDRV)
+-include $(dep_clss)
 ${obj_path}%.o: ${src_path}%.cpp Makefile
 	g++ $(CFLAGS) -c $< -o $@
 

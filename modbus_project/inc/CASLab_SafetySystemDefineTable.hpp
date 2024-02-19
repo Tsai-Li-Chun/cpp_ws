@@ -32,7 +32,15 @@
 /* Extern Typedef -------------------------------------------*/
 /* Extern Typedef Begin */
 
-
+struct state
+{
+	/* 0:healthy, 1: */
+	uint8_t network;
+	uint8_t fence;
+	uint8_t camera_robot;
+	uint8_t guide_robot;
+	uint8_t stand;
+};
 
 /* Extern Typedef End */
 
