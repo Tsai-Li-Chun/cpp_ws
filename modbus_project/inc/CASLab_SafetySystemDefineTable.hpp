@@ -1,58 +1,44 @@
 /** ******************************************************
-	* @file		WISE4060_ModbusAddressTable.hpp
+	* @file		CASLab_SafetySystemDefineTable.hpp
 	* @author	Tsai,Li-chun
 	******************************************************
 **	**/
 
 /* Define to prevent recursive inclusi ----------------------*/
-#ifndef __WISE4060_ModbusAddressTable_HPP__
-#define __WISE4060_ModbusAddressTable_HPP__
+#ifndef __CASLab_SafetySystemDefineTable_HPP__
+#define __CASLab_SafetySystemDefineTable_HPP__
 
 
 /* System Includes ------------------------------------------*/
 /* System Includes Begin */
-#include "stdint.h"
 /* System Includes End */
 /* User Includes --------------------------------------------*/
 /* User Includes Begin */
+#include "WISE4060_ModbusAddressTable.hpp"
 /* User Includes End */
 
 
 /* Define ---------------------------------------------------*/
 /* Define Begin */
 
-#define wise4060_IP "192.168.1.1"
-#define wise4060_port 502
-#define wise4060_slave 1
-#define wise4060_input_quantity 4
-#define wise4060_output_quantity 4
+#define fence_remoteIO_IP "192.168.1.11"
+#define camera_root_remoteIO_IP "192.168.1.12"
+#define guide_root_remoteIO_IP "192.168.1.13"
+#define stand_remoteIO_IP "192.168.1.14"
 
 /* Define End */
 
 
 /* Extern Typedef -------------------------------------------*/
 /* Extern Typedef Begin */
+
+
+
 /* Extern Typedef End */
 
 
 /* Extern Class -------------------------------------------*/
 /* Extern Class Begin */
-
-enum class DI_Address:int
-{
-	DI_0 = 0,
-	DI_1 = 1,
-	DI_2 = 2,
-	DI_3 = 3
-};
-enum class DO_Address:int
-{
-	DO_0 = 16,
-	DO_1 = 17,
-	DO_2 = 18,
-	DO_3 = 19
-};
-
 /* Extern Class End */
 
 
@@ -66,6 +52,6 @@ enum class DO_Address:int
 /* Function End */
 
 
-#endif /*__WISE4060_ModbusAddressTable_HPP__ */
+#endif /*__CASLab_SafetySystemDefineTable_HPP__ */
 
-/* ***** END OF WISE4060_ModbusAddressTable.HPP ***** */
+/* ***** END OF CASLab_SafetySystemDefineTable.HPP ***** */

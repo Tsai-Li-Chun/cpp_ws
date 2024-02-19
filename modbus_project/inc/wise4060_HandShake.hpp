@@ -14,7 +14,7 @@
 /* System Includes End */
 /* User Includes --------------------------------------------*/
 /* User Includes Begin */
-#include "WISE4060_ModbusAddressTable.hpp"
+#include "CASLab_SafetySystemDefineTable.hpp"
 #include "modbus/modbus.h"
 /* User Includes End */
 
