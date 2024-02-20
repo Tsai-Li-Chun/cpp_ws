@@ -53,6 +53,8 @@ private:
 	/* create modbus_communication_structure */
 	modbus_t* mb;
 
+	std::string modbus_name = "null";
+
 	/* libmodbus return value(ReturnCode) */
 	int rc;
 	/* for temporary IO status */
@@ -61,6 +63,10 @@ private:
 	uint8_t DI_status[wise4060_input_quantity];
 	/* for status of each output channel */
 	uint8_t DO_status[wise4060_output_quantity];
+	/* wise4060 Module Name */
+	uint16_t module_name;
+	/* response timeout */
+	uint32_t response_to_sec,response_to_usec;
 
 	/* 設定連結函數 */
 	int Modbus_slave_connect(int slave);
@@ -73,6 +79,9 @@ public:
 	wise4060_HandShake(const char* device, int BR, char parity='N', int data_bit=8, int stop_bit=1, int slave=1);
 	/* 解建構函數 */
 	~wise4060_HandShake();
+
+	int isConnect(void);
+	int reConnect(void);
 
 	/* read single input channel function */
 	int wise4060_readDI(DI_Address channel);

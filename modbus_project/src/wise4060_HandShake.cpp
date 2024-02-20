@@ -61,15 +61,26 @@
 wise4060_HandShake::wise4060_HandShake(const char* IP, int port, int slave)
 {
 	/* 初始化modbus通訊設定 */
+	std::cout << "Modbus TCP Mode Setup : " << IP << std::endl;
 	mb = modbus_new_tcp(IP,port);
 	if( Modbus_slave_connect(slave) != 0 )
-		printf("Modbus TCP Mode Setup Failure!\n");
-	
+		std::cout << TC_ERROR << "Modbus TCP Mode Setup : " << IP << TC_RESET << std::endl;
+	else
+	{
+		std::cout << "[Create] ModbusTCP(" << IP << ") controller object Success!" << std::endl;
+	}
+	// /* save original timeout */
+	// modbus_get_response_timeout(mb, &response_to_sec, &response_to_usec);
+	// std::cout << "response timeout: " << response_to_sec << " : " << response_to_usec << std::endl;
+	std::cout << "------------------------------------------------" << std::endl << std::endl;
+
 	/* reset the variable to zero  */
 	for(int i=0; i<wise4060_input_quantity; i++)
 		DI_status[i]=0xFF;
 	for(int i=0; i<wise4060_output_quantity; i++)
 		DO_status[i]=0xFF;
+
+	modbus_name = IP;
 }
 
 /** * @brief Constructor - RTU Mode
@@ -84,15 +95,21 @@ wise4060_HandShake::wise4060_HandShake(const char* IP, int port, int slave)
 wise4060_HandShake::wise4060_HandShake(const char* device, int BR, char parity, int data_bit, int stop_bit, int slave)
 {
 	/* 初始化modbus通訊設定 */
+	std::cout << "Modbus RTU Mode Setup : " << device << std::endl;
 	mb = modbus_new_rtu(device,BR,parity,data_bit,stop_bit);
 	if( Modbus_slave_connect(slave) != 0 )
-		printf("Modbus RTU Mode Setup Failure!\n");
+		std::cout << TC_ERROR << "Modbus RTU Mode Setup : " << device << TC_RESET << std::endl;
+	else
+		std::cout << "[Create] ModbusRTU(" << device << ") controller object Success!" << std::endl;
+	std::cout << "------------------------------------------------" << std::endl << std::endl;
 	
 	/* reset the variable to zero  */
 	for(int i=0; i<wise4060_input_quantity; i++)
 		DI_status[i]=0xFF;
 	for(int i=0; i<wise4060_output_quantity; i++)
 		DO_status[i]=0xFF;
+
+	modbus_name = device;
 }
 
 /** * @brief Setup SlaveID & Connect
@@ -106,37 +123,38 @@ int wise4060_HandShake::Modbus_slave_connect(int slave)
 	/* 初始化是否成功判斷 */
 	if( mb == NULL )
 	{	/* 若初始化失敗,打印訊息,退出程序 */
-		printf("%s\n",modbus_strerror(errno));
+		std::cout << TC_ERROR << modbus_strerror(errno) << TC_RESET << std::endl;;
 		exit(EXIT_FAILURE);
 	}
 	else
 	{	/* 若初始化成功,打印訊息 */
-		printf("Initialize modbus_t Structure Success\n");
+		std::cout << "Initialize modbus_t Structure Success" << std::endl;
 	}
 
 	/* 設定欲通訊的modbus-slaveID */
 	rc = modbus_set_slave(mb,slave);
 	if( rc != 0 )
 	{	/* 若設定失敗,打印訊息,退出建構函數 */
-		printf("modbus set slave Failure!\n");
+		std::cout << TC_ERROR << "Setup modbus slave Failure! : " << slave << TC_RESET << std::endl;
 		return rc;
 	}
 	else
 	{	/* 若slaveID設定成功,打印訊息 */
-		printf("Setup Slave ID \"%d\" Success\n", slave);
+		std::cout << "Setup modbus slave(" << slave << ") Success!" << std::endl;
 	}
 
 	/* 建立連結 */
 	rc = modbus_connect(mb);
 	if( rc != 0 )
 	{	/* 若設定失敗,打印訊息,退出建構函數 */
-		printf("modbus connect Failure!\n");
-		printf("%s\n",modbus_strerror(errno));
+		std::cout << TC_ERROR << "Connect modbusIP:slave(" \
+			<< modbus_name << ":" << slave << " Failure!" << std::endl;
+		std::cout << "    >> " << modbus_strerror(errno) << TC_RESET << std::endl;
 		return rc;
 	}
 	else
 	{	/* 若連結成功,打印訊息 */
-		printf("Slave ID \"%d\" Connect Success\n", slave);
+		std::cout << "Connect modbusIP:slave(" << modbus_name << ":" << slave << " Success!" << std::endl;
 	}
 
 	/* 程式正常結束,返回0 */
@@ -154,7 +172,7 @@ wise4060_HandShake::~wise4060_HandShake()
 	/* release the address of the modbus_communication_structure */
 	modbus_free(mb);
 	/* 打印關閉訊息 */
-	printf("modbus connect close\n");
+	std::cout << "modbus connect close : " << modbus_name << std::endl;
 }
 
 /** * @brief read single input channel function
@@ -247,6 +265,31 @@ void wise4060_HandShake::get_DI_status(uint8_t *din)
 void wise4060_HandShake::get_DO_status(uint8_t *dout)
 {
 	memcpy(dout, DO_status, wise4060_output_quantity);
+}
+
+/** * @brief verify connection status
+ 	* @param none
+ 	* @return int, connection status, 1:connected, 0:disconnected
+**	**/
+int wise4060_HandShake::isConnect(void)
+{
+	module_name = 0;
+	rc = modbus_read_registers(mb, 210, 1, &module_name);
+	return (module_name == 0x4060);
+	// rc = modbus_connect(mb);
+	// return rc;
+}
+
+/** * @brief reconnection to modbus
+ 	* @param none
+ 	* @return int, reconnection result, 0:success, -1:fail
+**	**/
+int wise4060_HandShake::reConnect(void)
+{
+	// rc = modbus_read_registers(mb, 210, 1, &module_name);
+	// return (module_name == 0x4060);
+	rc = modbus_connect(mb);
+	return rc;
 }
 
 /* Program End */

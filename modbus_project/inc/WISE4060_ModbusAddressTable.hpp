@@ -21,6 +21,11 @@
 /* Define ---------------------------------------------------*/
 /* Define Begin */
 
+/* define terminal color */
+#define TC_RESET "\033[0m"  /* Normal  */
+#define TC_ERROR "\033[1m\033[31m[ERROR] " /* Red */
+
+/* common settings for WISE-4060 */
 #define wise4060_IP "192.168.1.1"
 #define wise4060_port 502
 #define wise4060_slave 1

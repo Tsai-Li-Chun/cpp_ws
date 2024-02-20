@@ -53,6 +53,7 @@ c_sources_deltaDRV = \
 	src/deltaDRV_modbus_HandShake.cpp
 c_sources_clss = \
 	src/cas_lab_safetysystem.cpp \
+	src/cas_lab_safetysystem_classType.cpp \
 	src/wise4060_HandShake.cpp
 
 

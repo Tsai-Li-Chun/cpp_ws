@@ -7,13 +7,11 @@
 
 /* System Includes ------------------------------------------*/
 /* System Includes Begin */
-#include <iostream>
-#include <unistd.h>
+// #include <string>
 /* System Includes End */
 /* User Includes --------------------------------------------*/
 /* User Includes Begin */
-#include "CASLab_SafetySystemDefineTable.hpp"
-#include "wise4060_HandShake.hpp"
+#include "cas_lab_safetysystem_classType.hpp"
 /* User Includes End */
 
 /* namespace ------------------------------------------------*/
@@ -38,11 +36,16 @@
 
 /* Variables ------------------------------------------------*/
 /* Variables Begin */
+// int rc;
+
 /* Variables End */
 
 
 /* Function -------------------------------------------------*/
 /* Function Begin */
+
+
+
 /* Function End */
 
 
@@ -60,19 +63,31 @@
 int main(int argc, char **argv)
 {
 	/* 隨便顯示些東西證明程式運作 */
-	std::cout << "CAS Lab Safety System ..." << std::endl;
+	std::cout << "CAS Lab Safety System program setup..." << std::endl;
+	std::cout << "----------------------------------------------" << std::endl << std::endl;
+
+	/* create data structure for the work status of cas lab */
+	lab_state cas_lab_state;
 
 	/* 建立modbus通訊物件 */
-	wise4060_HandShake wise4060(wise4060_IP, wise4060_port, wise4060_slave);
+	cas_lab_safetysystem_classType cas_lab_safetysystem;
 
 	// /* main loop */
 	// while(1)
 	// {
+		/* work once loop */
+		cas_lab_state = cas_lab_safetysystem.run();
+	// 	/* delay 100ms */
+	// 	usleep(1000*100);
 	// }
 
 	/* main quit */
 	return 0;
 }
+
+
+
+
 
 /* Program End */
 /* ---------------------------------------------------------*/
