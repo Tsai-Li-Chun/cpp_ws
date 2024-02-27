@@ -23,10 +23,10 @@
 
 /* define terminal color */
 #define TC_RESET "\033[0m"  /* Normal  */
-#define TC_ERROR "\033[1m\033[31m[ERROR] " /* Red */
+#define TC_ERROR "\033[31m[ERROR] " /* Red */
 
 /* common settings for WISE-4060 */
-#define wise4060_IP "192.168.1.1"
+#define wise4060_IP "192.168.1.15"
 #define wise4060_port 502
 #define wise4060_slave 1
 #define wise4060_input_quantity 4
@@ -56,6 +56,13 @@ enum class DO_Address:int
 	DO_1 = 17,
 	DO_2 = 18,
 	DO_3 = 19
+};
+enum class DO_pulse_FixedTotal_Address:int
+{
+	DO_0 = 24,
+	DO_1 = 26,
+	DO_2 = 28,
+	DO_3 = 30
 };
 
 /* Extern Class End */

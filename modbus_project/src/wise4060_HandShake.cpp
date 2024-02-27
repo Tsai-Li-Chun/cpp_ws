@@ -292,6 +292,18 @@ int wise4060_HandShake::reConnect(void)
 	return rc;
 }
 
+/** * @brief output the specified pulse count according to the webpage parameters
+ 	* @param DO_pulse_FixedTotal_Address channel, specify the channel to output pulse
+ 	* @param int number, output number, 0 is continue
+ 	* @return int, number of written registers, -1 is error
+**	**/
+int wise4060_HandShake::wise4060_DO_pulse(DO_pulse_FixedTotal_Address channel, const int number)
+{
+	itou16_tmp.i = number;
+	rc = modbus_write_registers(mb, static_cast<int>(channel), 2, itou16_tmp.u16);
+	return rc;
+}
+
 /* Program End */
 /* ---------------------------------------------------------*/
 /* ⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧ Program ⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧ ---------------------------*/

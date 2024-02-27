@@ -32,7 +32,11 @@ union modbus_u16tofloat
     float f;
     uint16_t ch[ (sizeof(float))/sizeof(uint16_t) ];
 };
-
+union modbus_itou16
+{
+    int i;
+    uint16_t u16[ (sizeof(int))/sizeof(uint16_t) ];
+};
 union modbus_u8tou16
 {
     uint16_t u16;
@@ -55,6 +59,8 @@ private:
 
 	std::string modbus_name = "null";
 
+	/* conversion and buffer of numerical digits */
+	modbus_itou16 itou16_tmp;
 	/* libmodbus return value(ReturnCode) */
 	int rc;
 	/* for temporary IO status */
@@ -95,6 +101,9 @@ public:
 	int wise4060_writeDO(DO_Address channel,const int onoff);
 	/* write ALL output channel function */
 	int wise4060_writeALLDO(const uint8_t *onoff);
+
+	/* output the specified pulse count */
+	int wise4060_DO_pulse(DO_pulse_FixedTotal_Address channel, const int number);
 
 	/* get DI_status value */
 	void get_DI_status(uint8_t *din);

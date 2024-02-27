@@ -29,29 +29,55 @@
 #define remoteIO_IP_guide_root "192.168.1.13"
 #define remoteIO_IP_stand "192.168.1.15"
 
-/* network error code */
-#define network_healthy						(uint8_t)0
-#define network_total_AP_err				(uint8_t)1
-#define network_camera_robot_AP_err			(uint8_t)2
-#define network_guide_robot_AP_err			(uint8_t)3
-#define network_stand_AP_err				(uint8_t)4
-#define network_fence_remoteIO_err			(uint8_t)5
-#define network_camera_robot_remoteIO_err	(uint8_t)6
-#define network_guide_robot_remoteIO_err	(uint8_t)7
-#define network_stand_remoteIO_err			(uint8_t)8
-/* fence error code */
-#define fence_close (uint8_t)0
-#define fence_open (uint8_t)1
-/* camera_robot error code */
-#define camera_robot_EMS_on (uint8_t)0
-#define camera_robot_EMS_off (uint8_t)1
-/* guide_robot error code */
-#define guide_robot_EMS_on (uint8_t)0
-#define guide_robot_EMS_off (uint8_t)1
-/* stand error code */
-#define AGV_EMS_on (uint8_t)0
-#define AGV_EMS_off (uint8_t)1
+/* cas lab module err code */
+#define module_camera_robot_err (uint8_t)1
+#define module_guide_robot_err 	(uint8_t)2
+#define module_stand_err 		(uint8_t)3
+#define module_AGV_err 			(uint8_t)4
+#define module_ALL_healthy 		(uint8_t)5
+#define module_network_err 		(uint8_t)6
+#define module_fence_err 		(uint8_t)7
 
+/* network error code */
+#define network_fence_remoteIO_err			(uint8_t)0
+#define network_camera_robot_remoteIO_err	(uint8_t)1
+#define network_guide_robot_remoteIO_err	(uint8_t)2
+#define network_stand_remoteIO_err			(uint8_t)3
+#define network_total_AP_err				(uint8_t)4
+#define network_camera_robot_AP_err			(uint8_t)5
+#define network_guide_robot_AP_err			(uint8_t)6
+#define network_stand_AP_err				(uint8_t)7
+#define network_healthy						(uint8_t)99
+/* fence error code */
+#define fence_close	(uint8_t)0
+#define fence_open	(uint8_t)1
+/* camera_robot error code */
+#define camera_robot_EMS_off (uint8_t)0
+#define camera_robot_EMS_on	 (uint8_t)1
+#define camera_robot_STO_adr (DO_Address)DO_Address::DO_1
+/* guide_robot error code */
+#define guide_robot_EMS_off (uint8_t)0
+#define guide_robot_EMS_on (uint8_t)1
+#define guide_robot_STO_adr (DO_Address)DO_Address::DO_2
+#define guide_robot_reset_adr (DO_pulse_FixedTotal_Address)DO_pulse_FixedTotal_Address::DO_0
+/* AGV error code */
+#define AGV_EMS_off (uint8_t)0
+#define AGV_EMS_on (uint8_t)1
+#define AGV_STO_adr (DO_Address)DO_Address::DO_3
+/* stand error code */
+#define stand_EMS_off (uint8_t)0
+#define stand_EMS_on (uint8_t)1
+#define stand_STO_adr (DO_Address)DO_Address::DO_3
+
+/* remoteIO DI/O signal, refer to actual wire */
+#define DI_signal_efficient (uint8_t)1
+#define DI_signal_invalid (uint8_t)0
+#define DI_EMS_off (uint8_t)1
+#define DI_EMS_on (uint8_t)0
+#define DO_LED_enable (uint8_t)1
+#define DO_LED_disable (uint8_t)0
+#define DO_STO_enable (uint8_t)0
+#define DO_STO_disable (uint8_t)1
 
 /* Define End */
 
@@ -61,16 +87,18 @@
 
 enum remoteIO_number
 {
-	remoteIO_number_fence = 0,
-	remoteIO_number_camera_robot = 1,
-	remoteIO_number_guide_robot = 2,
-	remoteIO_number_stand = 3
+	fence = 0,
+	camera_robot = 1,
+	guide_robot = 2,
+	stand = 3,
+	AGV = 3
 };
 
 struct lab_state
 {
 	uint8_t network;		/* reference network error code */
 	uint8_t fence;			/* reference fence error code */
+	uint8_t AGV;			/* reference stand error code */
 	uint8_t camera_robot;	/* reference camera_robot error code */
 	uint8_t guide_robot;	/* reference guide_robot error code */
 	uint8_t stand;			/* reference stand error code */

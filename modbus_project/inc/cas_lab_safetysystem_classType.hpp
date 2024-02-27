@@ -14,6 +14,7 @@
 #include <memory>
 #include <iostream>
 #include <unistd.h>
+#include <sys/time.h>
 /* System Includes End */
 /* User Includes --------------------------------------------*/
 /* User Includes Begin */
@@ -41,36 +42,66 @@ class cas_lab_safetysystem_classType
 private:
 	/* for loop count */
 	int flc1,flc2,flc3;
+	/* StackLight Display Mode */
+	int display_mode, display_mode_old;
 	/* libmodbus Return Code */
 	int rc;
-	// /* online remoteIO quantity */
-	// int online_remoteIO_quantity;
+	/* online remoteIO quantity */
+	int online_remoteIO_quantity;
+	/* current program time(us), previous program time(us) */
+	long time_us, time_us_old;
+	struct timeval tv;
 	/* create string data type variable for the IP address  */
 	std::string ipAddress;
 	/* create string data type variable for the to termanal command */
 	std::string command;
 	/* create data structure for the work status of cas lab */
-	lab_state cas_lab_state;
+	lab_state cas_lab_state, cas_lab_state_old;
 	/* craeate cas lab remoteIO IP list */
 	std::vector<std::string> remoteIO_IP;
+	
+	/* for status of each input channel */
+	uint8_t DI_status[remoteIO_quantity][wise4060_input_quantity];
+	/* for status of each output channel */
+	uint8_t DO_status[remoteIO_quantity][wise4060_output_quantity];
 
 	std::shared_ptr<wise4060_HandShake> remoteIO[remoteIO_quantity];
 	// wise4060_HandShake *remoteIO[remoteIO_quantity];
 
+	void get_remoteIO_DI(int number);	/* get DI data of remoteIO[number] */
+
 	int verify_totalAP(void);	/* verify total AP */
 	int verify_moduleAP(void);	/* verify module AP */
 	int verify_remoteIO(void);	/* verify remoteIO */
+
+	uint8_t check_fence_door(void);			/* check if the fence door is open */
+	uint8_t check_camera_robot_EMS(void);	/* check if the camera robot EMS is pressed */
+	uint8_t check_guide_robot_EMS(void);	/* check if the guide robot EMS is pressed */
+	uint8_t check_stand_EMS(void);			/* check if the stand EMS is pressed */
+	uint8_t check_AGV_EMS(void);			/* check if the AGV EMS is pressed */
+
+	void set_StackLight_DisplayMode(void);	/* set StackLight Display Mode */
+	void CAS_LAB_action(void);			/* implement actions on the indicator lights and STO of each module */
+	void action_camera_robot_STO(void);	/* STO actions based on the status of camera robot */
+	void action_guide_robot_STO(void);	/* STO actions based on the status of guide robot */
+	void action_stand_STO(void);		/* STO actions based on the status of stand */
+	void action_AGV_STO(void);			/* STO actions based on the status of AGV */
+	void action_StackLight(void);		/* StackLight actions based on the status of DisplayMode */
+
+	uint8_t STOon_camera_robot(void);	/* activate the STO mechanism of the camera robot */
+	uint8_t STOoff_camera_robot(void);	/* deactivate the STO mechanism of the camera robot */
+	uint8_t STOon_guide_robot(void);	/* activate the STO mechanism of the guide robot */
+	uint8_t STOoff_guide_robot(void);	/* deactivate the STO mechanism of the guide robot */
+	uint8_t STOon_stand(void);			/* activate the STO mechanism of the stand */
+	uint8_t STOoff_stand(void);			/* deactivate the STO mechanism of the stand */
+	uint8_t STOon_AGV(void);			/* activate the STO mechanism of the AGV */
+	uint8_t STOoff_AGV(void);			/* deactivate the STO mechanism of the AGV */
 
 /* public number */
 public:
 	
 	cas_lab_safetysystem_classType();	/* constructor */
 	~cas_lab_safetysystem_classType();	/* destructor */
-
-	int check_fence_door(void);		/* check if the fence door is open  */
-	int check_camera_robot_EMS(void);	/* Check if the camera robot EMS is pressed  */
-	int check_guide_robot_EMS(void);	/* Check if the guide robot EMS is pressed  */
-	int check_AGV_EMS(void);			/* Check if the AGV EMS is pressed  */
 
 	/* main function */
 	lab_state run(void);

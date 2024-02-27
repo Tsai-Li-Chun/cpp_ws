@@ -107,6 +107,7 @@ int main(int argc, char **argv)
 		printf("%02x , %02x , %02x , %02x\n",DO_status[3],DO_status[2],DO_status[1],DO_status[0]);
 		sleep(2);
 	}
+	wise4060.wise4060_DO_pulse(DO_pulse_FixedTotal_Address::DO_0,1);
 
 	// /* main loop */
 	// while(1)
