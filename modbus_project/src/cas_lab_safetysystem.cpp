@@ -71,32 +71,12 @@ int main(int argc, char **argv)
 
 	/* 建立modbus通訊物件 */
 	cas_lab_safetysystem_classType cas_lab_safetysystem;
-
-	struct timeval tv;
-    gettimeofday(&tv, NULL);
-    
-    printf("second: %ld\n", tv.tv_sec); // 秒
-    // printf("millisecond: %ld\n", tv.tv_sec * 1000 + tv.tv_usec / 1000); // 毫秒
-    // printf("microsecond: %ld\n", tv.tv_sec * 1000000 + tv.tv_usec); // 徽秒
-    printf("microsecond: %ld\n", tv.tv_usec); // 徽秒
-    
-    sleep(3); // 让程序休眠3秒
-    printf("---------------------sleep 3 second-------------------\n");
-    
-    gettimeofday(&tv, NULL);
-        
-    printf("second: %ld\n", tv.tv_sec); // 秒
-    // printf("millisecond: %ld\n", tv.tv_sec * 1000 + tv.tv_usec / 1000); // 毫秒
-    // printf("microsecond: %ld\n", tv.tv_sec * 1000000 + tv.tv_usec); // 徽秒
-    printf("microsecond: %ld\n", tv.tv_usec); // 徽秒
+	cas_lab_safetysystem.init();
+	cas_lab_state = cas_lab_safetysystem.run();
 
 	// /* main loop */
 	// while(1)
 	// {
-		// /* work once loop */
-		// cas_lab_state = cas_lab_safetysystem.run();
-	// 	/* delay 100ms */
-	// 	usleep(1000*100);
 	// }
 
 	/* main quit */

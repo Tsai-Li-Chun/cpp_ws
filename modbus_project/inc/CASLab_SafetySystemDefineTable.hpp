@@ -79,6 +79,12 @@
 #define DO_STO_enable (uint8_t)0
 #define DO_STO_disable (uint8_t)1
 
+/* parameters for controlling the StackLight  */
+#define flash_interval (long)200000	/* us(200ms) */
+#define fence_GLED_adr (DO_Address)DO_Address::DO_3
+#define fence_YLED_adr (DO_Address)DO_Address::DO_2
+#define fence_RLED_adr (DO_Address)DO_Address::DO_1
+
 /* Define End */
 
 

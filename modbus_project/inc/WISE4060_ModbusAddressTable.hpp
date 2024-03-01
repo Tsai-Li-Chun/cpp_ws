@@ -24,6 +24,7 @@
 /* define terminal color */
 #define TC_RESET "\033[0m"  /* Normal  */
 #define TC_ERROR "\033[31m[ERROR] " /* Red */
+#define TC_CLOSE "\x1B[2J\x1B[H " /* close */
 
 /* common settings for WISE-4060 */
 #define wise4060_IP "192.168.1.15"
