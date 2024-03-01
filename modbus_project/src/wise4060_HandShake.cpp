@@ -292,6 +292,27 @@ int wise4060_HandShake::reConnect(void)
 	return rc;
 }
 
+/** * @brief set the timeout interval used to wait for a response, total waiting time s+us, s+us=0 disable this feature
+ 	* @param uint32_t s, waiting time(S)
+ 	* @param uint32_t us, waiting time(uS)
+ 	* @return int, return value
+**	**/
+int wise4060_HandShake::set_response_timeout(uint32_t s, uint32_t us)
+{
+	rc = modbus_set_response_timeout(mb, s, us);
+	return rc;
+}
+/** * @brief set the timeout interval used to wait for a indication, total waiting time s+us, s+us=0 disable this feature
+ 	* @param uint32_t s, waiting time(S)
+ 	* @param uint32_t us, waiting time(uS)
+ 	* @return int, return value
+**	**/
+int wise4060_HandShake::set_indication_timeout(uint32_t s, uint32_t us)
+{
+	rc = modbus_set_indication_timeout(mb, s, us);
+	return rc;
+}
+
 /** * @brief output the specified pulse count according to the webpage parameters
  	* @param DO_pulse_FixedTotal_Address channel, specify the channel to output pulse
  	* @param int number, output number, 0 is continue

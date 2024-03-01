@@ -68,15 +68,20 @@ int main(int argc, char **argv)
 
 	/* create data structure for the work status of cas lab */
 	lab_state cas_lab_state;
+	bool display_HL_change=false;
 
 	/* 建立modbus通訊物件 */
 	cas_lab_safetysystem_classType cas_lab_safetysystem;
 	cas_lab_safetysystem.init();
 	cas_lab_state = cas_lab_safetysystem.run();
 
+	// // std::cout << "display_HL_change : " << display_HL_change << std::endl;
 	// /* main loop */
 	// while(1)
 	// {
+	// 	// display_HL_change = (!display_HL_change);
+	// 	// std::cout << "display_HL_change : " << display_HL_change << std::endl;
+	// 	// cas_lab_safetysystem.delay_1ms(1000);
 	// }
 
 	/* main quit */

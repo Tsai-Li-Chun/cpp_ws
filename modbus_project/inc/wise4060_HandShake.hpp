@@ -89,6 +89,11 @@ public:
 	int isConnect(void);
 	int reConnect(void);
 
+	/* set the timeout interval used to wait for a response */
+	int set_response_timeout(uint32_t s, uint32_t us);
+	/* set the timeout interval used to wait for a indication */
+	int set_indication_timeout(uint32_t s, uint32_t us);
+
 	/* read single input channel function */
 	int wise4060_readDI(DI_Address channel);
 	/* read ALL input channel function */
