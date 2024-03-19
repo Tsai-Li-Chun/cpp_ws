@@ -140,6 +140,11 @@ public:
 	int setup_RLControl(RL_control rl);
 	/* setup DO status */
 	int setup_userDO(uint16_t *status);
+
+	/* read Robot Device Data Buffer */
+	int read_deltaDRV_DataBuffer(int adr, int nb, uint16_t *data);
+	/* write Robot Device Data Buffer */
+	int write_deltaDRV_DataBuffer(int adr, uint16_t data);
 };
 
 

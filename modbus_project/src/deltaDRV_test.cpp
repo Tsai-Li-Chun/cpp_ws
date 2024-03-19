@@ -8,6 +8,7 @@
 /* System Includes ------------------------------------------*/
 /* System Includes Begin */
 #include <iostream>
+#include <unistd.h>
 /* System Includes End */
 /* User Includes --------------------------------------------*/
 /* User Includes Begin */
@@ -74,21 +75,20 @@ RL_control 		 _deltaDRV_RLStatus;
 int main(int argc, char **argv)
 {
 	int rc;
+	uint16_t i = 1;
+	uint16_t data;
 
 	deltaDRV_modbus_HandShake deltaDRV_modbus_HS(DRV_modbus_IP, DRV_modbus_port, DRV_modbus_slave);
 	
-	rc = deltaDRV_modbus_HS.read_deltaDRV_info_PUU(&_deltaDRV_info_PUU);
-	std::cout << "rc : " << rc << std::endl;
-	std::cout << "PUU a1 : " << _deltaDRV_info_PUU.ex_axis1 << std::endl;
-	std::cout << "PUU a2 : " << _deltaDRV_info_PUU.ex_axis2 << std::endl;
-	std::cout << "PUU a3 : " << _deltaDRV_info_PUU.ex_axis3 << std::endl;
-	std::cout << "PUU a4 : " << _deltaDRV_info_PUU.ex_axis4 << std::endl;
-	std::cout << "PUU j1 : " << _deltaDRV_info_PUU.j1 << std::endl;
-	std::cout << "PUU j2 : " << _deltaDRV_info_PUU.j2 << std::endl;
-	std::cout << "PUU j3 : " << _deltaDRV_info_PUU.j3 << std::endl;
-	std::cout << "PUU j4 : " << _deltaDRV_info_PUU.j4_ << std::endl;
-	std::cout << "PUU j5 : " << _deltaDRV_info_PUU._j5 << std::endl;
-	std::cout << "PUU j6 : " << _deltaDRV_info_PUU.j6 << std::endl;
+	while(1)
+	{
+		deltaDRV_modbus_HS.read_deltaDRV_DataBuffer(0x3201,1,&data);
+		printf("%4x\n",data);
+		deltaDRV_modbus_HS.write_deltaDRV_DataBuffer(0x3201,i);
+		if(i==0)	i=1;
+		else if(i==1) i=0;
+		sleep(3);
+	}
 
 	/* main quit */
 	return 0;

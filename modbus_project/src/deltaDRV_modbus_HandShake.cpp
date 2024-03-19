@@ -232,6 +232,32 @@ int deltaDRV_modbus_HandShake::read_deltaDRV_info_jDegPos(InfojDegPos *jdp)
 	return rc;
 }
 
+
+
+
+/** * @brief read Robot Device Data Buffer
+ 	* @param int adr, adrress
+ 	* @param int nb, quantity
+ 	* @param uint16_t* data, data
+ 	* @return int, result execution
+**	**/
+int deltaDRV_modbus_HandShake::read_deltaDRV_DataBuffer(int adr, int nb, uint16_t *data)
+{
+	rc = modbus_read_registers(mb, adr, nb, data);
+	return rc;
+}
+/** * @brief write Robot Device Data Buffer
+ 	* @param int adr, adrress
+ 	* @param int nb, quantity
+ 	* @param uint16_t* data, data
+ 	* @return int, result execution
+**	**/
+int deltaDRV_modbus_HandShake::write_deltaDRV_DataBuffer(int adr, uint16_t data)
+{
+	rc = modbus_write_register(mb, adr, data);
+	return rc;
+}
+
 /* Program End */
 /* ---------------------------------------------------------*/
 /* ⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧ Program ⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧ ---------------------------*/
