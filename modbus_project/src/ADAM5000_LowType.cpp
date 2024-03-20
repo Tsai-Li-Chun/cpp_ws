@@ -87,9 +87,9 @@ int main(int argc, char **argv)
 		// 	_adam5000_ctl.adam5000_readDO(static_cast<adam5000_DO>(j));
 		// _adam5000_ctl.adam5000_readDO_slot(slot4_DO_x56);
 		for(j=static_cast<int>(adam5000_DI::DI_2_00);j<=static_cast<int>(adam5000_DI::DI_2_15);j++)
-			DIO_status[0][(j%16)] = _adam5000_ctl.get_DIO_status(static_cast<adam5000_DI>(j));
+			DIO_status[0][(j%16)] = _adam5000_ctl.get_DI_status(static_cast<adam5000_DI>(j));
 		for(j=static_cast<int>(adam5000_DO::DO_3_00);j<=static_cast<int>(adam5000_DO::DO_4_15);j++)
-			DIO_status[(j/16-1)][(j%16)] = _adam5000_ctl.get_DIO_status(static_cast<adam5000_DO>(j));
+			DIO_status[(j/16-1)][(j%16)] = _adam5000_ctl.get_DO_status(static_cast<adam5000_DO>(j));
 		// for(j=static_cast<int>(adam5000_DO::DO_4_00);j<=static_cast<int>(adam5000_DO::DO_4_15);j++)
 		// 	DIO_status[2][(j%16)] = _adam5000_ctl.get_DIO_status(static_cast<adam5000_DO>(j));
 

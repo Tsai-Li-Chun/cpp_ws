@@ -213,11 +213,11 @@ int ADAM5000_HandShake::adam5000_readAO(adam5000_AO ch)
 	return rc;
 }
 
-uint8_t ADAM5000_HandShake::get_DIO_status(adam5000_DI ch)
+uint8_t ADAM5000_HandShake::get_DI_status(adam5000_DI ch)
 {
 	return DIO_status[ts_DIO_status_col(ch)][ts_DIO_status_row(ch)];
 }
-uint8_t ADAM5000_HandShake::get_DIO_status(adam5000_DO ch)
+uint8_t ADAM5000_HandShake::get_DO_status(adam5000_DO ch)
 {
 	return DIO_status[ts_DIO_status_col(ch)][ts_DIO_status_row(ch)];
 }

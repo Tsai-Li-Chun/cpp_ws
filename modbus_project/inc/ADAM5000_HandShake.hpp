@@ -69,8 +69,8 @@ public:
 	int adam5000_setAO(adam5000_AO ch, uint16_t v);	/* set single analogy output */
 	int adam5000_readAO(adam5000_AO ch);	/* read ALL analogy output */
 
-	uint8_t get_DIO_status(adam5000_DI ch);	/* get slotx specify ch */
-	uint8_t get_DIO_status(adam5000_DO ch);	/* get slotx specify ch */
+	uint8_t get_DI_status(adam5000_DI ch);	/* get slotx specify ch */
+	uint8_t get_DO_status(adam5000_DO ch);	/* get slotx specify ch */
 	void get_DIO_status_slot(int slotx, uint8_t *data);/* get slotx ALL ch */
 	uint16_t get_AIO_status(adam5000_AO ch);/* get slotx ALL ch */
 };
