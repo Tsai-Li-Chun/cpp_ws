@@ -7,6 +7,8 @@
 
 /* System Includes ------------------------------------------*/
 /* System Includes Begin */
+#include <iostream>
+#include <unistd.h>
 /* System Includes End */
 /* User Includes --------------------------------------------*/
 /* User Includes Begin */
@@ -58,7 +60,11 @@ int main(int argc, char **argv)
 {
 	cas_lab_StandController clst;
 
-	clst.run();
+	clst.init();
+	while(1)
+	{
+		clst.run();
+	}
 	/* main quit */
 	return 0;
 }

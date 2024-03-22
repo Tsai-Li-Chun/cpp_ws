@@ -48,53 +48,51 @@ private:
 	deltaDRV_modbus_HandShake deltaDRV_ctl;
 	/* create remotIO(ADAM5000) control object  */
 	ADAM5000_HandShake adam5000_ctl;
+	/* action flag */
+	bool action_regulate,action_kinetrol,action_gripper,action_brake,action_toolATC,action_fixture;
+	/* robot action information */
+	uint16_t robot_info_regulate_kg ,robot_info_item 	,robot_info_toolATC_check ,\
+			 robot_info_RS1 	 ,robot_info_RS2 	,robot_info_RS3 , robot_info_RS4 ,\
+			 robot_info_kinetrol ,robot_info_brake	,robot_info_gripper ,robot_cmd ,\
+			 robot_info_kinetrol_old ,robot_info_brake_old	,robot_info_gripper_old ,\
+			 robot_info_toolATC  ,robot_info_fixture ,\
+			 robot_info_toolATC_old  ,robot_info_fixture_old;
+	/* arm M5 action information - digital */
+	uint8_t  armM5_info_RS1			,armM5_info_RS2		 	  ,armM5_info_RS3 	  		,armM5_info_RS4 ,\
+			 armM5_info_noitem		,armM5_info_lowitem	 	  ,armM5_info_highitem 		,\
+			 armM5_info_brake		,armM5_info_security 	  ,armM5_info_toolATC_check ,\
+			 armM5_info_kinetrolUP	,armM5_info_kinetrolDOWN  ,\
+			 armM5_info_gripperOPEN	,armM5_info_gripperCLOSE   ,\
+			 armM5_info_value1_lock ,armM5_info_value1_unlock ,\
+			 armM5_info_value2_lock ,armM5_info_value2_unlock ,\
+			 armM5_info_value3_lock ,armM5_info_value3_unlock ,\
+			 armM5_info_value4_lock ,armM5_info_value4_unlock;
+	/* arm M5 action information - analogy */
+	uint16_t  armM5_info_regulate;
+	float regulate_kg2bar;
+	// const float regulate_bar2v = 0.83333;
+	// const float regulate_v2bin = 409.6;
+	const float regulate_bar2bin = 341.333;
+	const float regulate_kg2bar_a=(-0.374);
+	const float regulate_kg2bar_b=0.124;
 
 	/* deltaDRV robot control-BOX handshake api */
-	int read_deltaDRV_cmd(void);					/* read action commands(total) from deltaDRV */
-	int read_deltaDRV_regulate(uint16_t* data);		/* read action commands(regulate) from deltaDRV */
-	int read_deltaDRV_kinetrol(uint16_t* data);		/* read action commands(kinetrol) from deltaDRV */
-	int read_deltaDRV_brake(uint16_t* data);		/* read action commands(brake) from deltaDRV */
-	int read_deltaDRV_gripper(uint16_t* data);		/* read action commands(gripper) from deltaDRV */
-	int read_deltaDRV_toolATC(uint16_t* data);		/* read action commands(toolATC) from deltaDRV */
-	int read_deltaDRV_fixture(uint16_t* data);		/* read action commands(fixtrue) from deltaDRV */
-	// int set_deltaDRV_cmd(void);						/* set action commands(total) to deltaDRV */
-	int set_deltaDRV_item(uint16_t data);			/* set action commands(item) to deltaDRV */
-	int set_deltaDRV_toolATC_check(uint16_t data);	/* set action commands(toolATC_check) to deltaDRV */
-	int set_deltaDRV_ReedSwitch1(uint16_t data);	/* set action commands(ReedSwitch1) to deltaDRV */
-	int set_deltaDRV_ReedSwitch2(uint16_t data);	/* set action commands(ReedSwitch2) to deltaDRV */
-	int set_deltaDRV_ReedSwitch3(uint16_t data);	/* set action commands(ReedSwitch3) to deltaDRV */
-	int set_deltaDRV_ReedSwitch4(uint16_t data);	/* set action commands(ReedSwitch4) to deltaDRV */
-	int set_deltaDRV_kinetrol(uint16_t data);		/* set action commands(kinetrol) to deltaDRV */
-	int set_deltaDRV_brake(uint16_t data);			/* set action commands(brake) to deltaDRV */
-	int set_deltaDRV_gripper(uint16_t data);		/* set action commands(gripper) to deltaDRV */
-	int set_deltaDRV_toolATC(uint16_t data);		/* set action commands(toolATC) to deltaDRV */
-	int set_deltaDRV_fixture(uint16_t data);		/* set action commands(fixture) to deltaDRV */
+	int read_deltaDRV_total(void);					/* read action commands(total) from deltaDRV */
+	int read_deltaDRV_cmd(robot_adr adr, uint16_t* data);
+	int set_deltaDRV_total(void);						/* set action commands(total) to deltaDRV */
+	int set_deltaDRV_cmd(robot_adr adr, uint16_t data);
 
 	/* stand IO control module adam5000 handshake */
-	int read_adma5000_cmd(void);	/* read adam5000 input state */
-	int read_adam5000_noitem(uint16_t* data);		/* read no-item state from adam5000 */
-	int read_adam5000_lowitem(uint16_t* data);		/* read low-item state from adam5000 */
-	int read_adam5000_highitem(uint16_t* data);		/* read high-item state from adam5000 */
-	int read_adam5000_toolATC_check(uint16_t* data);/* read toolATC_check state from adam5000 */
-	int read_adam5000_ReedSwitch1(uint16_t* data);	/* read ReedSwitch1 state from adam5000 */
-	int read_adam5000_ReedSwitch2(uint16_t* data);	/* read ReedSwitch2 state from adam5000 */
-	int read_adam5000_ReedSwitch3(uint16_t* data);	/* read ReedSwitch3 state from adam5000 */
-	int read_adam5000_ReedSwitch4(uint16_t* data);	/* read ReedSwitch4 state from adam5000 */
-	// int set_adma5000_cmd(void);		/* set adam5000 output signal */
-	int set_adam5000_kinetrolUp(uint16_t data);		/* set kinetrol_up signal to adam5000 */
-	int set_adam5000_kinetrolDown(uint16_t data);	/* set kinetrol_down signal to adam5000 */
-	int set_adam5000_brake(uint16_t data);			/* set brake signal to adam5000 */
-	int set_adam5000_gripperOpen(uint16_t data);	/* set gripper_open signal to adam5000 */
-	int set_adam5000_gripperClose(uint16_t data);	/* set gripper_close signal to adam5000 */
-	int set_adam5000_security(uint16_t data);		/* set security signal to adam5000 */
-	int set_adam5000_value1_lock(uint16_t data);	/* set value1_lock signal to adam5000 */
-	int set_adam5000_value1_unlock(uint16_t data);	/* set value1_unlock signal to adam5000 */
-	int set_adam5000_value2_lock(uint16_t data);	/* set value2_lock signal to adam5000 */
-	int set_adam5000_value2_unlock(uint16_t data);	/* set value2_unlock signal to adam5000 */
-	int set_adam5000_value3_lock(uint16_t data);	/* set value3_lock signal to adam5000 */
-	int set_adam5000_value3_unlock(uint16_t data);	/* set value3_unlock signal to adam5000 */
-	int set_adam5000_value4_lock(uint16_t data);	/* set value4_lock signal to adam5000 */
-	int set_adam5000_value4_unlock(uint16_t data);	/* set value4_unlock signal to adam5000 */
+	int read_adam5000_total(void);	/* read adam5000 input state */
+	int read_adam5000_cmd(stand_adr_in ch, uint8_t* data);
+	int set_adam5000_total(void);		/* set adam5000 output signal */
+	int set_adam5000_cmd(stand_adr_out ch, uint8_t data);
+	int set_adam5000_cmd(stand_adr_out ch, uint16_t data);
+
+	bool check_robot_cmd(void);		/* check robot cmd */
+	void check_action(void);		/* robot modbus data processing */
+	void action_stand(void);		/* stand IO action execution */
+	void adaminfo2robotinfo(void);	/* adam information to robot handshake information */
 
 /* public member */
 public:
@@ -107,7 +105,7 @@ public:
 	int arm_M5_kinetrol(bool onoff);
 	int arm_M5_toolATC(bool onoff);
 	int arm_M5_fixture(bool onoff);
-	stand_state run(void);	  /* main function */
+	void run(void);	  /* main function */
 	void delay_1ms(int time); /* delay function */
 
 };
