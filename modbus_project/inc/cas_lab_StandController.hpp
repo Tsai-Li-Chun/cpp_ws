@@ -43,7 +43,7 @@ private:
 	int rc;
 	/* define variable used for delay time */
 	struct timeval tv;
-	long delay_time_us_old,delay_time_us;
+	long delay_time_us_old,delay_time_us,delay_count,delay_count_old;
 	/* create deltaDRV-BOX control object */
 	deltaDRV_modbus_HandShake deltaDRV_ctl;
 	/* create remotIO(ADAM5000) control object  */
@@ -56,7 +56,7 @@ private:
 			 robot_info_kinetrol ,robot_info_brake	,robot_info_gripper ,robot_cmd ,\
 			 robot_info_kinetrol_old ,robot_info_brake_old	,robot_info_gripper_old ,\
 			 robot_info_toolATC  ,robot_info_fixture ,\
-			 robot_info_toolATC_old  ,robot_info_fixture_old;
+			 robot_info_toolATC_old  ,robot_info_fixture_old ,robot_info_regulate_kg_old;
 	/* arm M5 action information - digital */
 	uint8_t  armM5_info_RS1			,armM5_info_RS2		 	  ,armM5_info_RS3 	  		,armM5_info_RS4 ,\
 			 armM5_info_noitem		,armM5_info_lowitem	 	  ,armM5_info_highitem 		,\
@@ -69,6 +69,7 @@ private:
 			 armM5_info_value4_lock ,armM5_info_value4_unlock;
 	/* arm M5 action information - analogy */
 	uint16_t  armM5_info_regulate;
+	float  armM5_info_regulate_float;
 	float regulate_kg2bar;
 	// const float regulate_bar2v = 0.83333;
 	// const float regulate_v2bin = 409.6;
@@ -80,7 +81,7 @@ private:
 	int read_deltaDRV_total(void);					/* read action commands(total) from deltaDRV */
 	int read_deltaDRV_cmd(robot_adr adr, uint16_t* data);
 	int set_deltaDRV_total(void);						/* set action commands(total) to deltaDRV */
-	int set_deltaDRV_cmd(robot_adr adr, uint16_t data);
+
 
 	/* stand IO control module adam5000 handshake */
 	int read_adam5000_total(void);	/* read adam5000 input state */
@@ -107,6 +108,8 @@ public:
 	int arm_M5_fixture(bool onoff);
 	void run(void);	  /* main function */
 	void delay_1ms(int time); /* delay function */
+
+		int set_deltaDRV_cmd(robot_adr adr, uint16_t data);
 
 };
 

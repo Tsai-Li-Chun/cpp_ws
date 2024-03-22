@@ -29,6 +29,7 @@
 #define robot_action_init 255
 
 #define time_blank_short 1000
+#define time_blank_nor 3000
 #define time_blank_long 10000
 
 /* Define End */
@@ -45,6 +46,7 @@
 /* define deltaDRV robot control-BOX modbus address */
 enum class robot_adr:int
 {	
+	de_timeout_cmd = 0x1Efe,
 	action_cmd = 0x1Eff,
 	regulate = 0x1F00,
 	item_state= 0x1F01,
@@ -74,6 +76,7 @@ enum class stand_adr_in:int
 /* define cas_lab stand system remoteIO-input modbus address */
 enum class stand_adr_out:int
 {
+	de_timeout_cmd = 1,
 	regulate 	  = static_cast<int>(adam5000_AO::AO_1_0),
 	kinetrol_up   = static_cast<int>(adam5000_DO::DO_3_00),
 	kinetrol_down = static_cast<int>(adam5000_DO::DO_3_01),
