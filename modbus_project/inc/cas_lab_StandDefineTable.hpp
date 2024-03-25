@@ -28,8 +28,8 @@
 #define robot_action_invalid 0
 #define robot_action_init 255
 
-#define time_blank_short 1000
-#define time_blank_nor 3000
+#define time_blank_pin 100
+#define time_blank_action 1000
 #define time_blank_long 10000
 
 /* Define End */

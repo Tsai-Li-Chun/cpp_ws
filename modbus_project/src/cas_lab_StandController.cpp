@@ -224,7 +224,7 @@ void cas_lab_StandController::action_stand(void)
 			std::cout << "3ARMs M5 brake RELEASE..." << std::endl;
 		armM5_info_brake = static_cast<uint8_t>(arm_M5_pin_valid);
 		set_adam5000_cmd(stand_adr_out::brake, armM5_info_brake);
-		delay_1ms(time_blank_short);
+		delay_1ms(time_blank_pin);
 		armM5_info_brake = static_cast<uint8_t>(arm_M5_pin_invalid);
 		set_adam5000_cmd(stand_adr_out::brake, armM5_info_brake);
 		action_brake = false;
@@ -244,7 +244,6 @@ void cas_lab_StandController::action_stand(void)
 		// std::cout << "    target fff= " << armM5_info_regulate_float << std::endl;
 		// std::cout << "    target bin= " << armM5_info_regulate << std::endl;
 		rc = set_adam5000_cmd(stand_adr_out::regulate, armM5_info_regulate);
-		// std::cout << "    rc= " << rc << " ,armM5_info_regulate= " << armM5_info_regulate << std::endl;
 		action_regulate = false;
 		std::cout << "action_regulate worked" << std::endl;
 	}
@@ -254,40 +253,28 @@ void cas_lab_StandController::action_stand(void)
 		if( robot_info_kinetrol == static_cast<uint16_t>(armM5_kinetrol::up) )
 		{
 			std::cout << "action_kinetrol up working ..." << std::endl;
-			armM5_info_kinetrolUP = static_cast<uint8_t>(arm_M5_pin_valid);
-			armM5_info_security = static_cast<uint8_t>(arm_M5_pin_valid);
-			rc = set_adam5000_cmd(stand_adr_out::security, armM5_info_security);
-			// std::cout << "    rc= " << rc << " ,armM5_info_security set 1" << std::endl;
-			delay_1ms(time_blank_short);
-			rc = set_adam5000_cmd(stand_adr_out::kinetrol_up, armM5_info_kinetrolUP);
-			// std::cout << "    rc= " << rc << " ,armM5_info_kinetrolUP set 1" << std::endl;
-			delay_1ms(time_blank_nor);
-			armM5_info_kinetrolUP = static_cast<uint8_t>(arm_M5_pin_invalid);
 			armM5_info_security = static_cast<uint8_t>(arm_M5_pin_invalid);
-			rc = set_adam5000_cmd(stand_adr_out::kinetrol_up, armM5_info_kinetrolUP);
-			// std::cout << "    rc= " << rc << " ,armM5_info_kinetrolUP set 0" << std::endl;
-			delay_1ms(time_blank_short);
+			armM5_info_kinetrolDOWN = static_cast<uint8_t>(arm_M5_pin_invalid);
 			rc = set_adam5000_cmd(stand_adr_out::security, armM5_info_security);
-			// std::cout << "    rc= " << rc << " ,armM5_info_security set 0" << std::endl;
+			rc = set_adam5000_cmd(stand_adr_out::kinetrol_down, armM5_info_kinetrolDOWN);
+			delay_1ms(time_blank_pin);
+			armM5_info_security = static_cast<uint8_t>(arm_M5_pin_valid);
+			armM5_info_kinetrolUP = static_cast<uint8_t>(arm_M5_pin_valid);
+			rc = set_adam5000_cmd(stand_adr_out::security, armM5_info_security);
+			rc = set_adam5000_cmd(stand_adr_out::kinetrol_up, armM5_info_kinetrolUP);
 		}
 		else if( robot_info_kinetrol == static_cast<uint16_t>(armM5_kinetrol::down) )
 		{
 			std::cout << "action_kinetrol down working ..." << std::endl;
-			armM5_info_kinetrolDOWN = static_cast<uint8_t>(arm_M5_pin_valid);
-			armM5_info_security = static_cast<uint8_t>(arm_M5_pin_valid);
-			rc = set_adam5000_cmd(stand_adr_out::security, armM5_info_security);
-			// std::cout << "    rc= " << rc << " ,armM5_info_security set 1" << std::endl;
-			delay_1ms(time_blank_short);
-			rc = set_adam5000_cmd(stand_adr_out::kinetrol_down, armM5_info_kinetrolDOWN);
-			// std::cout << "    rc= " << rc << " ,armM5_info_kinetrolDOWN set 1" << std::endl;
-			delay_1ms(time_blank_nor);
-			armM5_info_kinetrolDOWN = static_cast<uint8_t>(arm_M5_pin_invalid);
 			armM5_info_security = static_cast<uint8_t>(arm_M5_pin_invalid);
-			rc = set_adam5000_cmd(stand_adr_out::kinetrol_down, armM5_info_kinetrolDOWN);
-			// std::cout << "    rc= " << rc << " ,armM5_info_kinetrolDOWN set 0" << std::endl;
-			delay_1ms(time_blank_short);
+			armM5_info_kinetrolUP = static_cast<uint8_t>(arm_M5_pin_invalid);
 			rc = set_adam5000_cmd(stand_adr_out::security, armM5_info_security);
-			// std::cout << "    rc= " << rc << " ,armM5_info_security set 0" << std::endl;
+			rc = set_adam5000_cmd(stand_adr_out::kinetrol_up, armM5_info_kinetrolUP);
+			delay_1ms(time_blank_pin);
+			armM5_info_security = static_cast<uint8_t>(arm_M5_pin_valid);
+			armM5_info_kinetrolDOWN = static_cast<uint8_t>(arm_M5_pin_valid);
+			rc = set_adam5000_cmd(stand_adr_out::security, armM5_info_security);
+			rc = set_adam5000_cmd(stand_adr_out::kinetrol_down, armM5_info_kinetrolDOWN);
 		}
 		action_kinetrol = false;
 		std::cout << "action_kinetrol worked." << std::endl;
@@ -301,17 +288,13 @@ void cas_lab_StandController::action_stand(void)
 			armM5_info_value2_lock = static_cast<uint8_t>(arm_M5_pin_invalid);
 			armM5_info_value3_lock = static_cast<uint8_t>(arm_M5_pin_invalid);
 			rc = set_adam5000_cmd(stand_adr_out::value2_lock, armM5_info_value2_lock);
-			// std::cout << "    rc= " << rc << " ,armM5_info_value2_lock set 0" << std::endl;
 			rc = set_adam5000_cmd(stand_adr_out::value3_lock, armM5_info_value3_lock);
-			// std::cout << "    rc= " << rc << " ,armM5_info_value3_lock set 0" << std::endl;
-			delay_1ms(time_blank_short);
+			delay_1ms(time_blank_pin);
 			armM5_info_value3_unlock = static_cast<uint8_t>(arm_M5_pin_valid);
 			rc = set_adam5000_cmd(stand_adr_out::value3_unlock, armM5_info_value3_unlock);
-			// std::cout << "    rc= " << rc << " ,armM5_info_value3_unlock set 1" << std::endl;
-			delay_1ms(time_blank_nor);
+			delay_1ms(time_blank_action);
 			armM5_info_value2_unlock = static_cast<uint8_t>(arm_M5_pin_valid);
 			rc = set_adam5000_cmd(stand_adr_out::value2_unlock, armM5_info_value2_unlock);
-			// std::cout << "    rc= " << rc << " ,armM5_info_value2_unlock set 1" << std::endl;
 		}
 		else if( robot_info_fixture == static_cast<uint16_t>(armM5_fixture_state::close) )
 		{
@@ -319,17 +302,13 @@ void cas_lab_StandController::action_stand(void)
 			armM5_info_value2_unlock = static_cast<uint8_t>(arm_M5_pin_invalid);
 			armM5_info_value3_unlock = static_cast<uint8_t>(arm_M5_pin_invalid);
 			rc = set_adam5000_cmd(stand_adr_out::value2_unlock, armM5_info_value2_unlock);
-			// std::cout << "    rc= " << rc << " ,armM5_info_value2_unlock set 0" << std::endl;
 			rc = set_adam5000_cmd(stand_adr_out::value3_unlock, armM5_info_value3_unlock);
-			// std::cout << "    rc= " << rc << " ,armM5_info_value3_unlock set 0" << std::endl;
-			delay_1ms(time_blank_short);
+			delay_1ms(time_blank_pin);
 			armM5_info_value3_lock = static_cast<uint8_t>(arm_M5_pin_valid);
 			rc = set_adam5000_cmd(stand_adr_out::value3_lock, armM5_info_value3_lock);
-			// std::cout << "    rc= " << rc << " ,armM5_info_value3_lock set 1" << std::endl;
-			delay_1ms(time_blank_nor);
+			delay_1ms(time_blank_action);
 			armM5_info_value2_lock = static_cast<uint8_t>(arm_M5_pin_valid);
 			rc = set_adam5000_cmd(stand_adr_out::value2_lock, armM5_info_value2_lock);
-			// std::cout << "    rc= " << rc << " ,armM5_info_value2_lock set 1" << std::endl;
 		}
 		action_fixture = false;
 		std::cout << "action_fixture worked." << std::endl;
@@ -342,35 +321,26 @@ void cas_lab_StandController::action_stand(void)
 			std::cout << "action_toolATC lock working ..." << std::endl;
 			armM5_info_value1_unlock = static_cast<uint8_t>(arm_M5_pin_invalid);
 			rc = set_adam5000_cmd(stand_adr_out::value1_unlock, armM5_info_value1_unlock);
-			// std::cout << "    rc= " << rc << " ,armM5_info_value1_unlock set 0" << std::endl;
-			delay_1ms(time_blank_short);
+			delay_1ms(time_blank_pin);
 			armM5_info_value1_lock = static_cast<uint8_t>(arm_M5_pin_valid);
 			rc = set_adam5000_cmd(stand_adr_out::value1_lock, armM5_info_value1_lock);
-			// std::cout << "    rc= " << rc << " ,armM5_info_value1_lock set 1" << std::endl;
 		}
 		else if( robot_info_toolATC == static_cast<uint16_t>(armM5_toolATC_state::release) )
 		{
 			std::cout << "action_toolATC release working ..." << std::endl;
-			armM5_info_value1_lock = static_cast<uint8_t>(arm_M5_pin_invalid);
-			rc = set_adam5000_cmd(stand_adr_out::value1_lock, armM5_info_value1_lock);
-			// std::cout << "    rc= " << rc << " ,armM5_info_value1_lock set 0" << std::endl;
-			delay_1ms(time_blank_short);
-			armM5_info_value1_unlock = static_cast<uint8_t>(arm_M5_pin_valid);
 			armM5_info_value2_lock = static_cast<uint8_t>(arm_M5_pin_invalid);
 			armM5_info_value2_unlock = static_cast<uint8_t>(arm_M5_pin_invalid);
 			armM5_info_value3_lock = static_cast<uint8_t>(arm_M5_pin_invalid);
 			armM5_info_value3_unlock = static_cast<uint8_t>(arm_M5_pin_invalid);
 			rc = set_adam5000_cmd(stand_adr_out::value2_lock, armM5_info_value2_lock);
-			// std::cout << "    rc= " << rc << " ,armM5_info_value2_lock set 0" << std::endl;
 			rc = set_adam5000_cmd(stand_adr_out::value2_unlock, armM5_info_value2_unlock);
-			// std::cout << "    rc= " << rc << " ,armM5_info_value2_unlock set 0" << std::endl;
 			rc = set_adam5000_cmd(stand_adr_out::value3_lock, armM5_info_value3_lock);
-			// std::cout << "    rc= " << rc << " ,armM5_info_value3_lock set 0" << std::endl;
 			rc = set_adam5000_cmd(stand_adr_out::value3_unlock, armM5_info_value3_unlock);
-			// std::cout << "    rc= " << rc << " ,armM5_info_value3_unlock set 0" << std::endl;
-			delay_1ms(time_blank_short);
+			armM5_info_value1_lock = static_cast<uint8_t>(arm_M5_pin_invalid);
+			rc = set_adam5000_cmd(stand_adr_out::value1_lock, armM5_info_value1_lock);
+			delay_1ms(time_blank_pin);
+			armM5_info_value1_unlock = static_cast<uint8_t>(arm_M5_pin_valid);
 			rc = set_adam5000_cmd(stand_adr_out::value1_unlock, armM5_info_value1_unlock);
-			// std::cout << "    rc= " << rc << " ,armM5_info_value1_unlock set 1" << std::endl;
 		}
 		action_toolATC = false;
 		std::cout << "action_toolATC worked." << std::endl;
