@@ -2,3 +2,9 @@
 PhotoneoAPI/**
 cas_photoneo/**/build/*.*
 cas_photoneo/**/LOCALIZATION_DEBUG/*.*
+serial_port/xbot_HandShake
+modbus_project/adam5000_modbus
+modbus_project/cas_lab_safetysystem
+modbus_project/deltaDRV_modbus
+modbus_project/stand_modbus
+modbus_project/wise4060_modbus
