@@ -93,7 +93,7 @@ private:
 	/* serial port input buffer data length */
 	int num_bytes = 0;
 	/* serial port input buffer data */
-	char read_buf[256];
+	uint8_t read_buf[256];
 	/* serial port semd buffer data */
 	uint8_t msg[12];
 	/* create serial port access configurtion struct */

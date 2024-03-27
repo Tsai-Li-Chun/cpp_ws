@@ -76,22 +76,27 @@ int main(int argc, char **argv)
 	while(1)
 	{
 		rc = deltaDRV_ctl.read_deltaDRV_DataBuffer(control_cmd_adr,1,&control_cmd);
+		std::cout << rc << ", " << "read control_cmd_adr data : " << control_cmd << std::endl;
 		if( control_cmd == 0 )
 		{
 			xbot_HS.chech_xbot_heartbeat();
 		}
 		else if( (control_cmd>=1) && (control_cmd<=max_waypoint) )
 		{
-			std::cout << "receive control go to waypoint command : " << control_cmd << std::endl;
+			printf("receive control go to waypoint command : 0x%02x\n",control_cmd);
 			xbot_HS.send_xbot_waypoint_cmd(control_cmd);
-			while(xbot_HS.check_waypoint_reached()){};
+			while(xbot_HS.check_waypoint_reached())
+			{
+				deltaDRV_ctl.read_deltaDRV_DataBuffer(control_cmd_adr,1,&control_cmd);
+			};
+			rc = deltaDRV_ctl.write_deltaDRV_DataBuffer(control_cmd_adr,100);
+			std::cout << rc << ", " << "xbot_HS create finish, write Set control_cmd_adr to 0" << std::endl;
+
 		}
 		else
 			std::cout << TC_ERROR << "control_cmd Error!" << TC_RESET << std::endl;
 		std::cout << "-----------------------------------------" << std::endl << std::endl;
-		
-		sleep(1);
-		std::cout << TC_CLOSE << TC_RESET << std::endl;
+		deltaDRV_ctl.read_deltaDRV_DataBuffer(control_cmd_adr,1,&control_cmd);
 	}	
 
 	/* main quit */
