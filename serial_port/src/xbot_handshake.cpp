@@ -7,15 +7,11 @@
 
 /* System Includes ------------------------------------------*/
 /* System Includes Begin */
-#include <stdio.h>	// C library headers
-#include <string.h>	// C library headers
-#include <fcntl.h>	// contains file controls like  O_RDWR
-#include <errno.h>	// error integer and strerror() function
-#include <termios.h>// contains POSIX terminal control definitions
-#include <unistd.h>	// write(), read(), close(), sleep()
+#include <iostream>
 /* System Includes End */
 /* User Includes --------------------------------------------*/
 /* User Includes Begin */
+#include "xbot_handshake.hpp"
 /* User Includes End */
 
 /* namespace ------------------------------------------------*/
@@ -54,36 +50,26 @@
 /* ---------------------------------------------------------*/
 /* Program Begin */
 
-/** * @brief  Program entry point.
-	* @param argc(int) Number of input parameters
- 	* @param argv(int) input parameters
- 	* @return (int) Program Error.
-**	**/
-int main(int argc, char **argv)
+xbot_HandShake::xbot_HandShake()
 {
-	// Allocate memory for read buffer, set size according to your needs
-	long count = 1;
-	int i,num_bytes = 0;
-	char read_buf[256];
-	/* create serial port access configurtion struct */
-	struct termios tty;
 	/* open device file = connect device */
-	int serial_port = open("/dev/ttyUSB0", O_RDWR | O_NOCTTY | O_SYNC);
-	/* check device connect */
-	if( serial_port < 0 )
+	int serial_port = open(PortName, O_RDWR | O_NOCTTY | O_SYNC);
+	if( serial_port < 0 )	/* check device connect */
 		printf("Error %i from open: %s\n",errno ,strerror(errno));
 	/* read in serial port existing settings */
 	if( tcgetattr(serial_port, &tty) != 0)
-    	printf("Error %i from tcgetattr: %s\n", errno, strerror(errno));
+		printf("Error %i from tcgetattr: %s\n", errno, strerror(errno));
 
-	tty.c_cflag &= ~PARENB; // Clear parity bit, disabling parity (most common)
-	tty.c_cflag &= ~CSTOPB; // Clear stop field, only one stop bit used in communication (most common)
-	tty.c_cflag &= ~CSIZE; 	// Clear all bits that set the data size 
-	tty.c_cflag |= CS8; 	// 8 bits per byte (most common)
-	tty.c_cflag &= ~CRTSCTS;// Disable RTS/CTS hardware flow control (most common)
-	// tty.c_cflag |= CREAD | CLOCAL; // Turn on READ & ignore ctrl lines (CLOCAL = 1)
-	tty.c_cflag |= CREAD; // Turn on READ & ignore ctrl lines (CLOCAL = 1)
-	tty.c_cflag &= ~CLOCAL; // Turn on READ & ignore ctrl lines (CLOCAL = 1)
+	// tty.c_cflag &= ~PARENB; // Clear parity bit, disabling parity (most common)
+	// tty.c_cflag &= ~CSTOPB; // Clear stop field, only one stop bit used in communication (most common)
+	// tty.c_cflag &= ~CSIZE; 	// Clear all bits that set the data size 
+	// tty.c_cflag &= ~CRTSCTS;// Disable RTS/CTS hardware flow control (most common)
+	// tty.c_cflag &= ~CLOCAL; // Turn on READ & ignore ctrl lines (CLOCAL = 1)
+	// // tty.c_cflag |= CREAD | CLOCAL; // Turn on READ & ignore ctrl lines (CLOCAL = 1)
+	// tty.c_cflag |= CS8; 	// 8 bits per byte (most common)
+	// tty.c_cflag |= CREAD; // Turn on READ & ignore ctrl lines (CLOCAL = 1)
+	tty.c_cflag &= ~(PARENB | CSTOPB | CSIZE | CRTSCTS | CLOCAL);
+	tty.c_cflag |= (CS8 | CREAD);
 
 	// tty.c_lflag &= ~ICANON;
 	// tty.c_lflag &= ~ECHO;	// Disable echo
@@ -103,45 +89,127 @@ int main(int argc, char **argv)
 	tty.c_cc[VMIN] = 0;
 
 	// Set in/out baud rate to be 9600
-	cfsetispeed(&tty, B9600);
-	cfsetospeed(&tty, B9600);
-
+	cfsetispeed(&tty, BuatRate);
+	cfsetospeed(&tty, BuatRate);
 	// Save tty settings, also checking for error
-	if (tcsetattr(serial_port, TCSANOW, &tty) != 0) {
+	if (tcsetattr(serial_port, TCSANOW, &tty) != 0)
 		printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
+
+	memset(&read_buf, '\0', sizeof(read_buf));
+}
+xbot_HandShake::~xbot_HandShake()
+{
+	/* disconnect from the AAA document */
+	close(serial_port);
+}
+
+
+void xbot_HandShake::chech_control_cmd(void)
+{
+
+}
+void xbot_HandShake::chech_xbot_heartbeat(void)
+{
+	tcflush(serial_port, TCIOFLUSH);
+	num_bytes = read(serial_port, &read_buf, sizeof(read_buf));
+	printf("%li , Read %i bytes : ",count ,num_bytes);
+	for( i=0; i<num_bytes; i++ )
+		printf("%02x ",read_buf[i]);
+	printf("\n");
+	if(num_bytes==20)
+	{
+		std::cout << std::hex;
+		u16tou8_tmp.u8[0] = read_buf[0];
+		u16tou8_tmp.u8[1] = read_buf[1];
+		xbot_heartbeat.head = u16tou8_tmp.u16;
+		std::cout << "head               =" << xbot_heartbeat.head << std::endl;
+		xbot_heartbeat.len = read_buf[2];
+		std::cout << "len                =" << xbot_heartbeat.len << std::endl;
+		xbot_heartbeat.cmd_type = read_buf[3];
+		std::cout << "cmd_type           =" << xbot_heartbeat.cmd_type << std::endl;
+		xbot_heartbeat.car_id = read_buf[4];
+		std::cout << "car_id             =" << xbot_heartbeat.car_id << std::endl;
+		xbot_heartbeat.battery = read_buf[5];
+		std::cout << "battery            =" << xbot_heartbeat.battery << std::endl;
+		u16tou8_tmp.u8[0] = read_buf[6];
+		u16tou8_tmp.u8[1] = read_buf[7];
+		xbot_heartbeat.prescribed_speed = u16tou8_tmp.u16;
+		std::cout << "prescribed_speed   =" << xbot_heartbeat.prescribed_speed << std::endl;
+		xbot_heartbeat.movement_state = read_buf[8];
+		std::cout << "movement_state     =" << xbot_heartbeat.movement_state << std::endl;
+		xbot_heartbeat.avoidance_stop = read_buf[9];
+		std::cout << "avoidance_stop     =" << xbot_heartbeat.avoidance_stop << std::endl;
+		xbot_heartbeat.arrive_stop = read_buf[10];
+		std::cout << "arrive_stop        =" << xbot_heartbeat.arrive_stop << std::endl;
+		xbot_heartbeat.cmd_stop = read_buf[11];
+		std::cout << "cmd_stop           =" << xbot_heartbeat.cmd_stop << std::endl;
+		u16tou8_tmp.u8[0] = read_buf[12];
+		u16tou8_tmp.u8[1] = read_buf[13];
+		xbot_heartbeat.realtime_speed = u16tou8_tmp.u16;
+		std::cout << "realtime_speed     =" << xbot_heartbeat.realtime_speed << std::endl;
+		xbot_heartbeat.current_waypoint = read_buf[14];
+		std::cout << "current_waypoint   =" << xbot_heartbeat.current_waypoint << std::endl;
+		xbot_heartbeat.prescribed_waypoint = read_buf[15];
+		std::cout << "prescribed_waypoint=" << xbot_heartbeat.prescribed_waypoint << std::endl;
+		xbot_heartbeat.error_code = read_buf[16];
+		std::cout << "error_code         =" << xbot_heartbeat.error_code << std::endl;
+		xbot_heartbeat.max_waypoint = read_buf[17];
+		std::cout << "max_waypoint       =" << xbot_heartbeat.max_waypoint << std::endl;
+		xbot_heartbeat.operation_mode = read_buf[18];
+		std::cout << "operation_mode     =" << xbot_heartbeat.operation_mode << std::endl;
+		xbot_heartbeat.CRC = read_buf[19];
+		std::cout << "CRC                =" << xbot_heartbeat.CRC << std::endl;
+		std::cout << TC_RESET;
+	}
+	count++;
+}
+bool xbot_HandShake::check_waypoint_reached(void)
+{
+	chech_xbot_heartbeat();
+	if( xbot_heartbeat.arrive_stop==1 )
+	{
+		std::cout << std::endl << "reached the target waypoint!" << std::endl;
 		return 1;
 	}
-	memset(&read_buf, '\0', sizeof(read_buf));
 
-	while(1)
-	{
-		// Read bytes. The behaviour of read() (e.g. does it block?,
-		// how long does it block for?) depends on the configuration
-		// settings above, specifically VMIN and VTIME
-		tcflush(serial_port, TCIOFLUSH);
-		num_bytes = read(serial_port, &read_buf, sizeof(read_buf));
-		printf("%li , Read %i bytes : ",count ,num_bytes);
-		for( i=0; i<num_bytes; i++ )
-			printf("%02x ",read_buf[i]);
-		printf("\n");
-		count++;
-		// // print bytes length and read_buf data
-		// if( num_bytes == read_buf[2] )
-		// {
-		// 	printf("Read %i bytes : ",num_bytes);
-		// 	for( i=0; i<num_bytes; i++ )
-		// 		printf("%02x ",read_buf[i]);
-		// 	printf("\n");
-		// }
-		// else
-		// {
-		// 	printf(" num_bytes != read_buf[2]\n");
-		// }
-		// // sleep(1);
-	}	
-	/* main quit */
+	std::cout << "En route to the destination waypoint......" << std::endl;
 	return 0;
 }
+
+
+void xbot_HandShake::send_xbot_waypoint_cmd(uint8_t waypoint)
+{
+	msg[0] = 0x00;
+	msg[1] = 0x01;
+	msg[2] = 0x04;
+	msg[3] = 0xA5;
+	msg[4] = 0x5A;
+	msg[5] = 0x08;
+	msg[6] = 0x23;
+	msg[7] = 0x9D;
+	msg[8] = waypoint;
+	msg[9] = 0x00;
+	// msg[10] = calculate_CRC();
+	calculate_CRC();	// set msg[10] CRC
+	msg[11] = '\0';
+	write(serial_port, msg, sizeof(msg));
+	std::cout << "send to xbot waypoint command : " << msg[10] << std::endl;
+}
+
+
+void xbot_HandShake::run(void)
+{
+
+}
+
+
+uint8_t xbot_HandShake::calculate_CRC(void)
+{
+	msg[10] = msg[3]+msg[4]+msg[5]+msg[6]+msg[7]+msg[8]+msg[9];
+	std::cout << msg[10] << std::endl;
+	return msg[10];
+}
+
 
 /* Program End */
 /* ---------------------------------------------------------*/

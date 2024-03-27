@@ -23,7 +23,7 @@ OPT = -O0
 # source code file paths
 src_path = src/
 # headle file paths
-inc_path = -Iinc/
+inc_path = -Iinc/ -I../modbus_project/inc/ 
 # object file paths
 obj_path = build/
 
@@ -31,7 +31,7 @@ obj_path = build/
 # link script & libraries
 #######################################
 # libraries
-libs = -L/usr/local/lib
+libs = -L/usr/local/lib -lmodbus
 
 ############################################################################
 #	compile gcc flags
@@ -43,12 +43,19 @@ CFLAGS = -std=c++11 $(OPT) -MMD -MP $(inc_path)
 #	source code
 ######################################
 c_sources_xbot_HS = \
-	src/xbot_handshake.cpp
+	src/xbot_test.cpp \
+	src/xbot_handshake.cpp \
+	../modbus_project/src/deltaDRV_modbus_HandShake.cpp
 
 ############################################################################
 #	object file
 ######################################
-obj_tmp_xbot_HS = $(subst $(src_path), $(obj_path), $(c_sources_xbot_HS))
+
+# obj_tmp_xbot_HS = $(subst $(src_path), $(obj_path), $(c_sources_xbot_HS))
+obj_tmp_xbot_HS = \
+	build/xbot_test.cpp \
+	build/xbot_handshake.cpp \
+	build/deltaDRV_modbus_HandShake.cpp
 obj_xbot_HS     = $(patsubst %.cpp, %.o, $(obj_tmp_xbot_HS))
 
 ############################################################################
@@ -71,6 +78,8 @@ $(target_xbot_HS): $(obj_xbot_HS)
 # build the application
 #######################################
 -include $(dep_xbot_HS)
+build/deltaDRV_modbus_HandShake.o: ../modbus_project/src/deltaDRV_modbus_HandShake.cpp Makefile
+	g++ $(CFLAGS) -c $< -o $@
 ${obj_path}%.o: ${src_path}%.cpp Makefile
 	g++ $(CFLAGS) -c $< -o $@
 
