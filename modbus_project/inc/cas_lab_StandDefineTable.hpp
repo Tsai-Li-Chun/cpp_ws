@@ -28,7 +28,7 @@
 #define robot_action_invalid 0
 #define robot_action_init 255
 
-#define time_blank_pin 100
+#define time_blank_pin 30
 #define time_blank_action 1000
 #define time_blank_long 10000
 
@@ -46,7 +46,7 @@
 /* define deltaDRV robot control-BOX modbus address */
 enum class robot_adr:int
 {	
-	de_timeout_cmd = 0x1Efe,
+	de_timeout_cmd = 0x1f50,
 	action_cmd = 0x1Eff,
 	regulate = 0x1F00,
 	item_state= 0x1F01,
@@ -78,8 +78,8 @@ enum class stand_adr_out:int
 {
 	de_timeout_cmd = 1,
 	regulate 	  = static_cast<int>(adam5000_AO::AO_1_0),
-	kinetrol_up   = static_cast<int>(adam5000_DO::DO_3_00),
-	kinetrol_down = static_cast<int>(adam5000_DO::DO_3_01),
+	kinetrol_down = static_cast<int>(adam5000_DO::DO_3_00),
+	kinetrol_up   = static_cast<int>(adam5000_DO::DO_3_01),
 	brake 		  = static_cast<int>(adam5000_DO::DO_3_02),
 	gripper_open  = static_cast<int>(adam5000_DO::DO_3_03),
 	gripper_close = static_cast<int>(adam5000_DO::DO_3_04),
@@ -106,6 +106,12 @@ enum class armM5_kinetrol:uint16_t
 	up = 1,
 	down = 2
 };
+/* define cas_lab stand system 3ARMs M5 brake state */
+enum class armM5_gripper:uint16_t
+{
+	open = 1,
+	close = 2
+};
 /* define cas_lab stand system 3ARMs M5 payload state */
 enum class armM5_item_state:uint16_t
 {
@@ -129,8 +135,8 @@ enum class armM5_toolATC_state:uint16_t
 /* define cas_lab stand system 3ARMs M5 reed switch state */
 enum class armM5_fixture_state:uint16_t
 {
-	open = 1,
-	close = 2
+	close = 1,
+	open = 2
 };
 /* define cas_lab stand system 3ARMs M5 reed switch state */
 enum class armM5_ReedSwitch_state:uint16_t

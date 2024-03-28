@@ -158,6 +158,8 @@ bool cas_lab_StandController::check_robot_cmd(void)
 {
 	rc = deltaDRV_ctl.read_deltaDRV_DataBuffer(static_cast<int>(robot_adr::action_cmd), 1, &robot_cmd);
 	std::cout << "rc = " << rc << " , robot_cmd = " << robot_cmd << std::endl;
+	// if( (rc==1) && (robot_cmd==robot_action_init) )
+	// 	return true;
 	if( (rc==1) && (robot_cmd==robot_action_valid) )
 		return true;
 	else
@@ -172,7 +174,6 @@ void cas_lab_StandController::check_action(void)
 		std::cout << "robot_info_brake is change" << std::endl;
 		std::cout << "    robot_info_brake     = " << robot_info_brake << std::endl;
 		std::cout << "    robot_info_brake_old = " << robot_info_brake_old << std::endl;
-		robot_info_brake_old = robot_info_brake;
 		action_brake = true;
 	}
 	/* check fixture */
@@ -181,7 +182,6 @@ void cas_lab_StandController::check_action(void)
 		std::cout << "robot_info_fixture is change" << std::endl;
 		std::cout << "    robot_info_fixture     = " << robot_info_fixture << std::endl;
 		std::cout << "    robot_info_fixture_old = " << robot_info_fixture_old << std::endl;
-		robot_info_fixture_old = robot_info_fixture;
 		action_fixture = true;
 	}
 	/* check kinetrol */
@@ -190,7 +190,6 @@ void cas_lab_StandController::check_action(void)
 		std::cout << "robot_info_kinetrol is change" << std::endl;
 		std::cout << "    robot_info_kinetrol     = " << robot_info_kinetrol << std::endl;
 		std::cout << "    robot_info_kinetrol_old = " << robot_info_kinetrol_old << std::endl;
-		robot_info_kinetrol_old = robot_info_kinetrol;
 		action_kinetrol = true;
 	}
 	/* check toolATC  */
@@ -199,8 +198,26 @@ void cas_lab_StandController::check_action(void)
 		std::cout << "robot_info_toolATC is change" << std::endl;
 		std::cout << "    robot_info_toolATC     = " << robot_info_toolATC << std::endl;
 		std::cout << "    robot_info_toolATC_old = " << robot_info_toolATC_old << std::endl;
-		robot_info_toolATC_old = robot_info_toolATC;
 		action_toolATC = true;
+	}
+	/* check gripper  */
+	if( robot_info_item != robot_info_gripper )
+	{
+		std::cout << "robot_info_gripper is change" << std::endl;
+		std::cout << "    robot_info_gripper     = " << robot_info_gripper << std::endl;
+		std::cout << "    robot_info_gripper_old = " << robot_info_gripper_old << std::endl;
+		std::cout << "    robot_info_item        = " << robot_info_item << std::endl;
+		if( robot_info_gripper > robot_info_item )
+		{
+			gripper_number = robot_info_gripper - robot_info_item;
+			robot_info_gripper = static_cast<uint16_t>(armM5_gripper::close);
+		}
+		else if( robot_info_gripper < robot_info_item )
+		{	
+			gripper_number = robot_info_item - robot_info_gripper;
+			robot_info_gripper = static_cast<uint16_t>(armM5_gripper::open);
+		}
+		action_gripper = true;
 	}
 	/* check regulate  */
 	if( robot_info_regulate_kg_old != robot_info_regulate_kg )
@@ -208,7 +225,6 @@ void cas_lab_StandController::check_action(void)
 		std::cout << "robot_info_regulate_kg is change" << std::endl;
 		std::cout << "    robot_info_regulate_kg     = " << robot_info_regulate_kg << std::endl;
 		std::cout << "    robot_info_regulate_kg_old = " << robot_info_regulate_kg_old << std::endl;
-		robot_info_regulate_kg_old = robot_info_regulate_kg;
 		action_regulate = true;
 	}
 }
@@ -227,6 +243,7 @@ void cas_lab_StandController::action_stand(void)
 		delay_1ms(time_blank_pin);
 		armM5_info_brake = static_cast<uint8_t>(arm_M5_pin_invalid);
 		set_adam5000_cmd(stand_adr_out::brake, armM5_info_brake);
+		robot_info_brake_old = robot_info_brake;
 		action_brake = false;
 		std::cout << "action_brake worked." << std::endl;
 	}
@@ -244,8 +261,70 @@ void cas_lab_StandController::action_stand(void)
 		// std::cout << "    target fff= " << armM5_info_regulate_float << std::endl;
 		// std::cout << "    target bin= " << armM5_info_regulate << std::endl;
 		rc = set_adam5000_cmd(stand_adr_out::regulate, armM5_info_regulate);
+		robot_info_regulate_kg_old = robot_info_regulate_kg;
 		action_regulate = false;
 		std::cout << "action_regulate worked" << std::endl;
+	}
+	/* action gripper */
+	if( action_gripper )
+	{	
+		std::cout << gripper_number << ", action_gripper working ..." << std::endl;
+		for( i=0; i<gripper_number; i++ )
+		{
+			if( robot_info_gripper == static_cast<uint16_t>(armM5_gripper::close) )
+			{
+				std::cout << "    gripper CLOSE working ..." << std::endl;
+				armM5_info_gripperOPEN = static_cast<uint8_t>(arm_M5_pin_invalid);
+				armM5_info_security = static_cast<uint8_t>(arm_M5_pin_invalid);
+				rc = set_adam5000_cmd(stand_adr_out::gripper_open, armM5_info_gripperOPEN);
+				// printf("    %i, gripper_open, %i\n",rc,armM5_info_gripperOPEN);
+				rc = set_adam5000_cmd(stand_adr_out::security, armM5_info_security);
+				// printf("    %i, security, %i\n",rc,armM5_info_security);
+				delay_1ms(time_blank_action);
+				armM5_info_gripperCLOSE = static_cast<uint8_t>(arm_M5_pin_valid);
+				armM5_info_security = static_cast<uint8_t>(arm_M5_pin_valid);
+				rc = set_adam5000_cmd(stand_adr_out::security, armM5_info_security);
+				// printf("    %i, security, %i\n",rc,armM5_info_security);
+				rc = set_adam5000_cmd(stand_adr_out::gripper_close, armM5_info_gripperCLOSE);
+				// printf("    %i, gripper_close, %i\n",rc,armM5_info_gripperCLOSE);
+				delay_1ms(time_blank_pin);
+				armM5_info_gripperCLOSE = static_cast<uint8_t>(arm_M5_pin_invalid);
+				armM5_info_security = static_cast<uint8_t>(arm_M5_pin_invalid);
+				rc = set_adam5000_cmd(stand_adr_out::security, armM5_info_security);
+				// printf("    %i, security, %i\n",rc,armM5_info_security);
+				rc = set_adam5000_cmd(stand_adr_out::gripper_close, armM5_info_gripperCLOSE);
+				// printf("    %i, gripper_close, %i\n",rc,armM5_info_gripperCLOSE);
+			}
+			else if( robot_info_gripper == static_cast<uint16_t>(armM5_gripper::open) )
+			{
+				std::cout << "    gripper OPEN working ..." << std::endl;
+				armM5_info_gripperCLOSE = static_cast<uint8_t>(arm_M5_pin_invalid);
+				armM5_info_security = static_cast<uint8_t>(arm_M5_pin_invalid);
+				rc = set_adam5000_cmd(stand_adr_out::gripper_close, armM5_info_gripperCLOSE);
+				// printf("    %i, gripper_close, %i\n",rc,armM5_info_gripperCLOSE);
+				rc = set_adam5000_cmd(stand_adr_out::security, armM5_info_security);
+				// printf("    %i, security, %i\n",rc,armM5_info_security);
+				delay_1ms(time_blank_action);
+				armM5_info_gripperOPEN = static_cast<uint8_t>(arm_M5_pin_valid);
+				armM5_info_security = static_cast<uint8_t>(arm_M5_pin_valid);
+				rc = set_adam5000_cmd(stand_adr_out::security, armM5_info_security);
+				// printf("    %i, security, %i\n",rc,armM5_info_security);
+				rc = set_adam5000_cmd(stand_adr_out::gripper_open, armM5_info_gripperOPEN);
+				// printf("    %i, gripper_open, %i\n",rc,armM5_info_gripperOPEN);
+				delay_1ms(time_blank_pin);
+				armM5_info_gripperOPEN = static_cast<uint8_t>(arm_M5_pin_invalid);
+				armM5_info_security = static_cast<uint8_t>(arm_M5_pin_invalid);
+				rc = set_adam5000_cmd(stand_adr_out::security, armM5_info_security);
+				// printf("    %i, security, %i\n",rc,armM5_info_security);
+				rc = set_adam5000_cmd(stand_adr_out::gripper_open, armM5_info_gripperOPEN);
+				// printf("    %i, gripper_open, %i\n",rc,armM5_info_gripperOPEN);
+			}
+			delay_1ms(time_blank_action);
+		}
+		gripper_number = 0;
+		// robot_info_gripper_old = robot_info_gripper;
+		action_gripper = false;
+		std::cout << "action_gripper worked" << std::endl;
 	}
 	/* action kinetrol */
 	if( action_kinetrol )
@@ -276,6 +355,7 @@ void cas_lab_StandController::action_stand(void)
 			rc = set_adam5000_cmd(stand_adr_out::security, armM5_info_security);
 			rc = set_adam5000_cmd(stand_adr_out::kinetrol_down, armM5_info_kinetrolDOWN);
 		}
+		robot_info_kinetrol_old = robot_info_kinetrol;
 		action_kinetrol = false;
 		std::cout << "action_kinetrol worked." << std::endl;
 	}
@@ -292,7 +372,7 @@ void cas_lab_StandController::action_stand(void)
 			delay_1ms(time_blank_pin);
 			armM5_info_value3_unlock = static_cast<uint8_t>(arm_M5_pin_valid);
 			rc = set_adam5000_cmd(stand_adr_out::value3_unlock, armM5_info_value3_unlock);
-			delay_1ms(time_blank_action);
+			// delay_1ms(time_blank_action);
 			armM5_info_value2_unlock = static_cast<uint8_t>(arm_M5_pin_valid);
 			rc = set_adam5000_cmd(stand_adr_out::value2_unlock, armM5_info_value2_unlock);
 		}
@@ -306,10 +386,11 @@ void cas_lab_StandController::action_stand(void)
 			delay_1ms(time_blank_pin);
 			armM5_info_value3_lock = static_cast<uint8_t>(arm_M5_pin_valid);
 			rc = set_adam5000_cmd(stand_adr_out::value3_lock, armM5_info_value3_lock);
-			delay_1ms(time_blank_action);
+			// delay_1ms(time_blank_action);
 			armM5_info_value2_lock = static_cast<uint8_t>(arm_M5_pin_valid);
 			rc = set_adam5000_cmd(stand_adr_out::value2_lock, armM5_info_value2_lock);
 		}
+		robot_info_fixture_old = robot_info_fixture;
 		action_fixture = false;
 		std::cout << "action_fixture worked." << std::endl;
 	}
@@ -342,6 +423,7 @@ void cas_lab_StandController::action_stand(void)
 			armM5_info_value1_unlock = static_cast<uint8_t>(arm_M5_pin_valid);
 			rc = set_adam5000_cmd(stand_adr_out::value1_unlock, armM5_info_value1_unlock);
 		}
+		robot_info_toolATC_old = robot_info_toolATC;
 		action_toolATC = false;
 		std::cout << "action_toolATC worked." << std::endl;
 	}
@@ -361,6 +443,8 @@ void cas_lab_StandController::adaminfo2robotinfo(void)
 	else
 		robot_info_item = static_cast<uint16_t>(armM5_item_state::invalid_item);
 	std::cout << "adaminfo2robotinfo : robot_info_item = " << robot_info_item << std::endl;
+	std::cout << "    robot_info_gripper     = " << robot_info_gripper << std::endl;
+	std::cout << "    robot_info_gripper_old = " << robot_info_gripper_old << std::endl;
 	// /* set robot_info_toolATC_check */
 	// 	robot_info_toolATC_check = static_cast<uint16_t>(armM5_info_toolATC_check);
 	// /* set rs1-4 */
@@ -382,12 +466,12 @@ void cas_lab_StandController::run(void)
 		std::cout << "checked robot send new action cmd" << std::endl;
 		check_action();
 		action_stand();
-		// read_adam5000_total();
-		// adaminfo2robotinfo();
-		// set_deltaDRV_total();
 	}
 	else
 		std::cout << "checked robot not cmd" << std::endl;
+	read_adam5000_total();
+	adaminfo2robotinfo();
+	set_deltaDRV_total();
 
 	std::cout << "---------------------------------------" << std::endl << std::endl;
 	delay_1ms(500);
@@ -401,15 +485,15 @@ void cas_lab_StandController::run(void)
 **	**/
 void cas_lab_StandController::init(void)
 {
-	std::cout << "wait robot to_stand_init() " << std::flush;
-	delay_1ms(1000);
-	do{
-		deltaDRV_ctl.read_deltaDRV_DataBuffer(static_cast<int>(robot_adr::action_cmd), 1, &robot_cmd);
-		if(robot_cmd==robot_action_init) break;
-		else std::cout << "." << std::flush;
-		delay_1ms(500);
-	}while(1);
-	std::cout << std::endl << "robot to_stand_init() finish." << std::endl;
+	std::cout << "wait cas_lab_StandController init() " << std::flush;
+	// delay_1ms(1000);
+	// do{
+	// 	deltaDRV_ctl.read_deltaDRV_DataBuffer(static_cast<int>(robot_adr::action_cmd), 1, &robot_cmd);
+	// 	if(robot_cmd==robot_action_init) break;
+	// 	else std::cout << "." << std::flush;
+	// 	delay_1ms(500);
+	// }while(1);
+	// std::cout << std::endl << "robot to_stand_init() finish." << std::endl;
 	
 
 	/* adam5000 information initialization */
@@ -434,7 +518,7 @@ void cas_lab_StandController::init(void)
 	armM5_info_value3_unlock = arm_M5_pin_valid;
 	armM5_info_value4_lock = arm_M5_pin_invalid;
 	armM5_info_value4_unlock = arm_M5_pin_valid;
-	/* deltaDRV control-BOX modbus handshake area data initialization  */
+	/* deltaDRV control-BOX modbus handshake area data initialization */
 	robot_info_kinetrol_old = 0;
 	robot_info_brake_old = 0;
 	robot_info_gripper_old = 0;
@@ -442,11 +526,11 @@ void cas_lab_StandController::init(void)
 	robot_info_fixture_old = 0;
 	robot_info_regulate_kg_old=0;
 	/* action init */
-	check_action();
-	action_stand();
-	// read_adam5000_total();
-	// adaminfo2robotinfo();
-	// set_deltaDRV_total();
+	// check_action();
+	// action_stand();
+	read_adam5000_total();
+	adaminfo2robotinfo();
+	set_deltaDRV_total();
 	std::cout << "stand init() finish." << std::endl;
 	std::cout << "----------------------------------------------------" << std::endl << std::endl;
 }

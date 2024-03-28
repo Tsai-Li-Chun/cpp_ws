@@ -27,7 +27,7 @@
 #define TC_CLOSE "\x1B[2J\x1B[H "	// close
 
 /* define adam5000 modbus net information */
-#define adam5000_modbus_IP "192.168.1.122"
+#define adam5000_modbus_IP "192.168.2.122"
 #define adam5000_modbus_port 502
 #define adam5000_modbus_slave 1
 

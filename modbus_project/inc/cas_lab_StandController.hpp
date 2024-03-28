@@ -39,6 +39,7 @@ class cas_lab_StandController
 {
 /* private member */
 private:
+	int i,gripper_number;
 	/* define return code */
 	int rc;
 	/* define variable used for delay time */
@@ -62,7 +63,7 @@ private:
 			 armM5_info_noitem		,armM5_info_lowitem	 	  ,armM5_info_highitem 		,\
 			 armM5_info_brake		,armM5_info_security 	  ,armM5_info_toolATC_check ,\
 			 armM5_info_kinetrolUP	,armM5_info_kinetrolDOWN  ,\
-			 armM5_info_gripperOPEN	,armM5_info_gripperCLOSE   ,\
+			 armM5_info_gripperOPEN	,armM5_info_gripperCLOSE  ,\
 			 armM5_info_value1_lock ,armM5_info_value1_unlock ,\
 			 armM5_info_value2_lock ,armM5_info_value2_unlock ,\
 			 armM5_info_value3_lock ,armM5_info_value3_unlock ,\
