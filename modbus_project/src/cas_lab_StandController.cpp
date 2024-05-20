@@ -3,7 +3,7 @@
 	* @author	Tsai,Li-chun
 	******************************************************
 **	**/
-
+//line416,418unlock//
 
 /* System Includes ------------------------------------------*/
 /* System Includes Begin */
@@ -274,12 +274,16 @@ void cas_lab_StandController::action_stand(void)
 			if( robot_info_gripper == static_cast<uint16_t>(armM5_gripper::close) )
 			{
 				std::cout << "    gripper CLOSE working ..." << std::endl;
-				armM5_info_gripperOPEN = static_cast<uint8_t>(arm_M5_pin_invalid);
 				armM5_info_security = static_cast<uint8_t>(arm_M5_pin_invalid);
-				rc = set_adam5000_cmd(stand_adr_out::gripper_open, armM5_info_gripperOPEN);
-				// printf("    %i, gripper_open, %i\n",rc,armM5_info_gripperOPEN);
+				armM5_info_kinetrolUP = static_cast<uint8_t>(arm_M5_pin_invalid);
+				armM5_info_kinetrolDOWN = static_cast<uint8_t>(arm_M5_pin_invalid);
+				armM5_info_gripperOPEN = static_cast<uint8_t>(arm_M5_pin_invalid);
+				armM5_info_gripperCLOSE = static_cast<uint8_t>(arm_M5_pin_invalid);
 				rc = set_adam5000_cmd(stand_adr_out::security, armM5_info_security);
-				// printf("    %i, security, %i\n",rc,armM5_info_security);
+				rc = set_adam5000_cmd(stand_adr_out::kinetrol_up, armM5_info_kinetrolUP);
+				rc = set_adam5000_cmd(stand_adr_out::kinetrol_down, armM5_info_kinetrolDOWN);
+				rc = set_adam5000_cmd(stand_adr_out::gripper_open, armM5_info_gripperOPEN);
+				rc = set_adam5000_cmd(stand_adr_out::gripper_close, armM5_info_gripperCLOSE);
 				delay_1ms(time_blank_action);
 				armM5_info_gripperCLOSE = static_cast<uint8_t>(arm_M5_pin_valid);
 				armM5_info_security = static_cast<uint8_t>(arm_M5_pin_valid);
@@ -288,22 +292,30 @@ void cas_lab_StandController::action_stand(void)
 				rc = set_adam5000_cmd(stand_adr_out::gripper_close, armM5_info_gripperCLOSE);
 				// printf("    %i, gripper_close, %i\n",rc,armM5_info_gripperCLOSE);
 				delay_1ms(time_blank_pin);
-				armM5_info_gripperCLOSE = static_cast<uint8_t>(arm_M5_pin_invalid);
 				armM5_info_security = static_cast<uint8_t>(arm_M5_pin_invalid);
+				armM5_info_kinetrolUP = static_cast<uint8_t>(arm_M5_pin_invalid);
+				armM5_info_kinetrolDOWN = static_cast<uint8_t>(arm_M5_pin_invalid);
+				armM5_info_gripperOPEN = static_cast<uint8_t>(arm_M5_pin_invalid);
+				armM5_info_gripperCLOSE = static_cast<uint8_t>(arm_M5_pin_invalid);
 				rc = set_adam5000_cmd(stand_adr_out::security, armM5_info_security);
-				// printf("    %i, security, %i\n",rc,armM5_info_security);
+				rc = set_adam5000_cmd(stand_adr_out::kinetrol_up, armM5_info_kinetrolUP);
+				rc = set_adam5000_cmd(stand_adr_out::kinetrol_down, armM5_info_kinetrolDOWN);
+				rc = set_adam5000_cmd(stand_adr_out::gripper_open, armM5_info_gripperOPEN);
 				rc = set_adam5000_cmd(stand_adr_out::gripper_close, armM5_info_gripperCLOSE);
-				// printf("    %i, gripper_close, %i\n",rc,armM5_info_gripperCLOSE);
 			}
 			else if( robot_info_gripper == static_cast<uint16_t>(armM5_gripper::open) )
 			{
 				std::cout << "    gripper OPEN working ..." << std::endl;
-				armM5_info_gripperCLOSE = static_cast<uint8_t>(arm_M5_pin_invalid);
 				armM5_info_security = static_cast<uint8_t>(arm_M5_pin_invalid);
-				rc = set_adam5000_cmd(stand_adr_out::gripper_close, armM5_info_gripperCLOSE);
-				// printf("    %i, gripper_close, %i\n",rc,armM5_info_gripperCLOSE);
+				armM5_info_kinetrolUP = static_cast<uint8_t>(arm_M5_pin_invalid);
+				armM5_info_kinetrolDOWN = static_cast<uint8_t>(arm_M5_pin_invalid);
+				armM5_info_gripperOPEN = static_cast<uint8_t>(arm_M5_pin_invalid);
+				armM5_info_gripperCLOSE = static_cast<uint8_t>(arm_M5_pin_invalid);
 				rc = set_adam5000_cmd(stand_adr_out::security, armM5_info_security);
-				// printf("    %i, security, %i\n",rc,armM5_info_security);
+				rc = set_adam5000_cmd(stand_adr_out::kinetrol_up, armM5_info_kinetrolUP);
+				rc = set_adam5000_cmd(stand_adr_out::kinetrol_down, armM5_info_kinetrolDOWN);
+				rc = set_adam5000_cmd(stand_adr_out::gripper_open, armM5_info_gripperOPEN);
+				rc = set_adam5000_cmd(stand_adr_out::gripper_close, armM5_info_gripperCLOSE);
 				delay_1ms(time_blank_action);
 				armM5_info_gripperOPEN = static_cast<uint8_t>(arm_M5_pin_valid);
 				armM5_info_security = static_cast<uint8_t>(arm_M5_pin_valid);
@@ -312,12 +324,16 @@ void cas_lab_StandController::action_stand(void)
 				rc = set_adam5000_cmd(stand_adr_out::gripper_open, armM5_info_gripperOPEN);
 				// printf("    %i, gripper_open, %i\n",rc,armM5_info_gripperOPEN);
 				delay_1ms(time_blank_pin);
-				armM5_info_gripperOPEN = static_cast<uint8_t>(arm_M5_pin_invalid);
 				armM5_info_security = static_cast<uint8_t>(arm_M5_pin_invalid);
+				armM5_info_kinetrolUP = static_cast<uint8_t>(arm_M5_pin_invalid);
+				armM5_info_kinetrolDOWN = static_cast<uint8_t>(arm_M5_pin_invalid);
+				armM5_info_gripperOPEN = static_cast<uint8_t>(arm_M5_pin_invalid);
+				armM5_info_gripperCLOSE = static_cast<uint8_t>(arm_M5_pin_invalid);
 				rc = set_adam5000_cmd(stand_adr_out::security, armM5_info_security);
-				// printf("    %i, security, %i\n",rc,armM5_info_security);
+				rc = set_adam5000_cmd(stand_adr_out::kinetrol_up, armM5_info_kinetrolUP);
+				rc = set_adam5000_cmd(stand_adr_out::kinetrol_down, armM5_info_kinetrolDOWN);
 				rc = set_adam5000_cmd(stand_adr_out::gripper_open, armM5_info_gripperOPEN);
-				// printf("    %i, gripper_open, %i\n",rc,armM5_info_gripperOPEN);
+				rc = set_adam5000_cmd(stand_adr_out::gripper_close, armM5_info_gripperCLOSE);
 			}
 			delay_1ms(time_blank_action);
 		}
@@ -327,15 +343,21 @@ void cas_lab_StandController::action_stand(void)
 		std::cout << "action_gripper worked" << std::endl;
 	}
 	/* action kinetrol */
-	if( action_kinetrol )
+	if( true )
 	{
 		if( robot_info_kinetrol == static_cast<uint16_t>(armM5_kinetrol::up) )
 		{
 			std::cout << "action_kinetrol up working ..." << std::endl;
 			armM5_info_security = static_cast<uint8_t>(arm_M5_pin_invalid);
+			armM5_info_kinetrolUP = static_cast<uint8_t>(arm_M5_pin_invalid);
 			armM5_info_kinetrolDOWN = static_cast<uint8_t>(arm_M5_pin_invalid);
+			armM5_info_gripperOPEN = static_cast<uint8_t>(arm_M5_pin_invalid);
+			armM5_info_gripperCLOSE = static_cast<uint8_t>(arm_M5_pin_invalid);
 			rc = set_adam5000_cmd(stand_adr_out::security, armM5_info_security);
+			rc = set_adam5000_cmd(stand_adr_out::kinetrol_up, armM5_info_kinetrolUP);
 			rc = set_adam5000_cmd(stand_adr_out::kinetrol_down, armM5_info_kinetrolDOWN);
+			rc = set_adam5000_cmd(stand_adr_out::gripper_open, armM5_info_gripperOPEN);
+			rc = set_adam5000_cmd(stand_adr_out::gripper_close, armM5_info_gripperCLOSE);
 			delay_1ms(time_blank_pin);
 			armM5_info_security = static_cast<uint8_t>(arm_M5_pin_valid);
 			armM5_info_kinetrolUP = static_cast<uint8_t>(arm_M5_pin_valid);
@@ -347,8 +369,14 @@ void cas_lab_StandController::action_stand(void)
 			std::cout << "action_kinetrol down working ..." << std::endl;
 			armM5_info_security = static_cast<uint8_t>(arm_M5_pin_invalid);
 			armM5_info_kinetrolUP = static_cast<uint8_t>(arm_M5_pin_invalid);
+			armM5_info_kinetrolDOWN = static_cast<uint8_t>(arm_M5_pin_invalid);
+			armM5_info_gripperOPEN = static_cast<uint8_t>(arm_M5_pin_invalid);
+			armM5_info_gripperCLOSE = static_cast<uint8_t>(arm_M5_pin_invalid);
 			rc = set_adam5000_cmd(stand_adr_out::security, armM5_info_security);
 			rc = set_adam5000_cmd(stand_adr_out::kinetrol_up, armM5_info_kinetrolUP);
+			rc = set_adam5000_cmd(stand_adr_out::kinetrol_down, armM5_info_kinetrolDOWN);
+			rc = set_adam5000_cmd(stand_adr_out::gripper_open, armM5_info_gripperOPEN);
+			rc = set_adam5000_cmd(stand_adr_out::gripper_close, armM5_info_gripperCLOSE);
 			delay_1ms(time_blank_pin);
 			armM5_info_security = static_cast<uint8_t>(arm_M5_pin_valid);
 			armM5_info_kinetrolDOWN = static_cast<uint8_t>(arm_M5_pin_valid);
@@ -360,7 +388,7 @@ void cas_lab_StandController::action_stand(void)
 		std::cout << "action_kinetrol worked." << std::endl;
 	}
 	/* action fixture */
-	if( action_fixture )
+	if( action_fixture && (robot_info_toolATC==static_cast<uint16_t>(armM5_toolATC_state::lock)) )
 	{
 		if( robot_info_fixture == static_cast<uint16_t>(armM5_fixture_state::open) )
 		{
@@ -390,6 +418,17 @@ void cas_lab_StandController::action_stand(void)
 			armM5_info_value2_lock = static_cast<uint8_t>(arm_M5_pin_valid);
 			rc = set_adam5000_cmd(stand_adr_out::value2_lock, armM5_info_value2_lock);
 		}
+		else if( robot_info_fixture == static_cast<uint16_t>(armM5_fixture_state::free) )
+		{
+			armM5_info_value2_lock = static_cast<uint8_t>(arm_M5_pin_invalid);
+			armM5_info_value2_unlock = static_cast<uint8_t>(arm_M5_pin_invalid);
+			armM5_info_value3_lock = static_cast<uint8_t>(arm_M5_pin_invalid);
+			armM5_info_value3_unlock = static_cast<uint8_t>(arm_M5_pin_invalid);
+			rc = set_adam5000_cmd(stand_adr_out::value2_lock, armM5_info_value2_unlock);
+			rc = set_adam5000_cmd(stand_adr_out::value2_unlock, armM5_info_value2_unlock);
+			rc = set_adam5000_cmd(stand_adr_out::value3_lock, armM5_info_value3_unlock);
+			rc = set_adam5000_cmd(stand_adr_out::value3_unlock, armM5_info_value3_unlock);
+		}
 		robot_info_fixture_old = robot_info_fixture;
 		action_fixture = false;
 		std::cout << "action_fixture worked." << std::endl;
@@ -413,15 +452,16 @@ void cas_lab_StandController::action_stand(void)
 			armM5_info_value2_unlock = static_cast<uint8_t>(arm_M5_pin_invalid);
 			armM5_info_value3_lock = static_cast<uint8_t>(arm_M5_pin_invalid);
 			armM5_info_value3_unlock = static_cast<uint8_t>(arm_M5_pin_invalid);
-			rc = set_adam5000_cmd(stand_adr_out::value2_lock, armM5_info_value2_lock);
+			rc = set_adam5000_cmd(stand_adr_out::value2_lock, armM5_info_value2_unlock);
 			rc = set_adam5000_cmd(stand_adr_out::value2_unlock, armM5_info_value2_unlock);
-			rc = set_adam5000_cmd(stand_adr_out::value3_lock, armM5_info_value3_lock);
+			rc = set_adam5000_cmd(stand_adr_out::value3_lock, armM5_info_value3_unlock);
 			rc = set_adam5000_cmd(stand_adr_out::value3_unlock, armM5_info_value3_unlock);
 			armM5_info_value1_lock = static_cast<uint8_t>(arm_M5_pin_invalid);
 			rc = set_adam5000_cmd(stand_adr_out::value1_lock, armM5_info_value1_lock);
 			delay_1ms(time_blank_pin);
 			armM5_info_value1_unlock = static_cast<uint8_t>(arm_M5_pin_valid);
 			rc = set_adam5000_cmd(stand_adr_out::value1_unlock, armM5_info_value1_unlock);
+			robot_info_fixture_old = 0;
 		}
 		robot_info_toolATC_old = robot_info_toolATC;
 		action_toolATC = false;

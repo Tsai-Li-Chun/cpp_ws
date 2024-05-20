@@ -37,8 +37,10 @@
 #define deltaDRV_slaveID 2
 
 #define robot_cmd_adr 0x1EFD
+#define robot_cmd_finish 0
 #define robot_cmd_lock_screw 1
 #define robot_cmd_take_out_screw 2
+#define robot_cmd_ERR 255
 
 #define Monitoring_Status_adr 3212
 #define realtime_Speed_adr 3301

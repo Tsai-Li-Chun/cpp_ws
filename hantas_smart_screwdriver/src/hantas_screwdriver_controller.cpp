@@ -68,6 +68,7 @@ int check_hantas_motion(void);
 **	**/
 int main(int argc, char **argv)
 {
+	long count = 1;
 	bool hantas_ok = false;
 
 	if(connect_hantas()==0)
@@ -83,34 +84,44 @@ int main(int argc, char **argv)
 	while(1)
 	{
 		rc = modbus_read_registers(deltaDRV,robot_cmd_adr,1,&robot_cmd_data);
-		printf("%i, new robot_cmd_data is %i\n",rc,robot_cmd_data);
+		printf("%li, %i, new robot_cmd_data is %i\n",count,rc,robot_cmd_data);
 		if( (robot_cmd_data==robot_cmd_lock_screw) || (robot_cmd_data==robot_cmd_take_out_screw) )
 		{
 			send_hantas_start();
 			while(!hantas_ok)
 			{
+				modbus_write_register(deltaDRV,robot_cmd_adr,robot_cmd_data);
 				check_hantas_motion();
-				if(MonitoringStatus==1)
-				if(param_RealtimeData.Speed==0)
-				if(param_RealtimeData.TorqueUp==1)
-				if(param_RealtimeData.FasteningOK==1)
+
+				if(MonitoringStatus==2)
 				{
+					modbus_write_register(deltaDRV,robot_cmd_adr,static_cast<uint16_t>(robot_cmd_ERR));
+					hantas_ok = true;
+					std::cout << TC_ERROR << "    !!!!FasteningNotOK TorqueNotUp!!!!" << TC_RESET << std::endl;
+				}
+				
+				if(MonitoringStatus==1)
+					if(param_RealtimeData.Speed==0)
+						if(param_RealtimeData.TorqueUp==1)
+							if(param_RealtimeData.FasteningOK==1)
+				{
+					modbus_write_register(deltaDRV,robot_cmd_adr,static_cast<uint16_t>(robot_cmd_finish));
 					hantas_ok = true;
 					std::cout << "    !!!!FasteningOK TorqueUp!!!!" << std::endl;
 				}
-			}
-			modbus_write_register(deltaDRV,robot_cmd_adr,0);
+				usleep(1000);
+				std::cout << TC_CLOSE << std::endl;
+			} 
+			hantas_ok = false;
 			sleep(1);
-			std::cout << TC_CLOSE << std::endl;
 		}
 		else
 			std::cout << "robot_cmd_data not take_out or lock " << std::endl;
 		
 		usleep(1000*500);
+		count++;
+		std::cout << TC_CLOSE << std::endl;
 	}
-
-
-
 	/* main quit */
 	return 0;
 }

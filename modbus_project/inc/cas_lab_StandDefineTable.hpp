@@ -135,6 +135,7 @@ enum class armM5_toolATC_state:uint16_t
 /* define cas_lab stand system 3ARMs M5 reed switch state */
 enum class armM5_fixture_state:uint16_t
 {
+	free = 0,
 	close = 1,
 	open = 2
 };
