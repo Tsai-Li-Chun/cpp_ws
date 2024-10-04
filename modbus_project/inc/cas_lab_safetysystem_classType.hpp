@@ -11,10 +11,9 @@
 
 /* System Includes ------------------------------------------*/
 /* System Includes Begin */
+#include <chrono>
 #include <memory>
 #include <iostream>
-#include <unistd.h>
-#include <sys/time.h>
 /* System Includes End */
 /* User Includes --------------------------------------------*/
 /* User Includes Begin */
@@ -102,9 +101,6 @@ private:
 
 	void set_StackLight_DisplayMode(void);	/* set StackLight Display Mode */
 	void action_StackLight(void);		/* StackLight actions based on the status of DisplayMode */
-
-	void std_cout_close(void);
-	void std_cout(void);
 
 /* public number */
 public:

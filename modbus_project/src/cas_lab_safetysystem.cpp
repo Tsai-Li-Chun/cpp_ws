@@ -7,7 +7,6 @@
 
 /* System Includes ------------------------------------------*/
 /* System Includes Begin */
-// #include <string>
 /* System Includes End */
 /* User Includes --------------------------------------------*/
 /* User Includes Begin */
@@ -43,9 +42,6 @@
 
 /* Function -------------------------------------------------*/
 /* Function Begin */
-
-
-
 /* Function End */
 
 
@@ -63,6 +59,7 @@
 int main(int argc, char **argv)
 {
 	/* 隨便顯示些東西證明程式運作 */
+	system("Color"); 
 	std::cout << "CAS Lab Safety System program setup..." << std::endl;
 	std::cout << "----------------------------------------------" << std::endl << std::endl;
 
@@ -72,24 +69,14 @@ int main(int argc, char **argv)
 
 	/* 建立modbus通訊物件 */
 	cas_lab_safetysystem_classType cas_lab_safetysystem;
+	cas_lab_safetysystem.delay_1ms(1000);
 	cas_lab_safetysystem.init();
+	cas_lab_safetysystem.delay_1ms(1000);
 	cas_lab_state = cas_lab_safetysystem.run();
-
-	// // std::cout << "display_HL_change : " << display_HL_change << std::endl;
-	// /* main loop */
-	// while(1)
-	// {
-	// 	// display_HL_change = (!display_HL_change);
-	// 	// std::cout << "display_HL_change : " << display_HL_change << std::endl;
-	// 	// cas_lab_safetysystem.delay_1ms(1000);
-	// }
 
 	/* main quit */
 	return 0;
 }
-
-
-
 
 
 /* Program End */

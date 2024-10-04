@@ -17,7 +17,7 @@
 /* User Includes Begin */
 #include "deltaDRV_modbus_AdrCmdTable.hpp"
 #include "deltaDRV_modbus_dataStruct.hpp"
-#include "modbus/modbus.h"
+#include "modbus.h"
 /* User Includes End */
 
 

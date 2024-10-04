@@ -1,3 +1,5 @@
+null
+*.exe
 **/build/*.*
 PhotoneoAPI/**
 cas_photoneo/**/build/*.*

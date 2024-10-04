@@ -22,12 +22,12 @@
 /* Define ---------------------------------------------------*/
 /* Define Begin */
 
-#define remoteIO_quantity 4
+#define remoteIO_quantity 3
 #define total_AP_IP "192.168.1.5"
 #define remoteIO_IP_fence "192.168.1.11"
 #define remoteIO_IP_camera_root "192.168.1.12"
 #define remoteIO_IP_guide_root "192.168.1.13"
-#define remoteIO_IP_stand "192.168.1.15"
+#define remoteIO_IP_stand "192.168.1.14"
 
 /* cas lab module err code */
 #define module_camera_robot_err (uint8_t)1

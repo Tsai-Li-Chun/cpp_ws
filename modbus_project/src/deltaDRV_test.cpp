@@ -7,8 +7,10 @@
 
 /* System Includes ------------------------------------------*/
 /* System Includes Begin */
-#include <iostream>
+#if defined(__OS_LINUX__)
 #include <unistd.h>
+#endif
+#include <iostream>
 /* System Includes End */
 /* User Includes --------------------------------------------*/
 /* User Includes Begin */
@@ -22,6 +24,9 @@
 
 /* Define ---------------------------------------------------*/
 /* Define Begin */
+#if defined(__OS_WIN__)
+#define sleep(time) Sleep(time*1000)
+#endif
 /* Define End */
 
 

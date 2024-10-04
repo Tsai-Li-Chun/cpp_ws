@@ -15,7 +15,8 @@
 /* User Includes --------------------------------------------*/
 /* User Includes Begin */
 #include "CASLab_SafetySystemDefineTable.hpp"
-#include "modbus/modbus.h"
+#include "modbus.h"
+
 /* User Includes End */
 
 

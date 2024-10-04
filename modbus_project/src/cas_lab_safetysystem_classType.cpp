@@ -7,6 +7,7 @@
 
 /* System Includes ------------------------------------------*/
 /* System Includes Begin */
+#include <string>
 /* System Includes End */
 /* User Includes --------------------------------------------*/
 /* User Includes Begin */
@@ -64,7 +65,7 @@ cas_lab_safetysystem_classType::cas_lab_safetysystem_classType()
 	remoteIO_IP[fence] = remoteIO_IP_fence;
 	remoteIO_IP[camera_robot] = remoteIO_IP_camera_root;
 	remoteIO_IP[guide_robot] = remoteIO_IP_guide_root;
-	remoteIO_IP[stand] = remoteIO_IP_stand;
+	// remoteIO_IP[stand] = remoteIO_IP_stand;
 
 	for(flc1=0; flc1<remoteIO_quantity; flc1++)
 		remoteIO[flc1] = std::make_shared<wise4060_HandShake>(remoteIO_IP[flc1].c_str(), wise4060_port, wise4060_slave);
@@ -128,11 +129,18 @@ void cas_lab_safetysystem_classType::get_remoteIO_DO(int number)
 int cas_lab_safetysystem_classType::verify_totalAP(void)
 {
 	debug_message.clear();
+	debug_message = "";
 	cas_lab_state_old = cas_lab_state;
 	// debug_message = "";
 	/* check total AP is working and connected */
 	ipAddress = total_AP_IP;
+
+#if defined(__OS_LINUX__)
 	command = std::string("ping -c 1 -w 1 ") + ipAddress + std::string(" > /dev/null");
+#elif defined(__OS_WIN__)
+	command = std::string("ping -n 1 -w 1 ") + ipAddress + std::string(" > null");
+#endif
+
 	/* check total AP is working and connected */
 	if( system(command.c_str()) != 0 )
 	{	/* totalAP not connected */
@@ -143,7 +151,7 @@ int cas_lab_safetysystem_classType::verify_totalAP(void)
 	}
 	else
 	{	/* totalAP online */
-		debug_message = debug_message + ipAddress + " is connected" + "\n";
+		// debug_message = debug_message + ipAddress + " is connected" + "\n";
 		// std::cout << ipAddress << " is connected" << std::endl;
 		cas_lab_state.network = network_healthy;
 		display_mode = module_ALL_healthy;
@@ -169,46 +177,52 @@ int cas_lab_safetysystem_classType::verify_remoteIO(void)
 	/* sequentially evaluate the status of all remoteIO */
 	for(flc1=(remoteIO_quantity-1); flc1>=0; flc1--)
 	{
-		debug_message = debug_message + "[verify_remoteIO]" + std::to_string(flc1) + " : ";
+		// debug_message = debug_message + "[verify_remoteIO]" + std::to_string(flc1) + " : ";
 		// std::cout << "[verify_remoteIO]" << flc1  << " : ";
 		/* check the remoteIO is online */
 		rc = remoteIO[flc1]->isConnect();
+// #if defined(__OS_LINUX__)
+// 		command = std::string("ping -c 1 -w 1 ") + ipAddress + std::string(" > /dev/null");
+// #elif defined(__OS_WIN__)
+// 		command = std::string("ping -n 1 -w 1 ") + remoteIO_IP[flc1] + std::string(" > null");
+// #endif
 		if(rc != 1)
+		// if( system(command.c_str()) != 0 )
 		{	/* if disconnected, attempt to reconnect */
-			debug_message = debug_message + TC_ERROR + "remoteIO IP:" + remoteIO_IP[flc1].c_str() + " connection lost!" + "\n";
+			// debug_message = debug_message + TC_ERROR + "remoteIO IP:" + remoteIO_IP[flc1].c_str() + " connection lost!" + "\n";
 			// std::cout << TC_ERROR << "remoteIO IP:" << remoteIO_IP[flc1].c_str() << " connection lost!" << std::endl;
 			rc = remoteIO[flc1]->reConnect();
 			if(rc != 0)
 			{	/* reconnection failed */
 				cas_lab_state.network = (static_cast<uint8_t>(flc1));
-				debug_message = debug_message + "    >> remoteIO IP:" + remoteIO_IP[flc1].c_str() + " reconnection failed!" + TC_RESET + "\n";
+				debug_message = debug_message + TC_ERROR + "remoteIO IP: " + remoteIO_IP[flc1].c_str() + " reconnection failed!" + TC_RESET + "\n";
 				// std::cout << "    >> remoteIO IP:" << remoteIO_IP[flc1].c_str() << " reconnection failed!" << TC_RESET << std::endl;
 			}
 			else
 			{	/* reconnection successfully */
 				online_remoteIO_quantity += 1;
-				debug_message = debug_message + TC_RESET + "    >> remoteIO IP:" + remoteIO_IP[flc1].c_str() + " reconnection successfully!" + "\n";
+				// debug_message = debug_message + TC_RESET + "    >> remoteIO IP:" + remoteIO_IP[flc1].c_str() + " reconnection successfully!" + "\n";
 				// std::cout << TC_RESET << "    >> remoteIO IP:" << remoteIO_IP[flc1].c_str() << " reconnection successfully!" << std::endl;
 			}
 		}
 		else
 		{	/* already online */
 			online_remoteIO_quantity += 1;
-			debug_message = debug_message + "remoteIO IP:" + remoteIO_IP[flc1].c_str() + " still online" + "\n";
+			// debug_message = debug_message + "remoteIO IP:" + remoteIO_IP[flc1].c_str() + " still online" + "\n";
 			// std::cout << "remoteIO IP:" << remoteIO_IP[flc1].c_str() << " still online" << std::endl;
 		}
 	}
 
-	/* display remoteIO number of faulty */
-	if( online_remoteIO_quantity < remoteIO_quantity )
-		debug_message = debug_message + TC_ERROR + "number of faulty remoteIO in the CAS lab: "\
-					 + std::to_string(remoteIO_quantity-online_remoteIO_quantity) + TC_RESET + "\n\n";
-		// std::cout << TC_ERROR << "number of faulty remoteIO in the CAS lab: " \
-		// << (remoteIO_quantity-online_remoteIO_quantity) << TC_RESET << std::endl;
-	else
-		debug_message = debug_message + "CAS Lab remoteIO All functioning normally!" + TC_RESET + "\n\n";
-		// std::cout << "CAS Lab remoteIO All functioning normally!" << TC_RESET << std::endl;
-	// std::cout << std::endl;
+	// /* display remoteIO number of faulty */
+	// if( online_remoteIO_quantity < remoteIO_quantity )
+	// 	debug_message = debug_message + TC_ERROR + "number of faulty remoteIO in the CAS lab: "\
+	// 				 + std::to_string(remoteIO_quantity-online_remoteIO_quantity) + TC_RESET + "\n\n";
+	// 	// std::cout << TC_ERROR << "number of faulty remoteIO in the CAS lab: " \
+	// 	// << (remoteIO_quantity-online_remoteIO_quantity) << TC_RESET << std::endl;
+	// else
+	// 	debug_message = debug_message + "CAS Lab remoteIO All functioning normally!" + TC_RESET + "\n\n";
+	// 	// std::cout << "CAS Lab remoteIO All functioning normally!" << TC_RESET << std::endl;
+	// // std::cout << std::endl;
 
 	return online_remoteIO_quantity;
 }
@@ -226,7 +240,7 @@ uint8_t cas_lab_safetysystem_classType::check_fence_door(void)
 	if( DI_status[fence][fence] == DI_signal_efficient )
 	{	/* fence door is close */
 		cas_lab_state.fence = fence_close;
-		debug_message = debug_message + "[check_fence_door] close" + "\n";
+		// debug_message = debug_message + "[check_fence_door] close" + "\n";
 		// std::cout << "[check_fence_door] close" << std::endl;
 		return fence_close;
 	}
@@ -252,7 +266,7 @@ uint8_t cas_lab_safetysystem_classType::check_camera_robot_EMS(void)
 		if( DI_status[camera_robot][camera_robot] == DI_EMS_off )
 	{	/* camera robot EMS is off, normal working */
 		cas_lab_state.camera_robot = camera_robot_EMS_off;
-		debug_message = debug_message + "[check_camera_robot] EMS_off" + "\n";
+		// debug_message = debug_message + "[check_camera_robot] EMS_off" + "\n";
 		// std::cout << "[check_camera_robot] EMS_off" << std::endl;
 		return camera_robot_EMS_off;
 	}
@@ -277,7 +291,7 @@ uint8_t cas_lab_safetysystem_classType::check_guide_robot_EMS(void)
 		if( DI_status[guide_robot][guide_robot] == DI_EMS_off )
 	{	/* guide robot EMS is off, normal working */
 		cas_lab_state.guide_robot = guide_robot_EMS_off;
-		debug_message = debug_message + "[check_guide_robot] EMS_off" + "\n";
+		// debug_message = debug_message + "[check_guide_robot] EMS_off" + "\n";
 		// std::cout << "[check_guide_robot] EMS_off" << std::endl;
 		return guide_robot_EMS_off;
 	}
@@ -300,7 +314,7 @@ uint8_t cas_lab_safetysystem_classType::check_stand_EMS(void)
 	if( DI_status[stand][stand] == DI_EMS_off )
 	{	/* stand EMS is off, normal working */
 		cas_lab_state.stand = stand_EMS_off;
-		debug_message = debug_message + "[check_stand] EMS_off" + "\n";
+		// debug_message = debug_message + "[check_stand] EMS_off" + "\n";
 		// std::cout << "[check_stand] EMS_off" << std::endl;
 		return stand_EMS_off;
 	}
@@ -327,7 +341,7 @@ uint8_t cas_lab_safetysystem_classType::check_AGV_EMS(void)
 			if( DI_status[guide_robot][AGV] == DI_EMS_off )
 	{	/* AGV EMS is off, normal working */
 		cas_lab_state.AGV = AGV_EMS_off;
-		debug_message = debug_message + "[check_AGV] EMS_off" + "\n";
+		// debug_message = debug_message + "[check_AGV] EMS_off" + "\n";
 		// std::cout << "[check_AGV] EMS_off" << std::endl;
 		return AGV_EMS_off;
 	}
@@ -351,12 +365,12 @@ void cas_lab_safetysystem_classType::CAS_LAB_action(void)
 	/* STO actions based on the status of guide robot */
 	action_guide_robot_STO();
 	/* STO actions based on the status of stand */
-	action_stand_STO();
+	// action_stand_STO();
 	/* STO actions based on the status of AGV */
 	action_AGV_STO();
 
 	/* StackLight actions based on the status of DisplayMode */
-	action_StackLight();
+	// action_StackLight();
 }
 /** * @brief STO actions based on the status of camera robot.
 	* @param none
@@ -364,7 +378,7 @@ void cas_lab_safetysystem_classType::CAS_LAB_action(void)
 **	**/
 void cas_lab_safetysystem_classType::action_camera_robot_STO(void)
 {
-	debug_message = debug_message + "[action_camera_robot_STO] ";
+	// debug_message = debug_message + "[action_camera_robot_STO] ";
 	if( cas_lab_state.fence == fence_close )
 		if( cas_lab_state.network != network_camera_robot_AP_err )
 		if( cas_lab_state.network != network_camera_robot_remoteIO_err )
@@ -383,7 +397,7 @@ void cas_lab_safetysystem_classType::action_camera_robot_STO(void)
 **	**/
 void cas_lab_safetysystem_classType::action_guide_robot_STO(void)
 {
-	debug_message = debug_message + "[action_guide_robot_STO] ";
+	// debug_message = debug_message + "[action_guide_robot_STO] ";
 	if( cas_lab_state.fence == fence_close )
 		if( cas_lab_state.network != network_guide_robot_AP_err )
 		if( cas_lab_state.network != network_guide_robot_remoteIO_err )
@@ -402,7 +416,7 @@ void cas_lab_safetysystem_classType::action_guide_robot_STO(void)
 **	**/
 void cas_lab_safetysystem_classType::action_stand_STO(void)
 {
-	debug_message = debug_message + "[action_stand_STO] ";
+	// debug_message = debug_message + "[action_stand_STO] ";
 	if( cas_lab_state.fence == fence_close )
 		if( cas_lab_state.network != network_stand_AP_err)
 		if( cas_lab_state.network != network_stand_remoteIO_err)
@@ -421,7 +435,7 @@ void cas_lab_safetysystem_classType::action_stand_STO(void)
 **	**/
 void cas_lab_safetysystem_classType::action_AGV_STO(void)
 {
-	debug_message = debug_message + "[action_AGV_STO] ";
+	// debug_message = debug_message + "[action_AGV_STO] ";
 	if( cas_lab_state.fence == fence_close )
 		if( cas_lab_state.network != network_camera_robot_AP_err )
 		if( cas_lab_state.network != network_camera_robot_remoteIO_err )
@@ -445,6 +459,7 @@ uint8_t cas_lab_safetysystem_classType::STOon_camera_robot(void)
 												  static_cast<int>(DO_STO_enable));
 	if(rc==1)	debug_message = debug_message + TC_ERROR + "STOon_camera_robot Success!" + TC_RESET + "\n";
 	else	debug_message = debug_message + TC_ERROR + "STOon_camera_robot Fail!" + TC_RESET + "\n";
+	// if(rc!=1) debug_message = debug_message + TC_ERROR + "STOon_camera_robot Fail!" + TC_RESET + "\n";
 	return rc;
 }
 /* deactivate the STO mechanism of the camera robot */
@@ -452,10 +467,9 @@ uint8_t cas_lab_safetysystem_classType::STOoff_camera_robot(void)
 {
 	rc = remoteIO[camera_robot]->wise4060_writeDO(camera_robot_STO_adr,
 												  static_cast<int>(DO_STO_disable));
-	// if(rc==1)	std::cout << "STOoff_camera_robot Success!" << std::endl;
-	// else	std::cout << TC_ERROR << "STOoff_camera_robot Fail!" << TC_RESET << std::endl;
-	if(rc==1)	debug_message += "STOoff_camera_robot Success!\n";
-	else	debug_message = debug_message + TC_ERROR + "STOoff_camera_robot Fail!" + TC_RESET + "\n";
+	// if(rc==1)	debug_message += "STOoff_camera_robot Success!\n";
+	// else	debug_message = debug_message + TC_ERROR + "STOoff_camera_robot Fail!" + TC_RESET + "\n";
+	if(rc!=1) debug_message = debug_message + TC_ERROR + "STOoff_camera_robot Fail!" + TC_RESET + "\n";
 	return rc;
 }
 /* activate the STO mechanism of the guide robot */
@@ -463,10 +477,9 @@ uint8_t cas_lab_safetysystem_classType::STOon_guide_robot(void)
 {
 	rc = remoteIO[guide_robot]->wise4060_writeDO(guide_robot_STO_adr,
 												 static_cast<int>(DO_STO_enable));
-	// if(rc==1)	std::cout << "STOon_guide_robot Success!" << std::endl;
-	// else	std::cout << TC_ERROR << "STOon_guide_robot Fail!" << TC_RESET << std::endl;
 	if(rc==1)	debug_message = debug_message + TC_ERROR + "STOon_guide_robot Success!" + TC_RESET + "\n";
 	else	debug_message = debug_message + TC_ERROR + "STOon_guide_robot Fail!" + TC_RESET + "\n";
+	// if(rc!=1) debug_message = debug_message + TC_ERROR + "STOon_guide_robot Fail!" + TC_RESET + "\n";
 	return rc;
 }	
 /* deactivate the STO mechanism of the guide robot */
@@ -474,16 +487,18 @@ uint8_t cas_lab_safetysystem_classType::STOoff_guide_robot(void)
 {
 	rc = remoteIO[guide_robot]->wise4060_writeDO(guide_robot_STO_adr,
 												 static_cast<int>(DO_STO_disable));
-	if(rc==1)	debug_message += "STOoff_guide_robot EMS Success!\n";
-	else	debug_message = debug_message + TC_ERROR + "STOoff_guide_robot EMS Fail!" + TC_RESET + "\n";
+	// if(rc==1)	debug_message += "STOoff_guide_robot EMS Success!\n";
+	// else	debug_message = debug_message + TC_ERROR + "STOoff_guide_robot EMS Fail!" + TC_RESET + "\n";
+	if(rc!=1) debug_message = debug_message + TC_ERROR + "STOoff_guide_robot EMS Fail!" + TC_RESET + "\n";
 
 	// debug_message = debug_message + std::to_string(rc) + " : ";
 
 	if( (cas_lab_state_old.guide_robot==guide_robot_EMS_on) || (cas_lab_state_old.fence==fence_open) || (cas_lab_state_old.network==network_guide_robot_remoteIO_err) )
 	{
 		rc = remoteIO[guide_robot]->wise4060_DO_pulse(guide_robot_reset_adr,1);
-		if(rc==2)	debug_message += "STOoff_guide_robot RESERT Success!\n";
-		else	debug_message = debug_message + TC_ERROR + "STOoff_guide_robot RESET Fail!" + TC_RESET + "\n";
+		// if(rc==2)	debug_message += "STOoff_guide_robot RESERT Success!\n";
+		// else	debug_message = debug_message + TC_ERROR + "STOoff_guide_robot RESET Fail!" + TC_RESET + "\n";
+		if(rc!=2) debug_message = debug_message + TC_ERROR + "STOoff_guide_robot RESET Fail!" + TC_RESET + "\n";
 		// std::cout << rc << " : ";
 		// debug_message = debug_message + std::to_string(rc) + " : ";
 		// if(rc==2)	debug_message += "                     STOoff_guide_robot RESET Success!\n";
@@ -496,10 +511,9 @@ uint8_t cas_lab_safetysystem_classType::STOon_stand(void)
 {
 	rc = remoteIO[stand]->wise4060_writeDO(stand_STO_adr,
 								 static_cast<int>(DO_STO_enable));
-	// if(rc==1)	std::cout << "STOon_stand Success!" << std::endl;
-	// else	std::cout << TC_ERROR << "STOon_stand Fail!" << TC_RESET << std::endl;
 	if(rc==1)	debug_message = debug_message + TC_ERROR + "STOon_stand Success!" + TC_RESET + "\n";
 	else	debug_message = debug_message + TC_ERROR + "STOon_stand Fail!" + TC_RESET + "\n";
+	// if(rc!=1) debug_message = debug_message + TC_ERROR + "STOon_stand Fail!" + TC_RESET + "\n";
 	return rc;
 }			
 /* deactivate the STO mechanism of the stand */
@@ -507,10 +521,9 @@ uint8_t cas_lab_safetysystem_classType::STOoff_stand(void)
 {
 	rc = remoteIO[stand]->wise4060_writeDO(stand_STO_adr,
 								 static_cast<int>(DO_STO_disable));
-	// if(rc==1)	std::cout << "STOoff_stand Success!" << std::endl;
-	// else	std::cout << TC_ERROR << "STOoff_stand Fail!" << TC_RESET << std::endl;
-	if(rc==1)	debug_message += "STOoff_stand Success!\n";
-	else	debug_message = debug_message + TC_ERROR + "STOoff_stand Fail!" + TC_RESET + "\n";
+	// if(rc==1)	debug_message += "STOoff_stand Success!\n";
+	// else	debug_message = debug_message + TC_ERROR + "STOoff_stand Fail!" + TC_RESET + "\n";
+	if(rc!=1) debug_message = debug_message + TC_ERROR + "STOoff_stand Fail!" + TC_RESET + "\n";
 	return rc;
 }		
 /* activate the STO mechanism of the AGV */
@@ -520,10 +533,9 @@ uint8_t cas_lab_safetysystem_classType::STOon_AGV(void)
 								 static_cast<int>(DO_STO_enable));
 	rc += remoteIO[guide_robot]->wise4060_writeDO(AGV_STO_adr,
 								 static_cast<int>(DO_STO_enable));
-	// if(rc==2)	std::cout << "STOon_AGV Success!" << std::endl;
-	// else	std::cout << TC_ERROR << "STOon_AGV Fail!" << TC_RESET << std::endl;
 	if(rc==2)	debug_message = debug_message + TC_ERROR + "STOon_AGV Success!" + TC_RESET + "\n";
 	else	debug_message = debug_message + TC_ERROR + "STOon_AGV Fail!" + TC_RESET + "\n";
+	// if(rc!=2) debug_message = debug_message + TC_ERROR + "STOon_AGV Fail!" + TC_RESET + "\n";
 	return rc;
 }		
 /* deactivate the STO mechanism of the AGV */
@@ -533,10 +545,9 @@ uint8_t cas_lab_safetysystem_classType::STOoff_AGV(void)
 								 static_cast<int>(DO_STO_disable));
 	rc += remoteIO[guide_robot]->wise4060_writeDO(AGV_STO_adr,
 								 static_cast<int>(DO_STO_disable));
-	// if(rc==2)	std::cout << "STOoff_AGV Success!" << std::endl;
-	// else	std::cout << TC_ERROR << "STOoff_AGV Fail!" << TC_RESET << std::endl;
-	if(rc==2)	debug_message += "STOoff_AGV Success!\n";
-	else	debug_message = debug_message + TC_ERROR + "STOoff_AGV Fail!" + TC_RESET + "\n";
+	// if(rc==2)	debug_message += "STOoff_AGV Success!\n";
+	// else	debug_message = debug_message + TC_ERROR + "STOoff_AGV Fail!" + TC_RESET + "\n";
+	if(rc!=2) debug_message = debug_message + TC_ERROR + "STOoff_AGV Fail!" + TC_RESET + "\n";
 	return rc;
 }		
 
@@ -564,16 +575,16 @@ void cas_lab_safetysystem_classType::set_StackLight_DisplayMode(void)
 		display_mode = module_camera_robot_err;
 	else if( cas_lab_state.network == network_guide_robot_remoteIO_err )
 		display_mode = module_guide_robot_err;
-	else if( cas_lab_state.network == network_stand_remoteIO_err )
-		display_mode = module_stand_err;
+	// else if( cas_lab_state.network == network_stand_remoteIO_err )
+	// 	display_mode = module_stand_err;
 	else if( cas_lab_state.fence == fence_open )
 		display_mode = module_fence_err;
 	else if( cas_lab_state.camera_robot == camera_robot_EMS_on )
 		display_mode = module_camera_robot_err;
 	else if( cas_lab_state.guide_robot == guide_robot_EMS_on )
 		display_mode = module_guide_robot_err;
-	else if( cas_lab_state.stand == stand_EMS_on )
-		display_mode = module_stand_err;
+	// else if( cas_lab_state.stand == stand_EMS_on )
+	// 	display_mode = module_stand_err;
 	else if( cas_lab_state.AGV == AGV_EMS_on )
 		display_mode = module_AGV_err;
 	else if( DO_status[camera_robot][camera_robot] == DI_EMS_on )
@@ -584,8 +595,8 @@ void cas_lab_safetysystem_classType::set_StackLight_DisplayMode(void)
 		display_mode = module_guide_robot_err;
 	else if( DO_status[guide_robot][AGV] == DI_EMS_on )
 		display_mode = module_AGV_err;
-	else if( DO_status[stand][stand] == DI_EMS_on )
-		display_mode = module_stand_err;
+	// else if( DO_status[stand][stand] == DI_EMS_on )
+	// 	display_mode = module_stand_err;
 }
 /** * @brief StackLight actions based on the status of DisplayMode.
 	* @param none
@@ -596,7 +607,7 @@ void cas_lab_safetysystem_classType::action_StackLight(void)
 	/* set StackLight Display Mode */
 	set_StackLight_DisplayMode();
 	/* get system time and convert to microseconds */
-	gettimeofday(&tv, NULL);
+	// gettimeofday(&tv, NULL);
 	display_time_us = ((tv.tv_sec*1000000)+tv.tv_usec);
 	/* flashing actions based on the status of display_mode */
 	if( display_mode >= module_camera_robot_err )
@@ -698,16 +709,15 @@ lab_state cas_lab_safetysystem_classType::run(void)
 			{	/* check cas lab module EMS */
 				check_camera_robot_EMS();
 				check_guide_robot_EMS();
-				check_stand_EMS();
+				// check_stand_EMS();
 				check_AGV_EMS();
 			}
 			/* implement actions on the indicator lights and STO of each module */
 			CAS_LAB_action();
 		}
 
-		std_cout();
-		std_cout_close();
-		delay_1ms(1);	/* delay 1ms */
+		delay_1ms(500);
+		std::cout << TC_CLOSE << "\n" << debug_message.c_str() << std::endl;
 	}
 	// std_cout();
 	std::cout << TC_ERROR << "CAS Lab network is down, unable to operate" << TC_RESET << std::endl;
@@ -719,7 +729,6 @@ lab_state cas_lab_safetysystem_classType::run(void)
 **	**/
 void cas_lab_safetysystem_classType::init(void)
 {
-	delay_1ms(1000);
 	debug_message.clear();
 	// debug_message = "";
 
@@ -737,16 +746,16 @@ void cas_lab_safetysystem_classType::init(void)
 
 	STOon_camera_robot();
 	STOon_guide_robot();
-	STOon_stand();
+	// STOon_stand();
 	STOon_AGV();
 	cas_lab_state_old.guide_robot = guide_robot_EMS_on;
 	delay_1ms(1000);
 	STOoff_camera_robot();
 	STOoff_guide_robot();
-	STOoff_stand();
+	// STOoff_stand();
 	STOoff_AGV();
 	delay_1ms(1000);
-	gettimeofday(&tv, NULL);
+	// gettimeofday(&tv, NULL);
 	
 	display_time_us=0;
 	TC_close_time_us_old = ((tv.tv_sec*1000000)+tv.tv_usec);
@@ -763,223 +772,23 @@ void cas_lab_safetysystem_classType::init(void)
 
 	std::cout << "    >>> cas_lab_SafetySystem controller initialization completed!" << std::endl;
 	std::cout << "-------------------------------------------------" << std::endl << std::endl;
-	delay_1ms(3000);
 }
 
 
-void cas_lab_safetysystem_classType::delay_1ms(int time)
+void cas_lab_safetysystem_classType::delay_1ms(int delay_time)
 {
-	gettimeofday(&tv, NULL);
-	delay_time_us_old = ((tv.tv_sec*1000000)+tv.tv_usec);
-	while(1)
+	std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+	while(true)
 	{
-		gettimeofday(&tv, NULL);
-		delay_time_us = ((tv.tv_sec*1000000)+tv.tv_usec);
-		if( (delay_time_us-delay_time_us_old) > (time*1000) )
+		int64_t duration =
+			std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start).count();
+		if (duration > delay_time)
+		{
+			// std::cout << "delay time: " << duration << "ms" << std::endl;
+			debug_message = debug_message + "delay time: " + std::to_string(duration) + "ms" + "\n";
 			break;
+		}
 	}
-}
-
-
-void cas_lab_safetysystem_classType::std_cout(void)
-{
-	debug_message += "\ncas_lab_state.network      : ";
-	// std::cout << "cas_lab_state.network      : ";
-	switch(cas_lab_state.network)
-	{
-		case 0: debug_message += "network_fence_remoteIO_err\n"; break;
-		// case 0: std::cout << "network_fence_remoteIO_err" << std::endl; break;
-		case 1: debug_message += "network_camera_robot_remoteIO_err\n"; break;
-		// case 1: std::cout << "network_camera_robot_remoteIO_err" << std::endl; break;
-		case 2: debug_message += "network_guide_robot_remoteIO_err\n"; break;
-		// case 2: std::cout << "network_guide_robot_remoteIO_err" << std::endl; break;
-		case 3: debug_message += "network_stand_remoteIO_err\n"; break;
-		// case 3: std::cout << "network_stand_remoteIO_err" << std::endl; break;
-		case 4: debug_message += "network_total_AP_err\n"; break;
-		// case 4: std::cout << "network_total_AP_err" << std::endl; break;
-		case 5: debug_message += "network_camera_robot_AP_err\n"; break;
-		// case 5: std::cout << "network_camera_robot_AP_err" << std::endl; break;
-		case 6: debug_message += "network_guide_robot_AP_err\n"; break;
-		// case 6: std::cout << "network_guide_robot_AP_err" << std::endl; break;
-		case 7: debug_message += "network_stand_AP_err\n"; break;
-		// case 7: std::cout << "network_stand_AP_err" << std::endl; break;
-		case 99:debug_message += "network_healthy\n"; break;
-		// case 99:std::cout << "network_healthy" << std::endl; break;
-		default:debug_message += "not network state\n"; break;
-		// default:std::cout << "not network state" << std::endl; break;
-	}
-	debug_message += "cas_lab_state.fence        : ";
-	// std::cout << "cas_lab_state.fence        : ";
-	switch(cas_lab_state.fence)
-	{
-		case 0: debug_message += "fence_close\n"; break;
-		// case 0: std::cout << "fence_close" << std::endl; break;
-		case 1: debug_message += "fence_open\n"; break;
-		// case 1: std::cout << "fence_open" << std::endl; break;
-		default:debug_message += "not fence state\n"; break;
-		// default:std::cout << "not fence state" << std::endl; break;
-	}
-	debug_message += "cas_lab_state.camera_robot : ";
-	// std::cout << "cas_lab_state.camera_robot : ";
-	switch(cas_lab_state.camera_robot)
-	{
-		case 0: debug_message += "camera_robot_EMS_off\n"; break;
-		// case 0: std::cout << "camera_robot_EMS_off" << std::endl; break;
-		case 1: debug_message += "camera_robot_EMS_on\n"; break;
-		// case 1: std::cout << "camera_robot_EMS_on" << std::endl; break;
-		default:debug_message += "not camera_robot state\n"; break;
-		// default:std::cout << "not camera_robot state" << std::endl; break;
-	}
-	debug_message += "cas_lab_state.guide_robot  : ";
-	// std::cout << "cas_lab_state.guide_robot  : ";
-	switch(cas_lab_state.guide_robot)
-	{
-		case 0: debug_message += "guide_robot_EMS_off\n"; break;
-		// case 0: std::cout << "guide_robot_EMS_off" << std::endl; break;
-		case 1: debug_message += "guide_robot_EMS_on\n"; break;
-		// case 1: std::cout << "guide_robot_EMS_on" << std::endl; break;
-		default:debug_message += "not guide_robot state\n"; break;
-		// default:std::cout << "not guide_robot state" << std::endl; break;
-	}
-	debug_message += "cas_lab_state.stand        : ";
-	// std::cout << "cas_lab_state.stand        : ";
-	switch(cas_lab_state.stand)
-	{
-		case 0: debug_message += "stand_EMS_off\n"; break;
-		// case 0: std::cout << "stand_EMS_off" << std::endl; break;
-		case 1: debug_message += "stand_EMS_on\n"; break;
-		// case 1: std::cout << "stand_EMS_on" << std::endl; break;
-		default:debug_message += "not stand state\n"; break;
-		// default:std::cout << "not stand state" << std::endl; break;
-	}
-	debug_message += "cas_lab_state.AGV          : ";
-	// std::cout << "cas_lab_state.AGV          : ";
-	switch(cas_lab_state.AGV)
-	{
-		case 0: debug_message += "AGV_EMS_off\n"; break;
-		// case 0: std::cout << "AGV_EMS_off" << std::endl; break;
-		case 1: debug_message += "AGV_EMS_on\n"; break;
-		// case 1: std::cout << "AGV_EMS_on" << std::endl; break;
-		default:debug_message += "not AGV state\n"; break;
-		// default:std::cout << "not AGV state" << std::endl; break;
-	}
-
-	debug_message += "\ncas_lab_state_old.network      : ";
-	// std::cout << "cas_lab_state_old.network      : ";
-	switch(cas_lab_state_old.network)
-	{
-		case 0: debug_message += "network_fence_remoteIO_err\n"; break;
-		// case 0: std::cout << "network_fence_remoteIO_err" << std::endl; break;
-		case 1: debug_message += "network_camera_robot_remoteIO_err\n"; break;
-		// case 1: std::cout << "network_camera_robot_remoteIO_err" << std::endl; break;
-		case 2: debug_message += "network_guide_robot_remoteIO_err\n"; break;
-		// case 2: std::cout << "network_guide_robot_remoteIO_err" << std::endl; break;
-		case 3: debug_message += "network_stand_remoteIO_err\n"; break;
-		// case 3: std::cout << "network_stand_remoteIO_err" << std::endl; break;
-		case 4: debug_message += "network_total_AP_err\n"; break;
-		// case 4: std::cout << "network_total_AP_err" << std::endl; break;
-		case 5: debug_message += "network_camera_robot_AP_err\n"; break;
-		// case 5: std::cout << "network_camera_robot_AP_err" << std::endl; break;
-		case 6: debug_message += "network_guide_robot_AP_err\n"; break;
-		// case 6: std::cout << "network_guide_robot_AP_err" << std::endl; break;
-		case 7: debug_message += "network_stand_AP_err\n"; break;
-		// case 7: std::cout << "network_stand_AP_err" << std::endl; break;
-		case 99:debug_message += "network_healthy\n"; break;
-		// case 99:std::cout << "network_healthy" << std::endl; break;
-		default:debug_message += "not network state\n"; break;
-		// default:std::cout << "not network state" << std::endl; break;
-	}
-	debug_message += "cas_lab_state_old.fence        : ";
-	// std::cout << "cas_lab_state_old.fence        : ";
-	switch(cas_lab_state_old.fence)
-	{
-		case 0: debug_message += "fence_close\n"; break;
-		// case 0: std::cout << "fence_close" << std::endl; break;
-		case 1: debug_message += "fence_open\n"; break;
-		// case 1: std::cout << "fence_open" << std::endl; break;
-		default:debug_message += "not fence state\n"; break;
-		// default:std::cout << "not fence state" << std::endl; break;
-	}
-	debug_message += "cas_lab_state_old.camera_robot : ";
-	// std::cout << "cas_lab_state_old.camera_robot : ";
-	switch(cas_lab_state_old.camera_robot)
-	{
-		case 0: debug_message += "camera_robot_EMS_off\n"; break;
-		// case 0: std::cout << "camera_robot_EMS_off" << std::endl; break;
-		case 1: debug_message += "camera_robot_EMS_on\n"; break;
-		// case 1: std::cout << "camera_robot_EMS_on" << std::endl; break;
-		default:debug_message += "not camera_robot state\n"; break;
-		// default:std::cout << "not camera_robot state" << std::endl; break;
-	}
-	debug_message += "cas_lab_state_old.guide_robot  : ";
-	// std::cout << "cas_lab_state_old.guide_robot  : ";
-	switch(cas_lab_state_old.guide_robot)
-	{
-		case 0: debug_message += "guide_robot_EMS_off\n"; break;
-		// case 0: std::cout << "guide_robot_EMS_off" << std::endl; break;
-		case 1: debug_message += "guide_robot_EMS_on\n"; break;
-		// case 1: std::cout << "guide_robot_EMS_on" << std::endl; break;
-		default:debug_message += "not guide_robot state\n"; break;
-		// default:std::cout << "not guide_robot state" << std::endl; break;
-	}
-	debug_message += "cas_lab_state_old.stand        : ";
-	// std::cout << "cas_lab_state_old.stand        : ";
-	switch(cas_lab_state_old.stand)
-	{
-		case 0: debug_message += "stand_EMS_off\n"; break;
-		// case 0: std::cout << "stand_EMS_off" << std::endl; break;
-		case 1: debug_message += "stand_EMS_on\n"; break;
-		// case 1: std::cout << "stand_EMS_on" << std::endl; break;
-		default:debug_message += "not stand state\n"; break;
-		// default:std::cout << "not stand state" << std::endl; break;
-	}
-	debug_message += "cas_lab_state_old.AGV          : ";
-	// std::cout << "cas_lab_state_old.AGV          : ";
-	switch(cas_lab_state_old.AGV)
-	{
-		case 0: debug_message += "AGV_EMS_off\n"; break;
-		// case 0: std::cout << "AGV_EMS_off" << std::endl; break;
-		case 1: debug_message += "AGV_EMS_on\n"; break;
-		// case 1: std::cout << "AGV_EMS_on" << std::endl; break;
-		default:debug_message += "not AGV state\n"; break;
-		// default:std::cout << "not AGV state" << std::endl; break;
-	}
-	debug_message += "\ndisplay_mode : ";
-	// std::cout << "display_mode : ";
-	switch(display_mode)
-	{
-		case 1: debug_message += "module_camera_robot_err\n"; break;
-		// case 1: std::cout << "module_camera_robot_err" << std::endl; break;
-		case 2: debug_message += "module_guide_robot_err\n"; break;
-		// case 2: std::cout << "module_guide_robot_err" << std::endl; break;
-		case 3: debug_message += "module_stand_err\n"; break;
-		// case 3: std::cout << "module_stand_err" << std::endl; break;
-		case 4: debug_message += "module_AGV_err\n"; break;
-		// case 4: std::cout << "module_AGV_err" << std::endl; break;
-		case 5: debug_message += "module_ALL_healthy\n"; break;
-		// case 5: std::cout << "module_ALL_healthy" << std::endl; break;
-		case 6: debug_message += "module_network_err\n"; break;
-		// case 6: std::cout << "module_network_err" << std::endl; break;
-		case 7: debug_message += "module_fence_err\n"; break;
-		// case 7: std::cout << "module_fence_err" << std::endl; break;
-		default:debug_message += "not display_mode state\n"; break;
-		// default:std::cout << "not display_mode state" << std::endl; break;
-	}
-	debug_message = debug_message + "-------------------------------------------------\n\n";
-	// std::cout << "-------------------------------------------------" << std::endl << std::endl;
-}
-void cas_lab_safetysystem_classType::std_cout_close(void)
-{
-	gettimeofday(&tv, NULL);
-	TC_close_time_us = ((tv.tv_sec*1000000)+tv.tv_usec);
-	if( (TC_close_time_us-TC_close_time_us_old) > (1000*1000) )
-	{
-		std::cout << TC_CLOSE << (TC_close_time_us-TC_close_time_us_old) << "\n" << debug_message.c_str() << std::endl;
-		// std::cout << TC_CLOSE << debug_message.c_str();
-		TC_close_time_us_old = TC_close_time_us;
-	}
-	// else
-	// 	std::cout << TC_CLOSE << debug_message.c_str();
 }
 
 /* Program End */
