@@ -14,6 +14,7 @@
 #include <chrono>
 #include <memory>
 #include <iostream>
+#include <stdio.h>
 /* System Includes End */
 /* User Includes --------------------------------------------*/
 /* User Includes Begin */
@@ -39,16 +40,22 @@ class cas_lab_safetysystem_classType
 {
 /* private number */
 private:
+	char buffer[1024];
+	FILE* pipe;
 	/* for loop count */
 	int flc1,flc2,flc3;
 	/* StackLight Display Mode */
 	int display_mode, display_mode_old,red_flash_count;
 	bool display_HL_change,display_LED_change;
-	struct timeval tv;
+	bool camera_robot_AP_err,guide_robot_AP_err;
 	/* current program time(us), previous program time(us) */
-	long display_time_us, display_time_us_old;
-	long TC_close_time_us, TC_close_time_us_old;
-	long delay_time_us, delay_time_us_old;
+	int64_t STO_time_diff;
+	int64_t display_time_diff;
+	std::chrono::system_clock::time_point STO_time_ms;
+	std::chrono::system_clock::time_point STO_time_ms_old;
+	std::chrono::system_clock::time_point display_time_ms;
+	std::chrono::system_clock::time_point display_time_ms_old;
+	/* current program time(us), previous program time(us) */
 	/* libmodbus Return Code */
 	int rc;
 	/* online remoteIO quantity */
@@ -74,6 +81,7 @@ private:
 	void get_remoteIO_DI(int number); /* get DI data of remoteIO[number] */
 	void get_remoteIO_DO(int number); /* get DO data of remoteIO[number] */
 
+	int ping_AP(std::string ip);/* ping AP ip */
 	int verify_totalAP(void);	/* verify total AP */
 	int verify_moduleAP(void);	/* verify module AP */
 	int verify_remoteIO(void);	/* verify remoteIO */
@@ -100,7 +108,6 @@ private:
 	uint8_t STOoff_AGV(void);			/* deactivate the STO mechanism of the AGV */
 
 	void set_StackLight_DisplayMode(void);	/* set StackLight Display Mode */
-	void action_StackLight(void);		/* StackLight actions based on the status of DisplayMode */
 
 /* public number */
 public:
@@ -113,8 +120,9 @@ public:
 	/* main function */
 	lab_state run(void);
 	/* delay function */
-	void delay_1ms(int time);
-
+	void delay_1ms(int time, bool printSW);
+	/* StackLight actions based on the status of DisplayMode */
+	void action_StackLight(void);
 };
 
 /* Extern Class End */

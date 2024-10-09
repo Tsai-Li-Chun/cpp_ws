@@ -24,6 +24,8 @@
 
 #define remoteIO_quantity 3
 #define total_AP_IP "192.168.1.5"
+#define camera_robot_AP_IP "192.168.1.6"
+#define guide_robot_AP_IP "192.168.1.7"
 #define remoteIO_IP_fence "192.168.1.11"
 #define remoteIO_IP_camera_root "192.168.1.12"
 #define remoteIO_IP_guide_root "192.168.1.13"
@@ -80,7 +82,8 @@
 #define DO_STO_disable (uint8_t)1
 
 /* parameters for controlling the StackLight  */
-#define flash_interval (long)200000	/* us(200ms) */
+#define STO_interval (long)500	/* 500ms */
+#define flash_interval (long)200	/* 100ms */
 #define fence_GLED_adr (DO_Address)DO_Address::DO_3
 #define fence_YLED_adr (DO_Address)DO_Address::DO_2
 #define fence_RLED_adr (DO_Address)DO_Address::DO_1

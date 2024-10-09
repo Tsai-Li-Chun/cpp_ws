@@ -69,10 +69,14 @@ int main(int argc, char **argv)
 
 	/* 建立modbus通訊物件 */
 	cas_lab_safetysystem_classType cas_lab_safetysystem;
-	cas_lab_safetysystem.delay_1ms(1000);
+	cas_lab_safetysystem.delay_1ms(1000,true);
 	cas_lab_safetysystem.init();
-	cas_lab_safetysystem.delay_1ms(1000);
+	cas_lab_safetysystem.delay_1ms(1000,true);
 	cas_lab_state = cas_lab_safetysystem.run();
+	// std::thread clss_STO_control(&cas_lab_safetysystem_classType::run, &cas_lab_safetysystem);
+	// std::thread clss_StackLight_control(action_StackLight);
+	// clss_STO_control.join();
+	// clss_StackLight_control.join();
 
 	/* main quit */
 	return 0;
