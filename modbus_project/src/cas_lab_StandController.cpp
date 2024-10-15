@@ -579,28 +579,29 @@ void cas_lab_StandController::init(void)
 	* @param int time, delay time, unit 1ms
  	* @return none
 **	**/
-void cas_lab_StandController::delay_1ms(int time)
+void cas_lab_StandController::delay_1ms(int delay_time, bool printSW)
 {
-	delay_count = 0;
-	gettimeofday(&tv, NULL);
-	delay_time_us_old = ((tv.tv_sec*1000000)+tv.tv_usec);
-	delay_count_old = delay_time_us_old;
-	while(1)
+	delay_time_base = std::chrono::system_clock::now();
+	delay_count = 1;
+	while(true)
 	{
-		gettimeofday(&tv, NULL);
-		if( delay_count>6000000 )
+		delay_time_now = std::chrono::system_clock::now();
+		delay_time_diff = std::chrono::duration_cast<std::chrono::milliseconds>(delay_time_now - delay_time_base).count();
+		if (delay_time_diff > delay_count)
 		{
 			// rc = set_adam5000_cmd(stand_adr_out::security, armM5_info_security);
 			rc = set_deltaDRV_cmd(robot_adr::de_timeout_cmd, static_cast<uint16_t>(robot_action_valid));
 			if( rc != 1 )
 				std::cout << "set_deltaDRV_cmd de_timeout_cmd error!" << std::endl;
-			delay_count = 0;
+			delay_count++;
 		}
-
-		delay_time_us = ((tv.tv_sec*1000000)+tv.tv_usec);
-		if( (delay_time_us-delay_time_us_old) > (time*1000) )
+		if (delay_time_diff > delay_time)
+		{
+			if(printSW)
+				std::cout << "delay time: " << delay_time_diff << "ms" << std::endl;
+				// debug_message = debug_message + "delay time: " + std::to_string(duration) + "ms" + "\n";
 			break;
-		delay_count++;
+		}
 	}
 }
 

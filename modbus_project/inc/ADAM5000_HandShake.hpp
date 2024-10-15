@@ -18,7 +18,7 @@
 /* User Includes --------------------------------------------*/
 /* User Includes Begin */
 #include "ADAM5000_DefineTable.hpp"
-#include "modbus/modbus.h"
+#include "modbus.h"
 /* User Includes End */
 
 

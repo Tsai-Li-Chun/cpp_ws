@@ -8,7 +8,6 @@
 /* System Includes ------------------------------------------*/
 /* System Includes Begin */
 #include <iostream>
-#include <unistd.h>
 /* System Includes End */
 /* User Includes --------------------------------------------*/
 /* User Includes Begin */

@@ -11,7 +11,7 @@
 
 /* System Includes ------------------------------------------*/
 /* System Includes Begin */
-#include <sys/time.h>
+#include <chrono>
 /* System Includes End */
 /* User Includes --------------------------------------------*/
 /* User Includes Begin */
@@ -43,8 +43,8 @@ private:
 	/* define return code */
 	int rc;
 	/* define variable used for delay time */
-	struct timeval tv;
-	long delay_time_us_old,delay_time_us,delay_count,delay_count_old;
+	std::chrono::system_clock::time_point delay_time_now,delay_time_base;
+	int64_t delay_time_diff,delay_count;
 	/* create deltaDRV-BOX control object */
 	deltaDRV_modbus_HandShake deltaDRV_ctl;
 	/* create remotIO(ADAM5000) control object  */
@@ -108,7 +108,7 @@ public:
 	int arm_M5_toolATC(bool onoff);
 	int arm_M5_fixture(bool onoff);
 	void run(void);	  /* main function */
-	void delay_1ms(int time); /* delay function */
+	void delay_1ms(int delay_time, bool printSW=false); /* delay function */
 
 		int set_deltaDRV_cmd(robot_adr adr, uint16_t data);
 
